@@ -30,13 +30,17 @@ const ParticipatedContests = () => {
 
         {/* Participated contests with color scheme */}
         {participated.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-xl text-muted">
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🎯</div>
+            <p className="text-xl text-muted mb-2">
               You haven't participated in any contests yet.
+            </p>
+            <p className="text-sm text-muted mb-6">
+              Browse available contests and start participating to win prizes!
             </p>
             <Link
               to="/all-contests"
-              className="bg-primary-custom hover:bg-primary-custom/90 text-white border-0 mt-4 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
+              className="bg-primary-custom hover:bg-primary-custom/90 text-white border-0 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
             >
               Browse Contests
             </Link>

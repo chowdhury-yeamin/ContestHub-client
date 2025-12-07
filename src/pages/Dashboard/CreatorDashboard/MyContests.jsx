@@ -44,13 +44,17 @@ const MyContests = () => {
         <h2 className="card-title mb-6">My Created Contests</h2>
 
         {contests.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-xl text-muted">
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">📝</div>
+            <p className="text-xl text-muted mb-2">
               You haven't created any contests yet.
+            </p>
+            <p className="text-sm text-muted mb-6">
+              Start by creating your first contest and let participants join!
             </p>
             <Link
               to="/dashboard/add-contest"
-              className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 mt-4 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
+              className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
             >
               Create Your First Contest
             </Link>
