@@ -27,6 +27,12 @@ import EditContest from "../pages/Dashboard/CreatorDashboard/EditContest";
 // Admin Dashboard
 import ManageUsers from "../pages/Dashboard/AdminDashboard/ManageUsers";
 import ManageContests from "../pages/Dashboard/AdminDashboard/ManageContests";
+import HelpCenter from "../pages/helpCenter/HelpCenter";
+import Terms from "../pages/Terms/Terms";
+import PrivacyPolicy from "../pages/PrivacyPolicy/PrivacyPolicy";
+import ContestRules from "../pages/ContestRules/ContestRules";
+import CreatorGuide from "../pages/CreatorGuide/CreatorGuide.JSX";
+
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +68,26 @@ export const router = createBrowserRouter([
         element: <Contact />,
       },
       {
+        path: "/help-center",
+        element: <HelpCenter />,
+      },
+      {
+        path: "/terms",
+        element: <Terms />,
+      },
+      {
+        path: "/privacy",
+        element: <PrivacyPolicy />,
+      },
+      {
+        path: "/rules",
+        element: <ContestRules></ContestRules>,
+      },
+      {
+        path: "/creator-guide",
+        element: <CreatorGuide></CreatorGuide>,
+      },
+      {
         path: "/login",
         element: <Login />,
       },
@@ -92,7 +118,7 @@ export const router = createBrowserRouter([
           {
             path: "add-contest",
             element: (
-              <RoleRoute allowedRoles={['creator', 'admin']}>
+              <RoleRoute allowedRoles={["creator", "admin"]}>
                 <AddContest />
               </RoleRoute>
             ),
@@ -100,7 +126,7 @@ export const router = createBrowserRouter([
           {
             path: "my-contests",
             element: (
-              <RoleRoute allowedRoles={['creator', 'admin']}>
+              <RoleRoute allowedRoles={["creator", "admin"]}>
                 <MyContests />
               </RoleRoute>
             ),
@@ -108,7 +134,7 @@ export const router = createBrowserRouter([
           {
             path: "submissions/:id",
             element: (
-              <RoleRoute allowedRoles={['creator', 'admin']}>
+              <RoleRoute allowedRoles={["creator", "admin"]}>
                 <Submissions />
               </RoleRoute>
             ),
@@ -116,7 +142,7 @@ export const router = createBrowserRouter([
           {
             path: "edit-contest/:id",
             element: (
-              <RoleRoute allowedRoles={['creator', 'admin']}>
+              <RoleRoute allowedRoles={["creator", "admin"]}>
                 <EditContest />
               </RoleRoute>
             ),
@@ -124,7 +150,7 @@ export const router = createBrowserRouter([
           {
             path: "manage-users",
             element: (
-              <RoleRoute allowedRoles={['admin']}>
+              <RoleRoute allowedRoles={["admin"]}>
                 <ManageUsers />
               </RoleRoute>
             ),
@@ -132,7 +158,7 @@ export const router = createBrowserRouter([
           {
             path: "manage-contests",
             element: (
-              <RoleRoute allowedRoles={['admin']}>
+              <RoleRoute allowedRoles={["admin"]}>
                 <ManageContests />
               </RoleRoute>
             ),

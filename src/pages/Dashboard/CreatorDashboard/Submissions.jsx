@@ -138,22 +138,22 @@ const Submissions = () => {
                     new Date(contest.deadline) < new Date() &&
                     selectedWinner !== submission._id && (
                       <div className="card-actions justify-end mt-4">
-                      <button
-                        onClick={() =>
-                          handleDeclareWinner(
-                            submission._id,
-                            submission.participant.name
-                          )
-                        }
-                        className="btn bg-accent-custom hover:bg-accent-custom/90 text-white border-0"
-                        disabled={
-                          declareWinnerMutation.isPending ||
-                          selectedWinner !== null
-                        }
-                      >
-                        <FaTrophy className="mr-2" />
-                        Declare Winner
-                      </button>
+                        <button
+                          onClick={() =>
+                            handleDeclareWinner(
+                              submission._id,
+                              submission.participant.name
+                            )
+                          }
+                          className="btn bg-accent-custom hover:bg-accent-custom/90 text-white border-0"
+                          disabled={
+                            declareWinnerMutation.isPending ||
+                            selectedWinner !== null
+                          }
+                        >
+                          <FaTrophy className="mr-2" />
+                          Declare Winner
+                        </button>
                       </div>
                     )}
                 </div>

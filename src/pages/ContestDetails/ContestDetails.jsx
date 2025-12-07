@@ -316,13 +316,13 @@ const ContestDetails = () => {
                   setShowSubmitModal(false);
                   setSubmissionLink("");
                 }}
-                className="btn btn-ghost"
+                className="btn btn-ghost hover:bg-primary-custom/10 hover:text-primary-custom"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
-                className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-4 py-2 rounded-lg font-semibold transition-colors"
+                className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-6 py-3 rounded-lg font-semibold transition-colors"
               >
                 {submitMutation.isPending ? (
                   <span className="loading loading-spinner"></span>

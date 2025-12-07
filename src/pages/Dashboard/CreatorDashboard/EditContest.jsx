@@ -1,10 +1,10 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { useContest, useUpdateContest } from '../../../hooks/useContests';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import Swal from 'sweetalert2';
-import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useContest, useUpdateContest } from "../../../hooks/useContests";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Swal from "sweetalert2";
+import { useState, useEffect } from "react";
 
 const EditContest = () => {
   const { id } = useParams();
@@ -36,21 +36,21 @@ const EditContest = () => {
   }, [contest, reset]);
 
   const contestTypes = [
-    'Image Design',
-    'Article Writing',
-    'Business Ideas',
-    'Gaming Reviews',
-    'Video Content',
-    'Photography',
-    'Other'
+    "Image Design",
+    "Article Writing",
+    "Business Ideas",
+    "Gaming Reviews",
+    "Video Content",
+    "Photography",
+    "Other",
   ];
 
   const onSubmit = async (data) => {
     if (!deadline) {
       Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'Please select a deadline',
+        icon: "error",
+        title: "Validation Error",
+        text: "Please select a deadline",
       });
       return;
     }
@@ -64,19 +64,19 @@ const EditContest = () => {
       };
 
       await updateMutation.mutateAsync({ id, data: contestData });
-      
+
       Swal.fire({
-        icon: 'success',
-        title: 'Contest Updated!',
-        text: 'Your contest has been updated successfully',
+        icon: "success",
+        title: "Contest Updated!",
+        text: "Your contest has been updated successfully",
       });
-      
-      navigate('/dashboard/my-contests');
+
+      navigate("/dashboard/my-contests");
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Update Failed',
-        text: 'Failed to update contest. Please try again.',
+        icon: "error",
+        title: "Update Failed",
+        text: "Failed to update contest. Please try again.",
       });
     }
   };
@@ -107,7 +107,7 @@ const EditContest = () => {
               <span className="label-text">Contest Name *</span>
             </label>
             <input
-              {...register('name', { required: 'Contest name is required' })}
+              {...register("name", { required: "Contest name is required" })}
               type="text"
               className="input input-bordered w-full"
             />
@@ -121,7 +121,7 @@ const EditContest = () => {
               <span className="label-text">Contest Image URL *</span>
             </label>
             <input
-              {...register('image', { required: 'Image URL is required' })}
+              {...register("image", { required: "Image URL is required" })}
               type="url"
               className="input input-bordered w-full"
             />
@@ -135,12 +135,16 @@ const EditContest = () => {
               <span className="label-text">Description *</span>
             </label>
             <textarea
-              {...register('description', { required: 'Description is required' })}
+              {...register("description", {
+                required: "Description is required",
+              })}
               className="textarea textarea-bordered w-full"
               rows={4}
             />
             {errors.description && (
-              <p className="text-error text-sm mt-1">{errors.description.message}</p>
+              <p className="text-error text-sm mt-1">
+                {errors.description.message}
+              </p>
             )}
           </div>
 
@@ -149,12 +153,16 @@ const EditContest = () => {
               <span className="label-text">Task Instructions *</span>
             </label>
             <textarea
-              {...register('taskInstruction', { required: 'Task instructions are required' })}
+              {...register("taskInstruction", {
+                required: "Task instructions are required",
+              })}
               className="textarea textarea-bordered w-full"
               rows={4}
             />
             {errors.taskInstruction && (
-              <p className="text-error text-sm mt-1">{errors.taskInstruction.message}</p>
+              <p className="text-error text-sm mt-1">
+                {errors.taskInstruction.message}
+              </p>
             )}
           </div>
 
@@ -164,16 +172,18 @@ const EditContest = () => {
                 <span className="label-text">Entry Fee ($) *</span>
               </label>
               <input
-                {...register('price', {
-                  required: 'Entry fee is required',
-                  min: { value: 0, message: 'Entry fee must be positive' },
+                {...register("price", {
+                  required: "Entry fee is required",
+                  min: { value: 0, message: "Entry fee must be positive" },
                 })}
                 type="number"
                 step="0.01"
                 className="input input-bordered w-full"
               />
               {errors.price && (
-                <p className="text-error text-sm mt-1">{errors.price.message}</p>
+                <p className="text-error text-sm mt-1">
+                  {errors.price.message}
+                </p>
               )}
             </div>
 
@@ -182,16 +192,18 @@ const EditContest = () => {
                 <span className="label-text">Prize Money ($) *</span>
               </label>
               <input
-                {...register('prizeMoney', {
-                  required: 'Prize money is required',
-                  min: { value: 0, message: 'Prize money must be positive' },
+                {...register("prizeMoney", {
+                  required: "Prize money is required",
+                  min: { value: 0, message: "Prize money must be positive" },
                 })}
                 type="number"
                 step="0.01"
                 className="input input-bordered w-full"
               />
               {errors.prizeMoney && (
-                <p className="text-error text-sm mt-1">{errors.prizeMoney.message}</p>
+                <p className="text-error text-sm mt-1">
+                  {errors.prizeMoney.message}
+                </p>
               )}
             </div>
           </div>
@@ -202,7 +214,9 @@ const EditContest = () => {
                 <span className="label-text">Contest Type *</span>
               </label>
               <select
-                {...register('contestType', { required: 'Contest type is required' })}
+                {...register("contestType", {
+                  required: "Contest type is required",
+                })}
                 className="select select-bordered w-full"
               >
                 {contestTypes.map((type) => (
@@ -212,7 +226,9 @@ const EditContest = () => {
                 ))}
               </select>
               {errors.contestType && (
-                <p className="text-error text-sm mt-1">{errors.contestType.message}</p>
+                <p className="text-error text-sm mt-1">
+                  {errors.contestType.message}
+                </p>
               )}
             </div>
 
@@ -224,7 +240,7 @@ const EditContest = () => {
                 selected={deadline}
                 onChange={(date) => {
                   setDeadline(date);
-                  setValue('deadline', date?.toISOString());
+                  setValue("deadline", date?.toISOString());
                 }}
                 minDate={new Date()}
                 showTimeSelect
@@ -237,7 +253,7 @@ const EditContest = () => {
           <div className="card-actions justify-end mt-6">
             <button
               type="button"
-              onClick={() => navigate('/dashboard/my-contests')}
+              onClick={() => navigate("/dashboard/my-contests")}
               className="btn btn-ghost hover:bg-primary-custom/10 hover:text-primary-custom"
             >
               Cancel
@@ -250,7 +266,7 @@ const EditContest = () => {
               {updateMutation.isPending ? (
                 <span className="loading loading-spinner"></span>
               ) : (
-                'Update Contest'
+                "Update Contest"
               )}
             </button>
           </div>
@@ -261,4 +277,3 @@ const EditContest = () => {
 };
 
 export default EditContest;
-
