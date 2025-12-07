@@ -145,7 +145,7 @@ const ManageContests = () => {
                       )}
                       <button
                         onClick={() => handleDelete(contest._id, contest.name)}
-                        className="btn btn-sm btn-error"
+                        className="btn btn-sm bg-red-600 hover:bg-red-700 text-white border-0"
                         disabled={deleteMutation.isPending}
                         title="Delete"
                       >
