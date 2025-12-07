@@ -115,7 +115,7 @@ const ParticipatedContests = () => {
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="join-item btn"
+                    className="join-item btn border-primary-custom text-primary-custom hover:bg-primary-custom hover:text-white disabled:opacity-50"
                   >
                     «
                   </button>
@@ -125,7 +125,9 @@ const ParticipatedContests = () => {
                         key={page}
                         onClick={() => setCurrentPage(page)}
                         className={`join-item btn ${
-                          currentPage === page ? "btn-active" : ""
+                          currentPage === page
+                            ? "bg-primary-custom text-white border-primary-custom"
+                            : "border-primary-custom text-primary-custom hover:bg-primary-custom hover:text-white"
                         }`}
                       >
                         {page}
@@ -137,7 +139,7 @@ const ParticipatedContests = () => {
                       setCurrentPage((p) => Math.min(totalPages, p + 1))
                     }
                     disabled={currentPage === totalPages}
-                    className="join-item btn"
+                    className="join-item btn border-primary-custom text-primary-custom hover:bg-primary-custom hover:text-white disabled:opacity-50"
                   >
                     »
                   </button>
