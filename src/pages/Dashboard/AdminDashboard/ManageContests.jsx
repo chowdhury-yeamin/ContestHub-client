@@ -127,7 +127,7 @@ const ManageContests = () => {
                         <>
                           <button
                             onClick={() => handleApprove(contest._id, contest.name)}
-                            className="btn btn-sm btn-success"
+                            className="btn btn-sm bg-green-600 hover:bg-green-700 text-white border-0"
                             disabled={approveMutation.isPending}
                             title="Approve"
                           >
@@ -135,7 +135,7 @@ const ManageContests = () => {
                           </button>
                           <button
                             onClick={() => handleReject(contest._id, contest.name)}
-                            className="btn btn-sm btn-error"
+                            className="btn btn-sm bg-red-600 hover:bg-red-700 text-white border-0"
                             disabled={rejectMutation.isPending}
                             title="Reject"
                           >
