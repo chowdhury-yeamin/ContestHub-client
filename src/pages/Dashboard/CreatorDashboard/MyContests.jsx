@@ -101,7 +101,7 @@ const MyContests = () => {
                       <div className="flex gap-2">
                         <Link
                           to={`/contest/${contest._id}`}
-                          className="btn btn-sm btn-ghost"
+                          className="btn btn-sm btn-ghost hover:bg-primary-custom/10 hover:text-primary-custom"
                           title="View Details"
                         >
                           <FaEye />
@@ -119,7 +119,7 @@ const MyContests = () => {
                               onClick={() =>
                                 handleDelete(contest._id, contest.name)
                               }
-                              className="btn btn-sm btn-error"
+                              className="btn btn-sm bg-red-600 hover:bg-red-700 text-white border-0"
                               title="Delete"
                               disabled={deleteMutation.isPending}
                             >
@@ -129,7 +129,7 @@ const MyContests = () => {
                         )}
                         <Link
                           to={`/dashboard/submissions/${contest._id}`}
-                          className="btn btn-sm btn-secondary"
+                          className="btn btn-sm bg-accent-custom hover:bg-accent-custom/90 text-white border-0"
                         >
                           See Submissions
                         </Link>

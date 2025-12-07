@@ -124,7 +124,7 @@ const Submissions = () => {
                       href={submission.submission}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="link text-primary-custom hover:text-accent-custom break-all"
+                      className="link text-primary-custom hover:text-accent-custom break-all underline"
                     >
                       {submission.submission}
                     </a>
@@ -134,22 +134,22 @@ const Submissions = () => {
                     new Date(contest.deadline) < new Date() &&
                     selectedWinner !== submission._id && (
                       <div className="card-actions justify-end mt-4">
-                        <button
-                          onClick={() =>
-                            handleDeclareWinner(
-                              submission._id,
-                              submission.participant.name
-                            )
-                          }
-                          className="btn btn-success"
-                          disabled={
-                            declareWinnerMutation.isPending ||
-                            selectedWinner !== null
-                          }
-                        >
-                          <FaTrophy className="mr-2" />
-                          Declare Winner
-                        </button>
+                      <button
+                        onClick={() =>
+                          handleDeclareWinner(
+                            submission._id,
+                            submission.participant.name
+                          )
+                        }
+                        className="btn bg-accent-custom hover:bg-accent-custom/90 text-white border-0"
+                        disabled={
+                          declareWinnerMutation.isPending ||
+                          selectedWinner !== null
+                        }
+                      >
+                        <FaTrophy className="mr-2" />
+                        Declare Winner
+                      </button>
                       </div>
                     )}
                 </div>
