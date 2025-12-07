@@ -84,6 +84,12 @@ const ManageContests = () => {
       <div className="card-body">
         <h2 className="card-title mb-6">Manage Contests</h2>
         
+        {contests.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">📋</div>
+            <p className="text-xl text-muted">No contests to manage yet.</p>
+          </div>
+        ) : (
         <div className="overflow-x-auto">
           <table className="table table-zebra">
             <thead>
@@ -158,6 +164,7 @@ const ManageContests = () => {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   );
