@@ -37,7 +37,7 @@ const AllContests = () => {
         All Contests
       </h1>
 
-      {/* Tabs */}
+      {/* Tabs with color scheme */}
       <div className="tabs tabs-boxed mb-8 flex-wrap bg-base-200">
         {contestTypes.map((type) => (
           <button
