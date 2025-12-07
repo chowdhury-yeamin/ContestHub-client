@@ -1,10 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useContest, useRegisterContest, useSubmitTask } from '../../hooks/useContests';
-import { useAuth } from '../../contexts/AuthContext';
-import Swal from 'sweetalert2';
-import { FaUsers, FaTrophy, FaCalendarAlt, FaCheckCircle } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  useContest,
+  useRegisterContest,
+  useSubmitTask,
+} from "../../hooks/useContests";
+import { useAuth } from "../../contexts/AuthContext";
+import Swal from "sweetalert2";
+import {
+  FaUsers,
+  FaTrophy,
+  FaCalendarAlt,
+  FaCheckCircle,
+} from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const ContestDetails = () => {
   const { id } = useParams();
@@ -14,17 +23,17 @@ const ContestDetails = () => {
   const registerMutation = useRegisterContest();
   const submitMutation = useSubmitTask();
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [submissionLink, setSubmissionLink] = useState('');
+  const [submissionLink, setSubmissionLink] = useState("");
 
   // Check if contest has ended
   const isEnded = contest && new Date(contest.deadline) < new Date();
-  
+
   // Check if user is registered (mock - replace with API call)
   const [isRegistered, setIsRegistered] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   // Countdown timer
-  const [timeLeft, setTimeLeft] = useState('');
+  const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     if (contest && !isEnded) {
@@ -34,12 +43,16 @@ const ContestDetails = () => {
         const distance = deadline - now;
 
         if (distance < 0) {
-          setTimeLeft('Contest Ended');
+          setTimeLeft("Contest Ended");
           clearInterval(interval);
         } else {
           const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const hours = Math.floor(
+            (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor(
+            (distance % (1000 * 60 * 60)) / (1000 * 60)
+          );
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
         }
@@ -52,12 +65,12 @@ const ContestDetails = () => {
   // TODO: Replace with actual payment integration - POST /payment/create-intent, then POST /contests/:id/register
   const handleRegister = async () => {
     Swal.fire({
-      title: 'Processing Payment',
-      text: 'Redirecting to payment gateway...',
+      title: "Processing Payment",
+      text: "Redirecting to payment gateway...",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
-      }
+      },
     });
 
     // Simulate payment processing
@@ -65,20 +78,20 @@ const ContestDetails = () => {
       try {
         await registerMutation.mutateAsync({
           contestId: id,
-          paymentData: { amount: contest.price, method: 'card' }
+          paymentData: { amount: contest.price, method: "card" },
         });
-        
+
         setIsRegistered(true);
         Swal.fire({
-          icon: 'success',
-          title: 'Registration Successful!',
-          text: 'You have successfully registered for this contest',
+          icon: "success",
+          title: "Registration Successful!",
+          text: "You have successfully registered for this contest",
         });
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Registration Failed',
-          text: 'Payment processing failed. Please try again.',
+          icon: "error",
+          title: "Registration Failed",
+          text: "Payment processing failed. Please try again.",
         });
       }
     }, 2000);
@@ -87,9 +100,9 @@ const ContestDetails = () => {
   const handleSubmit = async () => {
     if (!submissionLink.trim()) {
       Swal.fire({
-        icon: 'error',
-        title: 'Invalid Submission',
-        text: 'Please provide a valid submission link',
+        icon: "error",
+        title: "Invalid Submission",
+        text: "Please provide a valid submission link",
       });
       return;
     }
@@ -97,23 +110,23 @@ const ContestDetails = () => {
     try {
       await submitMutation.mutateAsync({
         contestId: id,
-        submissionData: { submission: submissionLink }
+        submissionData: { submission: submissionLink },
       });
-      
+
       setHasSubmitted(true);
       setShowSubmitModal(false);
-      setSubmissionLink('');
-      
+      setSubmissionLink("");
+
       Swal.fire({
-        icon: 'success',
-        title: 'Submission Successful!',
-        text: 'Your task has been submitted successfully',
+        icon: "success",
+        title: "Submission Successful!",
+        text: "Your task has been submitted successfully",
       });
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission Failed',
-        text: 'Failed to submit your task. Please try again.',
+        icon: "error",
+        title: "Submission Failed",
+        text: "Failed to submit your task. Please try again.",
       });
     }
   };
@@ -150,8 +163,10 @@ const ContestDetails = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4">{contest.name}</h1>
-          <div className="flex flex-wrap gap-2 sm:gap-4 text-sm sm:text-base md:text-lg">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+              {contest.name}
+            </h1>
+            <div className="flex flex-wrap gap-2 sm:gap-4 text-sm sm:text-base md:text-lg">
               <span className="flex items-center gap-2">
                 <FaUsers /> {contest.participantsCount} Participants
               </span>
@@ -159,7 +174,8 @@ const ContestDetails = () => {
                 <FaTrophy /> ${contest.prizeMoney} Prize
               </span>
               <span className="flex items-center gap-2">
-                <FaCalendarAlt /> {new Date(contest.deadline).toLocaleDateString()}
+                <FaCalendarAlt />{" "}
+                {new Date(contest.deadline).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -200,8 +216,12 @@ const ContestDetails = () => {
                       className="w-16 h-16 rounded-full border-4 border-white"
                     />
                     <div>
-                      <h3 className="text-xl font-bold">{contest.winner.name}</h3>
-                      <p className="text-white/90">Congratulations on winning ${contest.prizeMoney}!</p>
+                      <h3 className="text-xl font-bold">
+                        {contest.winner.name}
+                      </h3>
+                      <p className="text-white/90">
+                        Congratulations on winning ${contest.prizeMoney}!
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -218,7 +238,9 @@ const ContestDetails = () => {
                 {isEnded ? (
                   <p className="text-error text-xl font-bold">Contest Ended</p>
                 ) : (
-                  <p className="text-2xl font-bold text-accent-custom">{timeLeft}</p>
+                  <p className="text-2xl font-bold text-accent-custom">
+                    {timeLeft}
+                  </p>
                 )}
               </div>
             </div>
@@ -227,8 +249,10 @@ const ContestDetails = () => {
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body">
                 <h3 className="card-title">Entry Fee</h3>
-                <p className="text-3xl font-bold text-accent-custom">${contest.price}</p>
-                
+                <p className="text-3xl font-bold text-accent-custom">
+                  ${contest.price}
+                </p>
+
                 {/* Accent color for CTA buttons */}
                 {!isRegistered ? (
                   <button
@@ -239,7 +263,7 @@ const ContestDetails = () => {
                     {registerMutation.isPending ? (
                       <span className="loading loading-spinner"></span>
                     ) : (
-                      'Register & Pay'
+                      "Register & Pay"
                     )}
                   </button>
                 ) : (
@@ -276,7 +300,8 @@ const ContestDetails = () => {
           <div className="modal-box">
             <h3 className="font-bold text-lg mb-4">Submit Your Task</h3>
             <p className="mb-4 text-muted">
-              Please provide the link to your submission (e.g., Google Drive, Dropbox, portfolio link, etc.)
+              Please provide the link to your submission (e.g., Google Drive,
+              Dropbox, portfolio link, etc.)
             </p>
             <textarea
               value={submissionLink}
@@ -288,17 +313,20 @@ const ContestDetails = () => {
               <button
                 onClick={() => {
                   setShowSubmitModal(false);
-                  setSubmissionLink('');
+                  setSubmissionLink("");
                 }}
                 className="btn btn-ghost"
               >
                 Cancel
               </button>
-              <button onClick={handleSubmit} className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-4 py-2 rounded-lg font-semibold transition-colors">
+              <button
+                onClick={handleSubmit}
+                className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-4 py-2 rounded-lg font-semibold transition-colors"
+              >
                 {submitMutation.isPending ? (
                   <span className="loading loading-spinner"></span>
                 ) : (
-                  'Submit'
+                  "Submit"
                 )}
               </button>
             </div>
@@ -310,4 +338,3 @@ const ContestDetails = () => {
 };
 
 export default ContestDetails;
-

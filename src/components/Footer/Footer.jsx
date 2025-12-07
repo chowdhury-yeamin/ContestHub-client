@@ -10,7 +10,9 @@ const Footer = () => {
         {/* Logo + Website Name */}
         <Link to="/" className="flex items-center space-x-2">
           <img src={logo} alt="Logo" className="h-8 w-8" />
-          <span className="font-bold text-xl text-base-content">ContestHub</span>
+          <span className="font-bold text-xl text-base-content">
+            ContestHub
+          </span>
         </Link>
 
         {/* Copyright */}

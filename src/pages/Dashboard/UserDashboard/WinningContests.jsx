@@ -16,6 +16,7 @@ const WinningContests = () => {
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
+        {/* Winning contests with accent color */}
         <h2 className="card-title mb-6 flex items-center gap-2">
           <FaTrophy className="text-yellow-500" />
           My Winning Contests
