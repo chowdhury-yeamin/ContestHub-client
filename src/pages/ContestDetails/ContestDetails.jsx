@@ -229,6 +229,7 @@ const ContestDetails = () => {
                 <h3 className="card-title">Entry Fee</h3>
                 <p className="text-3xl font-bold text-accent-custom">${contest.price}</p>
                 
+                {/* Accent color for CTA buttons */}
                 {!isRegistered ? (
                   <button
                     onClick={handleRegister}
