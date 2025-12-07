@@ -96,7 +96,7 @@ const Home = () => {
         </div>
       </motion.section>
 
-      {/* Popular Contests Section */}
+      {/* Popular Contests Section with color scheme */}
       <section className="my-16">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-base-content">
