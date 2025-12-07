@@ -97,7 +97,7 @@ const ParticipatedContests = () => {
                       <td>
                         <Link
                           to={`/contest/${item.contest._id}`}
-                          className="btn btn-sm bg-primary-custom hover:bg-primary-custom/90 text-white border-0"
+                          className="btn btn-sm bg-primary-custom hover:bg-primary-custom/90 text-white border-0 transition-colors"
                         >
                           View Details
                         </Link>
