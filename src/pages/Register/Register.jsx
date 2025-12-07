@@ -151,6 +151,7 @@ const Register = () => {
           </div>
 
           <div>
+            {/* Primary button with color scheme */}
             <button
               type="submit"
               disabled={loading}
