@@ -1,0 +1,254 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* Color Scheme Variables */
+:root {
+  --color-primary: #1e3a8a;
+  --color-secondary: #f3f4f6;
+  --color-accent: #f59e0b;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: sans-serif;
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html[data-theme="dark"] body {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+.pt-navbar {
+  padding-top: 6rem;
+}
+
+/* Custom color utilities */
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+html[data-theme="dark"] .text-muted {
+  color: #9ca3af;
+}
+
+/* Primary Color (Deep Blue) - for buttons, navbar, links */
+.bg-primary-custom {
+  background-color: var(--color-primary);
+}
+
+html[data-theme="dark"] .bg-primary-custom {
+  background-color: #3b82f6;
+}
+
+.text-primary-custom {
+  color: var(--color-primary);
+}
+
+html[data-theme="dark"] .text-primary-custom {
+  color: #3b82f6;
+}
+
+.border-primary-custom {
+  border-color: var(--color-primary);
+}
+
+.hover\:bg-primary-custom:hover {
+  background-color: var(--color-primary);
+}
+
+.hover\:text-primary-custom:hover {
+  color: var(--color-primary);
+}
+
+.hover\:border-primary-custom:hover {
+  border-color: var(--color-primary);
+}
+
+/* Accent Color (Amber/Gold) - for call-to-action highlights */
+.bg-accent-custom {
+  background-color: var(--color-accent);
+}
+
+.text-accent-custom {
+  color: var(--color-accent);
+}
+
+.border-accent-custom {
+  border-color: var(--color-accent);
+}
+
+.hover\:bg-accent-custom:hover {
+  background-color: var(--color-accent);
+}
+
+.hover\:text-accent-custom:hover {
+  color: var(--color-accent);
+}
+
+.hover\:border-accent-custom:hover {
+  border-color: var(--color-accent);
+}
+
+/* Secondary Color (Light Gray) - for background */
+.bg-secondary-custom {
+  background-color: var(--color-secondary);
+}
+
+html[data-theme="dark"] .bg-secondary-custom {
+  background-color: #1f2937;
+}
+
+/* Text Colors */
+.text-base-content {
+  color: var(--color-text);
+}
+
+html[data-theme="dark"] .text-base-content {
+  color: #f9fafb;
+}
+
+/* Link Styles */
+a {
+  color: var(--color-primary);
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+html[data-theme="dark"] a {
+  color: #3b82f6;
+}
+
+html[data-theme="dark"] a:hover {
+  color: var(--color-accent);
+}
+
+/* Button Base Styles */
+.btn-primary-custom {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+}
+
+.btn-primary-custom:hover {
+  background-color: #1e40af;
+  color: white;
+}
+
+.btn-accent-custom {
+  background-color: var(--color-accent);
+  color: white;
+  border: none;
+}
+
+.btn-accent-custom:hover {
+  background-color: #d97706;
+  color: white;
+}
+
+/* DaisyUI Overrides for consistent colors */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background-color: #1e40af;
+  border-color: #1e40af;
+}
+
+/* Tab Styles */
+.tab-active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.tab:hover {
+  color: var(--color-primary);
+}
+
+/* Input Focus Styles */
+.input:focus,
+.textarea:focus,
+.select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* Card Styles */
+.card {
+  background-color: white;
+}
+
+html[data-theme="dark"] .card {
+  background-color: #1f2937;
+}
+
+/* Opacity variants for primary color */
+.bg-primary-custom\/10 {
+  background-color: rgba(30, 58, 138, 0.1);
+}
+
+html[data-theme="dark"] .bg-primary-custom\/10 {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* React DatePicker Styles */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid hsl(var(--bc) / 0.2);
+  border-radius: 0.5rem;
+  background-color: hsl(var(--b1));
+  color: hsl(var(--bc));
+}
+
+.react-datepicker {
+  font-family: inherit;
+}
+
+.react-datepicker__header {
+  background-color: hsl(var(--p));
+  color: hsl(var(--pc));
+}
+
+.react-datepicker__day--selected {
+  background-color: hsl(var(--p));
+  color: hsl(var(--pc));
+}
+
+.react-datepicker__day:hover {
+  background-color: hsl(var(--p) / 0.8);
+  color: hsl(var(--pc));
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .pt-navbar {
+    padding-top: 5rem;
+  }
+}
