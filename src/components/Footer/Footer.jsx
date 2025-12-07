@@ -5,6 +5,7 @@ import logo from "../../assets/contest-project-logo.png";
 const Footer = () => {
   return (
     <footer className="bg-base-100/90 backdrop-blur-md shadow-md rounded-3xl z-50 mx-auto max-w-11/12">
+      {/* Footer with color scheme */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
         {/* Logo + Website Name */}
         <Link to="/" className="flex items-center space-x-2">
