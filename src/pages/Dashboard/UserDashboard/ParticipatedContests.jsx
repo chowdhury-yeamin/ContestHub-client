@@ -28,6 +28,7 @@ const ParticipatedContests = () => {
       <div className="card-body">
         <h2 className="card-title mb-6">My Participated Contests</h2>
 
+        {/* Participated contests with color scheme */}
         {participated.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-xl text-muted">
