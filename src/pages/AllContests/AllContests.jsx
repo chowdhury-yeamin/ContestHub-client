@@ -61,10 +61,12 @@ const AllContests = () => {
           <span className="loading loading-spinner loading-lg"></span>
         </div>
       ) : filteredContests.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-xl text-muted">
+        <div className="text-center py-16">
+          <div className="text-6xl mb-4">🔍</div>
+          <p className="text-xl text-muted mb-2">
             No contests found in this category.
           </p>
+          <p className="text-sm text-muted">Try selecting a different category or check back later.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

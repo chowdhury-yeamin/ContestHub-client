@@ -238,7 +238,7 @@ const EditContest = () => {
             <button
               type="button"
               onClick={() => navigate('/dashboard/my-contests')}
-              className="btn btn-ghost"
+              className="btn btn-ghost hover:bg-primary-custom/10 hover:text-primary-custom"
             >
               Cancel
             </button>
