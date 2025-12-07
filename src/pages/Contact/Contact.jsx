@@ -50,6 +50,7 @@ const Contact = () => {
             <div className="card-body">
               <h2 className="card-title mb-4">Get in Touch</h2>
               <div className="space-y-4">
+                {/* Primary color for contact icons */}
                 <div className="flex items-center gap-4">
                   <FaEnvelope className="text-2xl text-primary-custom" />
                   <div>
