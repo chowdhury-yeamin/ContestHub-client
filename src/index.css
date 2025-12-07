@@ -189,6 +189,18 @@ html[data-theme="dark"] a:hover {
   color: var(--color-primary);
 }
 
+/* Table Improvements */
+.table thead th {
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .table thead th {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
 /* Input Focus Styles */
 .input:focus,
 .textarea:focus,
