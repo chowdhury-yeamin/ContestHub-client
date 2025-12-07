@@ -23,6 +23,7 @@ const Navbar = ({ user, logout }) => {
   return (
     <div className="pt-3">
       <nav className="sticky top-4 bg-primary-custom backdrop-blur-md shadow-lg rounded-3xl z-50 mx-auto max-w-11/12 text-white">
+        {/* Navbar with primary blue color scheme */}
         <div className="px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
@@ -56,20 +57,27 @@ const Navbar = ({ user, logout }) => {
               aria-label="Toggle theme"
               type="button"
             >
-              {theme === 'light' ? <FaMoon /> : <FaSun />}
+              {theme === "light" ? <FaMoon /> : <FaSun />}
             </button>
 
             {user ? (
               <div className="relative">
                 <img
-                  src={user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.name || 'User')}&background=random`}
+                  src={
+                    user.photoURL ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      user.displayName || user.name || "User"
+                    )}&background=random`
+                  }
                   alt="User"
                   onClick={toggleDropdown}
                   className="h-10 w-10 rounded-full cursor-pointer"
                 />
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-base-100 border border-base-300 rounded shadow-lg">
-                    <div className="px-4 py-2 border-b border-base-300 text-base-content">{user.displayName || user.name}</div>
+                    <div className="px-4 py-2 border-b border-base-300 text-base-content">
+                      {user.displayName || user.name}
+                    </div>
                     <Link
                       to="/dashboard"
                       className="block px-4 py-2 hover:bg-base-200 text-base-content"
@@ -140,7 +148,7 @@ const Navbar = ({ user, logout }) => {
               className="block w-full text-left px-3 py-2 hover:bg-base-200 rounded text-base-content"
               type="button"
             >
-              {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+              {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
             </button>
 
             {user ? (
