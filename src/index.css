@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* Color Scheme Variables */
+/* ============================================
+   Color Scheme Variables - Foundation
+   ============================================ */
 :root {
   --color-primary: #1e3a8a;
   --color-secondary: #f3f4f6;
