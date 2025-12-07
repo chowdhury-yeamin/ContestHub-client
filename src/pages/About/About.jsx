@@ -58,6 +58,7 @@ const About = () => {
             className="card bg-base-100 shadow-xl"
           >
             <div className="card-body">
+              {/* Primary color for icons */}
               <feature.icon className="text-4xl text-primary-custom mb-4" />
               <h3 className="card-title">{feature.title}</h3>
               <p className="text-muted">{feature.description}</p>
