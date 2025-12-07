@@ -23,12 +23,12 @@ const WinningContests = () => {
         </h2>
 
         {winnings.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-16">
             <FaMedal className="text-6xl mx-auto mb-4 text-base-content/30" />
-            <p className="text-xl text-muted">
+            <p className="text-xl text-muted mb-2">
               You haven't won any contests yet.
             </p>
-            <p className="text-muted mt-2">
+            <p className="text-sm text-muted">
               Keep participating to win amazing prizes!
             </p>
           </div>
