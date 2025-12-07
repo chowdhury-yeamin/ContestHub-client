@@ -105,6 +105,7 @@ const Profile = () => {
                   <p>No participation data yet</p>
                 </div>
               )}
+              {/* Primary color for stats */}
               <div className="text-center mt-4">
                 <p className="text-2xl font-bold text-primary-custom">
                   {winPercentage}%
