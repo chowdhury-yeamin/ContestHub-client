@@ -4,6 +4,7 @@ import { FaHome } from "react-icons/fa";
 const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200">
+      {/* Not found page with color scheme */}
       <div className="text-center">
         <h1 className="text-9xl font-bold text-primary-custom">404</h1>
         <h2 className="text-4xl font-semibold text-base-content mt-4">
