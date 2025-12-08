@@ -1,22 +1,22 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  signInWithEmailAndPassword, 
+import { createContext, useContext, useState, useEffect } from "react";
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  updateProfile
-} from 'firebase/auth';
-import { auth, googleProvider } from '../firebase/firebase.config';
-import api from '../services/api';
-import Swal from 'sweetalert2';
+  updateProfile,
+} from "firebase/auth";
+import { auth, googleProvider } from "../firebase/firebase.config";
+import api from "../services/api";
+import Swal from "sweetalert2";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };
@@ -32,28 +32,30 @@ export const AuthProvider = ({ children }) => {
           // TODO: Get user data from backend API
           // const response = await api.get('/users/profile');
           // const userData = response.data;
-          
+
           // For now, use Firebase user data
           const userData = {
             _id: firebaseUser.uid,
-            name: firebaseUser.displayName || 'User',
+            name: firebaseUser.displayName || "User",
             email: firebaseUser.email,
-            photoURL: firebaseUser.photoURL || 'https://ui-avatars.com/api/?name=User&background=random',
-            role: 'user' // TODO: Get from backend
+            photoURL:
+              firebaseUser.photoURL ||
+              "https://ui-avatars.com/api/?name=User&background=random",
+            role: "user", // TODO: Get from backend
           };
 
           // Get Firebase ID token for backend authentication
           const token = await firebaseUser.getIdToken();
-          localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify(userData));
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(userData));
           setUser(userData);
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          console.error("Error fetching user data:", error);
         }
       } else {
         setUser(null);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
       }
       setLoading(false);
     });
@@ -63,7 +65,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const firebaseUser = userCredential.user;
       const token = await firebaseUser.getIdToken();
 
@@ -75,38 +81,40 @@ export const AuthProvider = ({ children }) => {
 
       const userData = {
         _id: firebaseUser.uid,
-        name: firebaseUser.displayName || 'User',
+        name: firebaseUser.displayName || "User",
         email: firebaseUser.email,
-        photoURL: firebaseUser.photoURL || 'https://i.ibb.co/5vQvBdP/default-avatar.png',
-        role: 'user' // TODO: Get from backend
+        photoURL:
+          firebaseUser.photoURL ||
+          "https://i.ibb.co/5vQvBdP/default-avatar.png",
+        role: "user", // TODO: Get from backend
       };
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
 
       Swal.fire({
-        icon: 'success',
-        title: 'Login Successful!',
-        text: 'Welcome back!',
+        icon: "success",
+        title: "Login Successful!",
+        text: "Welcome back!",
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
 
       return { success: true };
     } catch (error) {
-      let errorMessage = 'Invalid email or password';
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address';
+      let errorMessage = "Invalid email or password";
+      if (error.code === "auth/user-not-found") {
+        errorMessage = "No account found with this email";
+      } else if (error.code === "auth/wrong-password") {
+        errorMessage = "Incorrect password";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address";
       }
 
       Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
+        icon: "error",
+        title: "Login Failed",
         text: errorMessage,
       });
       return { success: false };
@@ -120,7 +128,7 @@ export const AuthProvider = ({ children }) => {
       const token = await firebaseUser.getIdToken();
 
       // TODO: Send user data to backend to create/update user
-      // await api.post('/auth/google', { 
+      // await api.post('/auth/google', {
       //   uid: firebaseUser.uid,
       //   email: firebaseUser.email,
       //   name: firebaseUser.displayName,
@@ -129,30 +137,32 @@ export const AuthProvider = ({ children }) => {
 
       const userData = {
         _id: firebaseUser.uid,
-        name: firebaseUser.displayName || 'User',
+        name: firebaseUser.displayName || "User",
         email: firebaseUser.email,
-        photoURL: firebaseUser.photoURL || 'https://i.ibb.co/5vQvBdP/default-avatar.png',
-        role: 'user' // TODO: Get from backend
+        photoURL:
+          firebaseUser.photoURL ||
+          "https://i.ibb.co/5vQvBdP/default-avatar.png",
+        role: "user", // TODO: Get from backend
       };
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
 
       Swal.fire({
-        icon: 'success',
-        title: 'Login Successful!',
-        text: 'Welcome!',
+        icon: "success",
+        title: "Login Successful!",
+        text: "Welcome!",
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
 
       return { success: true };
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
-        text: error.message || 'Google sign-in failed',
+        icon: "error",
+        title: "Login Failed",
+        text: error.message || "Google sign-in failed",
       });
       return { success: false };
     }
@@ -160,14 +170,18 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password, photoURL) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const firebaseUser = userCredential.user;
 
       // Update Firebase profile with name and photo
       if (name || photoURL) {
         await updateProfile(firebaseUser, {
           displayName: name,
-          photoURL: photoURL || null
+          photoURL: photoURL || null,
         });
       }
 
@@ -185,36 +199,41 @@ export const AuthProvider = ({ children }) => {
         _id: firebaseUser.uid,
         name: name,
         email: email,
-        photoURL: photoURL || firebaseUser.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=random',
-        role: 'user' // TODO: Get from backend
+        photoURL:
+          photoURL ||
+          firebaseUser.photoURL ||
+          "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent(name) +
+            "&background=random",
+        role: "user", // TODO: Get from backend
       };
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
 
       Swal.fire({
-        icon: 'success',
-        title: 'Registration Successful!',
-        text: 'Welcome to ContestHub!',
+        icon: "success",
+        title: "Registration Successful!",
+        text: "Welcome to ContestHub!",
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
 
       return { success: true };
     } catch (error) {
-      let errorMessage = 'Registration failed';
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'Email is already registered';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Password should be at least 6 characters';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address';
+      let errorMessage = "Registration failed";
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "Email is already registered";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password should be at least 6 characters";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address";
       }
 
       Swal.fire({
-        icon: 'error',
-        title: 'Registration Failed',
+        icon: "error",
+        title: "Registration Failed",
         text: errorMessage,
       });
       return { success: false };
@@ -225,18 +244,18 @@ export const AuthProvider = ({ children }) => {
     try {
       await firebaseSignOut(auth);
       setUser(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
       Swal.fire({
-        icon: 'success',
-        title: 'Logged Out',
-        text: 'You have been logged out successfully',
+        icon: "success",
+        title: "Logged Out",
+        text: "You have been logged out successfully",
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -244,14 +263,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
-        throw new Error('No user logged in');
+        throw new Error("No user logged in");
       }
 
       // Update Firebase profile if name or photoURL changed
       if (updates.name || updates.photoURL) {
         await updateProfile(currentUser, {
           displayName: updates.name || currentUser.displayName,
-          photoURL: updates.photoURL || currentUser.photoURL
+          photoURL: updates.photoURL || currentUser.photoURL,
         });
       }
 
@@ -260,22 +279,22 @@ export const AuthProvider = ({ children }) => {
 
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
       Swal.fire({
-        icon: 'success',
-        title: 'Profile Updated!',
-        text: 'Your profile has been updated successfully',
+        icon: "success",
+        title: "Profile Updated!",
+        text: "Your profile has been updated successfully",
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
 
       return { success: true };
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Update Failed',
-        text: error.message || 'Failed to update profile',
+        icon: "error",
+        title: "Update Failed",
+        text: error.message || "Failed to update profile",
       });
       return { success: false };
     }
@@ -288,7 +307,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     googleSignIn,
-    updateUser
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

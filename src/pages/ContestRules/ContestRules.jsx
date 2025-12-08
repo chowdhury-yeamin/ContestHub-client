@@ -1,87 +1,153 @@
 import { motion } from "framer-motion";
-import { FaBook, FaUserCheck, FaClipboardCheck, FaClock, FaTrophy, FaCopyright, FaCreditCard, FaHandshake, FaSync, FaEnvelope, FaCheckCircle, FaExclamationTriangle, FaMedal } from "react-icons/fa";
+import {
+  FaBook,
+  FaUserCheck,
+  FaClipboardCheck,
+  FaClock,
+  FaTrophy,
+  FaCopyright,
+  FaCreditCard,
+  FaHandshake,
+  FaSync,
+  FaEnvelope,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaMedal,
+} from "react-icons/fa";
 
 const ContestRules = () => {
   const sections = [
     {
       icon: FaUserCheck,
       title: "1. Eligibility",
-      content: "All participants must be registered users of ContestHub and meet the minimum age requirement for the contest. Each participant may submit only the allowed number of entries per contest.",
-      gradient: "from-blue-500 to-cyan-500"
+      content:
+        "All participants must be registered users of ContestHub and meet the minimum age requirement for the contest. Each participant may submit only the allowed number of entries per contest.",
+      gradient: "from-blue-500 to-cyan-500",
     },
     {
       icon: FaClipboardCheck,
       title: "2. Entry Guidelines",
-      content: "Submissions must follow the contest theme and instructions provided. Plagiarized content, offensive material, or incomplete entries will be disqualified.",
-      gradient: "from-purple-500 to-pink-500"
+      content:
+        "Submissions must follow the contest theme and instructions provided. Plagiarized content, offensive material, or incomplete entries will be disqualified.",
+      gradient: "from-purple-500 to-pink-500",
     },
     {
       icon: FaClock,
       title: "3. Submission Deadlines",
-      content: "All entries must be submitted before the contest deadline. Late submissions will not be accepted under any circumstances.",
-      gradient: "from-amber-500 to-orange-500"
+      content:
+        "All entries must be submitted before the contest deadline. Late submissions will not be accepted under any circumstances.",
+      gradient: "from-amber-500 to-orange-500",
     },
     {
       icon: FaTrophy,
       title: "4. Judging Criteria",
-      content: "Contests are judged based on creativity, originality, adherence to guidelines, and overall quality. Judges' decisions are final and binding.",
-      gradient: "from-emerald-500 to-teal-500"
+      content:
+        "Contests are judged based on creativity, originality, adherence to guidelines, and overall quality. Judges' decisions are final and binding.",
+      gradient: "from-emerald-500 to-teal-500",
     },
     {
       icon: FaMedal,
       title: "5. Winner Announcement",
-      content: "Winners will be announced on the ContestHub platform as per the contest timeline. Winners will be contacted via email, and prizes must be claimed within the stipulated period.",
-      gradient: "from-indigo-500 to-purple-500"
+      content:
+        "Winners will be announced on the ContestHub platform as per the contest timeline. Winners will be contacted via email, and prizes must be claimed within the stipulated period.",
+      gradient: "from-indigo-500 to-purple-500",
     },
     {
       icon: FaCopyright,
       title: "6. Intellectual Property",
-      content: "Participants retain ownership of their submissions but grant ContestHub a non-exclusive license to display, promote, and use the submissions for contest-related purposes.",
-      gradient: "from-pink-500 to-rose-500"
+      content:
+        "Participants retain ownership of their submissions but grant ContestHub a non-exclusive license to display, promote, and use the submissions for contest-related purposes.",
+      gradient: "from-pink-500 to-rose-500",
     },
     {
       icon: FaCreditCard,
       title: "7. Payment & Entry Fees",
-      content: "Some contests may require an entry fee. Payments must be completed through the ContestHub platform. Failure to pay may result in disqualification.",
-      gradient: "from-cyan-500 to-blue-500"
+      content:
+        "Some contests may require an entry fee. Payments must be completed through the ContestHub platform. Failure to pay may result in disqualification.",
+      gradient: "from-cyan-500 to-blue-500",
     },
     {
       icon: FaHandshake,
       title: "8. Code of Conduct",
-      content: "Participants must act respectfully towards creators, other participants, and judges. Harassment, spamming, or any unethical behavior may result in immediate disqualification.",
-      gradient: "from-red-500 to-orange-500"
+      content:
+        "Participants must act respectfully towards creators, other participants, and judges. Harassment, spamming, or any unethical behavior may result in immediate disqualification.",
+      gradient: "from-red-500 to-orange-500",
     },
     {
       icon: FaSync,
       title: "9. Changes to Rules",
-      content: "ContestHub reserves the right to update or modify contest rules at any time. Updates will be communicated on the contest page.",
-      gradient: "from-teal-500 to-emerald-500"
+      content:
+        "ContestHub reserves the right to update or modify contest rules at any time. Updates will be communicated on the contest page.",
+      gradient: "from-teal-500 to-emerald-500",
     },
     {
       icon: FaEnvelope,
       title: "10. Contact",
-      content: "For questions regarding contest rules, please reach out to us at ",
+      content:
+        "For questions regarding contest rules, please reach out to us at ",
       email: "support@contesthub.com",
-      gradient: "from-violet-500 to-purple-500"
+      gradient: "from-violet-500 to-purple-500",
     },
   ];
 
   const highlights = [
     { icon: FaCheckCircle, text: "Fair Judging", color: "text-emerald-400" },
     { icon: FaCheckCircle, text: "Clear Guidelines", color: "text-blue-400" },
-    { icon: FaCheckCircle, text: "Transparent Process", color: "text-purple-400" },
+    {
+      icon: FaCheckCircle,
+      text: "Transparent Process",
+      color: "text-purple-400",
+    },
   ];
 
   const quickTips = [
-    { icon: "✅", title: "Do", items: ["Follow contest theme", "Submit before deadline", "Read all guidelines", "Be original & creative"] },
-    { icon: "❌", title: "Don't", items: ["Plagiarize content", "Miss deadlines", "Ignore instructions", "Use offensive material"] },
+    {
+      icon: "✅",
+      title: "Do",
+      items: [
+        "Follow contest theme",
+        "Submit before deadline",
+        "Read all guidelines",
+        "Be original & creative",
+      ],
+    },
+    {
+      icon: "❌",
+      title: "Don't",
+      items: [
+        "Plagiarize content",
+        "Miss deadlines",
+        "Ignore instructions",
+        "Use offensive material",
+      ],
+    },
   ];
 
   const judgingCriteria = [
-    { label: "Creativity", score: "30%", icon: "🎨", color: "from-pink-500 to-rose-500" },
-    { label: "Originality", score: "30%", icon: "💡", color: "from-amber-500 to-orange-500" },
-    { label: "Quality", score: "25%", icon: "⭐", color: "from-indigo-500 to-purple-500" },
-    { label: "Guidelines", score: "15%", icon: "📋", color: "from-emerald-500 to-teal-500" },
+    {
+      label: "Creativity",
+      score: "30%",
+      icon: "🎨",
+      color: "from-pink-500 to-rose-500",
+    },
+    {
+      label: "Originality",
+      score: "30%",
+      icon: "💡",
+      color: "from-amber-500 to-orange-500",
+    },
+    {
+      label: "Quality",
+      score: "25%",
+      icon: "⭐",
+      color: "from-indigo-500 to-purple-500",
+    },
+    {
+      label: "Guidelines",
+      score: "15%",
+      icon: "📋",
+      color: "from-emerald-500 to-teal-500",
+    },
   ];
 
   return (
@@ -133,9 +199,12 @@ const ContestRules = () => {
           </motion.div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-6">
-            Contest <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Rules</span>
+            Contest{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              Rules
+            </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-8">
             Guidelines to ensure fair and fun participation in every contest
           </p>
@@ -165,7 +234,9 @@ const ContestRules = () => {
             className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-6 py-2"
           >
             <FaSync className="text-slate-400" />
-            <span className="text-slate-400 text-sm">Last updated: December 2024</span>
+            <span className="text-slate-400 text-sm">
+              Last updated: December 2024
+            </span>
           </motion.div>
         </motion.div>
 
@@ -190,10 +261,14 @@ const ContestRules = () => {
                 whileHover={{ y: -5, scale: 1.02 }}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${criteria.color} rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${criteria.color} rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity`}
+                />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-6 text-center transition-all">
                   <div className="text-4xl mb-3">{criteria.icon}</div>
-                  <h3 className="font-bold text-white text-lg mb-2">{criteria.label}</h3>
+                  <h3 className="font-bold text-white text-lg mb-2">
+                    {criteria.label}
+                  </h3>
                   <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
                     {criteria.score}
                   </div>
@@ -224,16 +299,31 @@ const ContestRules = () => {
                 whileHover={{ scale: 1.02 }}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${idx === 0 ? 'from-emerald-600 to-teal-600' : 'from-red-600 to-orange-600'} rounded-2xl blur-lg opacity-0 group-hover:opacity-20 transition-opacity`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${
+                    idx === 0
+                      ? "from-emerald-600 to-teal-600"
+                      : "from-red-600 to-orange-600"
+                  } rounded-2xl blur-lg opacity-0 group-hover:opacity-20 transition-opacity`}
+                />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-6 transition-all">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="text-4xl">{tip.icon}</div>
-                    <h3 className="text-2xl font-bold text-white">{tip.title}</h3>
+                    <h3 className="text-2xl font-bold text-white">
+                      {tip.title}
+                    </h3>
                   </div>
                   <ul className="space-y-2">
                     {tip.items.map((item, i) => (
-                      <li key={i} className="flex items-center gap-3 text-slate-300">
-                        <div className={`w-2 h-2 rounded-full ${idx === 0 ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                      <li
+                        key={i}
+                        className="flex items-center gap-3 text-slate-300"
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            idx === 0 ? "bg-emerald-400" : "bg-red-400"
+                          }`}
+                        />
                         {item}
                       </li>
                     ))}
@@ -256,10 +346,14 @@ const ContestRules = () => {
               whileHover={{ scale: 1.01, x: 5 }}
               className="relative group"
             >
-              <div className={`absolute inset-0 bg-gradient-to-r ${section.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity`} />
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${section.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity`}
+              />
               <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-6 sm:p-8 transition-all">
                 <div className="flex items-start gap-4 sm:gap-6">
-                  <div className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-r ${section.gradient} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <div
+                    className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-r ${section.gradient} flex items-center justify-center group-hover:scale-110 transition-transform`}
+                  >
                     <section.icon className="text-white text-xl sm:text-2xl" />
                   </div>
                   <div className="flex-1">
@@ -302,11 +396,16 @@ const ContestRules = () => {
                 <FaExclamationTriangle className="text-white text-2xl" />
               </motion.div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-2">Important Reminder</h3>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Important Reminder
+                </h3>
                 <p className="text-slate-300 leading-relaxed">
-                  By participating in any contest on ContestHub, you acknowledge that you have read, understood, and agree to abide by these rules. 
-                  Violation of any rules may result in disqualification without refund. Contest creators reserve the right to make final decisions 
-                  on all contest-related matters. Play fair, be creative, and have fun!
+                  By participating in any contest on ContestHub, you acknowledge
+                  that you have read, understood, and agree to abide by these
+                  rules. Violation of any rules may result in disqualification
+                  without refund. Contest creators reserve the right to make
+                  final decisions on all contest-related matters. Play fair, be
+                  creative, and have fun!
                 </p>
               </div>
             </div>
@@ -330,7 +429,7 @@ const ContestRules = () => {
               transition={{ duration: 4, repeat: Infinity }}
               className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"
             />
-            
+
             <div className="relative z-10">
               <motion.div
                 animate={{ y: [0, -10, 0] }}
@@ -343,9 +442,10 @@ const ContestRules = () => {
                 Ready to Compete?
               </h2>
               <p className="text-lg sm:text-xl mb-8 max-w-2xl mx-auto text-white/90">
-                Now that you know the rules, start participating in exciting contests and win amazing prizes!
+                Now that you know the rules, start participating in exciting
+                contests and win amazing prizes!
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <motion.a
                   href="/all-contests"

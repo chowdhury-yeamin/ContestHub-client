@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const RoleRoute = ({ children, allowedRoles = [] }) => {
+const RoleRoute = ({ children, allowedRoles = ["admin"] }) => {
   const { user, loading } = useAuth();
 
   if (loading) {

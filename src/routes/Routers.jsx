@@ -33,7 +33,6 @@ import PrivacyPolicy from "../pages/PrivacyPolicy/PrivacyPolicy";
 import ContestRules from "../pages/ContestRules/ContestRules";
 import CreatorGuide from "../pages/CreatorGuide/CreatorGuide.JSX";
 
-
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -128,6 +127,14 @@ export const router = createBrowserRouter([
             element: (
               <RoleRoute allowedRoles={["creator", "admin"]}>
                 <MyContests />
+              </RoleRoute>
+            ),
+          },
+          {
+            path: "submissions",
+            element: (
+              <RoleRoute allowedRoles={["creator", "admin"]}>
+                <Submissions />
               </RoleRoute>
             ),
           },

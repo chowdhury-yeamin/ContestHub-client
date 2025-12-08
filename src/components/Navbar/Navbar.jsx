@@ -1,31 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FaSun,
-  FaMoon,
-  FaTrophy,
-  FaUser,
-  FaCog,
-  FaBell,
-  FaSearch,
-} from "react-icons/fa";
-
+import { FaTrophy, FaUser } from "react-icons/fa";
+import { div } from "framer-motion/client";
+import { Sparkles, Zap } from "lucide-react";
 
 const Navbar = ({ user, logout }) => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [isSearchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [theme, setTheme] = useState("dark");
+  const dropdownRef = useRef();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const navLinks = [
@@ -42,13 +41,32 @@ const Navbar = ({ user, logout }) => {
     setMenuOpen(false);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Navigate to search results or handle search
-      console.log("Searching for:", searchQuery);
-      setSearchOpen(false);
-    }
+  const hover3D = {
+    rotateX: [-2, 2, -1],
+    rotateY: [2, -2, 1],
+    scale: 1.12,
+    transition: { duration: 0.5, ease: "easeOut" },
+  };
+
+  const particleBurst = {
+    opacity: [0, 1, 0],
+    scale: [0.4, 1.4, 0.2],
+    transition: { duration: 0.6 },
+  };
+
+  const shineSweep = {
+    x: ["-150%", "150%"],
+    opacity: [0, 1, 0],
+    transition: { duration: 0.8, ease: "linear" },
+  };
+
+  const neonPulse = {
+    boxShadow: [
+      "0 0 0px rgba(255,255,255,0)",
+      "0 0 25px rgba(255,255,255,0.7)",
+      "0 0 0px rgba(255,255,255,0)",
+    ],
+    transition: { duration: 1.2, repeat: Infinity },
   };
 
   return (
@@ -67,9 +85,9 @@ const Navbar = ({ user, logout }) => {
               ? "rgba(15, 23, 42, 0.95)"
               : "rgba(15, 23, 42, 0.8)",
           }}
-          className="relative backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+          className="relative backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl"
         >
-          {/* Gradient Border Animation */}
+          {/* Gradient Animation */}
           <motion.div
             animate={{
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
@@ -92,9 +110,7 @@ const Navbar = ({ user, logout }) => {
                 className="flex items-center gap-3 group"
               >
                 <motion.div
-                  animate={{
-                    rotate: [0, 360],
-                  }}
+                  animate={{ rotate: [0, 360] }}
                   transition={{
                     duration: 20,
                     repeat: Infinity,
@@ -113,7 +129,7 @@ const Navbar = ({ user, logout }) => {
               </motion.div>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Nav */}
             <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <NavLink
@@ -147,10 +163,6 @@ const Navbar = ({ user, logout }) => {
                           }}
                         />
                       )}
-                      <motion.div
-                        className="absolute inset-0 bg-white/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                        whileHover={{ scale: 1.05 }}
-                      />
                     </motion.div>
                   )}
                 </NavLink>
@@ -159,183 +171,67 @@ const Navbar = ({ user, logout }) => {
 
             {/* Right Section */}
             <div className="flex items-center gap-3">
-
-              {/* User Section */}
+              {/* Desktop Dropdown */}
               {user ? (
-                <div className="relative hidden sm:block">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                <div className="relative" ref={dropdownRef}>
+                  <div
                     onClick={() => setDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 pl-2 pr-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all"
+                    className="p-4 md:py-1 md:px-2 border flex items-center rounded-full cursor-pointer hover:shadow-md transition"
                   >
-                    <div className="relative">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-full blur-sm opacity-75"
-                      />
-                      <img
-                        src={
-                          user.photoURL ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            user.displayName || user.name || "User"
-                          )}&background=6366F1&color=fff&size=200`
-                        }
-                        alt={user.displayName || user.name}
-                        className="relative w-8 h-8 rounded-full border-2 border-white/20"
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-white hidden md:block">
-                      {(user.displayName || user.name || "User").split(" ")[0]}
-                    </span>
-                    <motion.svg
-                      animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-                      className="w-4 h-4 text-slate-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </motion.svg>
-                  </motion.button>
+                    <img
+                      className="rounded-full"
+                      src={user?.photoURL || "https://via.placeholder.com/30"}
+                      alt="profile"
+                      height="30"
+                      width="30"
+                    />
+                  </div>
 
-                  {/* Dropdown Menu */}
                   <AnimatePresence>
                     {isDropdownOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
-                        }}
-                        className="absolute right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute right-0 top-full z-50 mt-2 rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white overflow-hidden text-sm"
                       >
-                        {/* User Info */}
-                        <div className="p-4 border-b border-white/10 bg-gradient-to-br from-indigo-600/20 to-purple-600/20">
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={
-                                user.photoURL ||
-                                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                  user.displayName || user.name || "User"
-                                )}&background=6366F1&color=fff&size=200`
-                              }
-                              alt={user.displayName || user.name}
-                              className="w-12 h-12 rounded-full border-2 border-white/20"
-                            />
-                            <div>
-                              <div className="font-bold text-white">
-                                {user.displayName || user.name}
-                              </div>
-                              <div className="text-xs text-slate-400">
-                                {user.email}
-                              </div>
+                        <div className="flex flex-col cursor-pointer">
+                          {user && (
+                            <div className="px-4 py-3 border-b border-white/10 font-semibold cursor-default">
+                              {user.displayName || user.name || "User"}
                             </div>
-                          </div>
-                        </div>
-
-                        {/* Menu Items */}
-                        <div className="p-2">
-                          {[
-                            {
-                              icon: FaUser,
-                              label: "Dashboard",
-                              path: "/dashboard",
-                            },
-                            {
-                              icon: FaTrophy,
-                              label: "My Contests",
-                              path: "/my-contests",
-                            },
-                            {
-                              icon: FaCog,
-                              label: "Settings",
-                              path: "/settings",
-                            },
-                          ].map((item, idx) => (
-                            <Link
-                              key={idx}
-                              to={item.path}
-                              onClick={() => setDropdownOpen(false)}
-                            >
-                              <motion.div
-                                whileHover={{
-                                  x: 4,
-                                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                                }}
-                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white transition-colors"
-                              >
-                                <item.icon className="text-indigo-400" />
-                                <span className="font-medium">
-                                  {item.label}
-                                </span>
-                              </motion.div>
-                            </Link>
-                          ))}
-                        </div>
-
-                        {/* Logout */}
-                        <div className="p-2 border-t border-white/10">
-                          <motion.button
-                            whileHover={{
-                              x: 4,
-                              backgroundColor: "rgba(239, 68, 68, 0.1)",
-                            }}
-                            onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                          )}
+                          <Link
+                            to="/dashboard"
+                            className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
                           >
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                              />
-                            </svg>
-                            <span className="font-medium">Logout</span>
-                          </motion.button>
+                            Dashboard
+                          </Link>
+                          <div
+                            onClick={handleLogout}
+                            className="px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer"
+                          >
+                            Logout
+                          </div>
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="hidden sm:flex items-center gap-2">
-                  <Link to="/login">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-5 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5 transition-all font-medium"
-                    >
-                      Login
-                    </motion.div>
+                <div className="flex gap-3">
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition"
+                  >
+                    Login
                   </Link>
-                  <Link to="/register">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all"
-                    >
-                      Sign Up
-                    </motion.div>
+
+                  <Link
+                    to="/register"
+                    className="px-4 py-2 rounded-lg bg-slate-600 text-white hover:bg-slate-500 transition"
+                  >
+                    Register
                   </Link>
                 </div>
               )}
@@ -385,33 +281,6 @@ const Navbar = ({ user, logout }) => {
             </div>
           </div>
 
-          {/* Search Bar */}
-          <AnimatePresence>
-            {isSearchOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden border-t border-white/10"
-              >
-                <div className="p-4">
-                  <div className="relative">
-                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
-                      placeholder="Search contests..."
-                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Mobile Menu */}
           <AnimatePresence>
             {isMenuOpen && (
@@ -420,7 +289,7 @@ const Navbar = ({ user, logout }) => {
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="lg:hidden overflow-hidden border-t border-white/10"
+                className="lg:hidden overflow-visible border-t border-white/10"
               >
                 <div className="p-4 space-y-2">
                   {navLinks.map((link, idx) => (
@@ -436,78 +305,31 @@ const Navbar = ({ user, logout }) => {
                         }`
                       }
                     >
-                      {({ isActive }) => (
-                        <motion.div
-                          initial={{ x: -20, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: idx * 0.05 }}
-                          whileHover={{ x: 4 }}
-                          className="flex items-center gap-3 w-full"
-                        >
-                          <span className="text-xl">{link.icon}</span>
-                          <span className="font-medium">{link.name}</span>
-                        </motion.div>
-                      )}
+                      <span className="text-xl">{link.icon}</span>
+                      <span className="font-medium">{link.name}</span>
                     </NavLink>
                   ))}
 
-                  <div className="pt-4 border-t border-white/10 space-y-2">
-                    {user ? (
-                      <>
-                        <Link
-                          to="/dashboard"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          <motion.div
-                            whileHover={{ x: 4 }}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all"
-                          >
-                            <FaUser />
-                            <span className="font-medium">Dashboard</span>
-                          </motion.div>
-                        </Link>
-                        <motion.button
-                          whileHover={{ x: 4 }}
-                          onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
-                        >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                            />
-                          </svg>
-                          <span className="font-medium">Logout</span>
-                        </motion.button>
-                      </>
-                    ) : (
-                      <>
-                        <Link to="/login" onClick={() => setMenuOpen(false)}>
-                          <motion.div
-                            whileHover={{ x: 4 }}
-                            className="flex items-center justify-center px-4 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition-all font-medium"
-                          >
-                            Login
-                          </motion.div>
-                        </Link>
-                        <Link to="/register" onClick={() => setMenuOpen(false)}>
-                          <motion.div
-                            whileHover={{ x: 4 }}
-                            className="flex items-center justify-center px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg"
-                          >
-                            Sign Up
-                          </motion.div>
-                        </Link>
-                      </>
-                    )}
-                  </div>
+                  
+
+                  {!user && (
+                    <>
+                      <Link
+                        to="/login"
+                        onClick={() => setMenuOpen(false)}
+                        className="px-4 py-3 hover:bg-neutral-100 transition font-semibold block"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="/signup"
+                        onClick={() => setMenuOpen(false)}
+                        className="px-4 py-3 hover:bg-neutral-100 transition font-semibold block"
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}

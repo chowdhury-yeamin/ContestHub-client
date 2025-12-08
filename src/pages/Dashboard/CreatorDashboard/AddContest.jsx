@@ -1,10 +1,21 @@
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { useCreateContest } from '../../../hooks/useContests';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import Swal from 'sweetalert2';
-import { useState } from 'react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { useCreateContest } from "../../../hooks/useContests";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Swal from "sweetalert2";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FaImage,
+  FaDollarSign,
+  FaCalendarAlt,
+  FaTrophy,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaRocket,
+  FaFileAlt,
+} from "react-icons/fa";
 
 const AddContest = () => {
   const navigate = useNavigate();
@@ -15,33 +26,44 @@ const AddContest = () => {
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm();
 
   const contestTypes = [
-    'Image Design',
-    'Article Writing',
-    'Business Ideas',
-    'Gaming Reviews',
-    'Video Content',
-    'Photography',
-    'Other'
+    { value: "Image Design", icon: "🎨" },
+    { value: "Article Writing", icon: "✍️" },
+    { value: "Business Ideas", icon: "💡" },
+    { value: "Gaming Reviews", icon: "🎮" },
+    { value: "Video Content", icon: "🎥" },
+    { value: "Photography", icon: "📸" },
+    { value: "Other", icon: "⭐" },
   ];
+
+  const watchedValues = watch();
+  const progress =
+    (Object.keys(watchedValues).filter(
+      (key) => watchedValues[key] && watchedValues[key] !== ""
+    ).length /
+      8) *
+    100;
 
   const onSubmit = async (data) => {
     if (!deadline) {
       Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'Please select a deadline',
+        icon: "error",
+        title: "Validation Error",
+        text: "Please select a deadline",
+        confirmButtonColor: "#6366F1",
       });
       return;
     }
 
     if (new Date(deadline) <= new Date()) {
       Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'Deadline must be in the future',
+        icon: "error",
+        title: "Validation Error",
+        text: "Deadline must be in the future",
+        confirmButtonColor: "#6366F1",
       });
       return;
     }
@@ -55,189 +77,469 @@ const AddContest = () => {
       };
 
       await createMutation.mutateAsync(contestData);
-      
+
       Swal.fire({
-        icon: 'success',
-        title: 'Contest Created!',
-        text: 'Your contest has been submitted for approval',
+        icon: "success",
+        title: "Contest Created!",
+        text: "Your contest has been submitted for approval",
+        confirmButtonColor: "#6366F1",
       });
-      
-      navigate('/dashboard/my-contests');
+
+      navigate("/dashboard/my-contests");
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Creation Failed',
-        text: 'Failed to create contest. Please try again.',
+        icon: "error",
+        title: "Creation Failed",
+        text: "Failed to create contest. Please try again.",
+        confirmButtonColor: "#6366F1",
       });
     }
   };
 
   return (
-    <div className="card bg-base-100 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title mb-6">Add New Contest</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="label">
-              <span className="label-text">Contest Name *</span>
-            </label>
-            <input
-              {...register('name', { required: 'Contest name is required' })}
-              type="text"
-              className="input input-bordered w-full"
-              placeholder="Enter contest name"
-            />
-            {errors.name && (
-              <p className="text-error text-sm mt-1">{errors.name.message}</p>
-            )}
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden py-12">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute top-20 right-10 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"
+        />
+      </div>
 
-          <div>
-            <label className="label">
-              <span className="label-text">Contest Image URL *</span>
-            </label>
-            <input
-              {...register('image', { required: 'Image URL is required' })}
-              type="url"
-              className="input input-bordered w-full"
-              placeholder="https://example.com/image.jpg"
-            />
-            {errors.image && (
-              <p className="text-error text-sm mt-1">{errors.image.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="label">
-              <span className="label-text">Description *</span>
-            </label>
-            <textarea
-              {...register('description', { required: 'Description is required' })}
-              className="textarea textarea-bordered w-full"
-              rows={4}
-              placeholder="Describe your contest..."
-            />
-            {errors.description && (
-              <p className="text-error text-sm mt-1">{errors.description.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="label">
-              <span className="label-text">Task Instructions *</span>
-            </label>
-            <textarea
-              {...register('taskInstruction', { required: 'Task instructions are required' })}
-              className="textarea textarea-bordered w-full"
-              rows={4}
-              placeholder="Provide detailed task instructions..."
-            />
-            {errors.taskInstruction && (
-              <p className="text-error text-sm mt-1">{errors.taskInstruction.message}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="label">
-                <span className="label-text">Entry Fee ($) *</span>
-              </label>
-              <input
-                {...register('price', {
-                  required: 'Entry fee is required',
-                  min: { value: 0, message: 'Entry fee must be positive' },
-                })}
-                type="number"
-                step="0.01"
-                className="input input-bordered w-full"
-                placeholder="5.00"
-              />
-              {errors.price && (
-                <p className="text-error text-sm mt-1">{errors.price.message}</p>
-              )}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+            className="inline-block mb-4"
+          >
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 rounded-full">
+              <FaRocket className="text-4xl text-white" />
             </div>
+          </motion.div>
+          <h1 className="text-4xl sm:text-5xl font-black text-white mb-2">
+            Create New{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              Contest
+            </span>
+          </h1>
+          <p className="text-slate-300 text-lg">
+            Fill in the details to launch your contest
+          </p>
+        </motion.div>
 
-            <div>
-              <label className="label">
-                <span className="label-text">Prize Money ($) *</span>
-              </label>
-              <input
-                {...register('prizeMoney', {
-                  required: 'Prize money is required',
-                  min: { value: 0, message: 'Prize money must be positive' },
-                })}
-                type="number"
-                step="0.01"
-                className="input input-bordered w-full"
-                placeholder="500.00"
+        {/* Progress Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-8"
+        >
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-slate-400">
+                Completion Progress
+              </span>
+              <span className="text-sm font-bold text-white">
+                {Math.round(progress)}%
+              </span>
+            </div>
+            <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+                className="h-full bg-gradient-to-r from-indigo-600 to-purple-600"
               />
-              {errors.prizeMoney && (
-                <p className="text-error text-sm mt-1">{errors.prizeMoney.message}</p>
-              )}
             </div>
           </div>
+        </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="label">
-                <span className="label-text">Contest Type *</span>
-              </label>
-              <select
-                {...register('contestType', { required: 'Contest type is required' })}
-                className="select select-bordered w-full"
+        {/* Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="relative"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-xl opacity-20" />
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8">
+            <div className="space-y-6">
+              {/* Contest Name */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
               >
-                <option value="">Select type</option>
-                {contestTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              {errors.contestType && (
-                <p className="text-error text-sm mt-1">{errors.contestType.message}</p>
-              )}
-            </div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Contest Name *
+                </label>
+                <div className="relative">
+                  <FaTrophy className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    {...register("name", {
+                      required: "Contest name is required",
+                    })}
+                    type="text"
+                    placeholder="e.g., Creative Logo Design Challenge"
+                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                  />
+                </div>
+                <AnimatePresence>
+                  {errors.name && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-red-400 text-sm mt-2 flex items-center gap-2"
+                    >
+                      <FaExclamationCircle />
+                      {errors.name.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
-            <div>
-              <label className="label">
-                <span className="label-text">Deadline *</span>
-              </label>
-              <DatePicker
-                selected={deadline}
-                onChange={(date) => {
-                  setDeadline(date);
-                  setValue('deadline', date?.toISOString());
-                }}
-                minDate={new Date()}
-                showTimeSelect
-                dateFormat="MMMM d, yyyy h:mm aa"
-                className="input input-bordered w-full"
-                placeholderText="Select deadline"
-              />
-              {errors.deadline && (
-                <p className="text-error text-sm mt-1">{errors.deadline.message}</p>
-              )}
+              {/* Image URL */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Contest Image URL *
+                </label>
+                <div className="relative">
+                  <FaImage className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    {...register("image", {
+                      required: "Image URL is required",
+                    })}
+                    type="url"
+                    placeholder="https://example.com/contest-banner.jpg"
+                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                  />
+                </div>
+                <AnimatePresence>
+                  {errors.image && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-red-400 text-sm mt-2 flex items-center gap-2"
+                    >
+                      <FaExclamationCircle />
+                      {errors.image.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Description */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  {...register("description", {
+                    required: "Description is required",
+                  })}
+                  rows={4}
+                  placeholder="Describe your contest, what you're looking for, and why participants should join..."
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all resize-none"
+                />
+                <AnimatePresence>
+                  {errors.description && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-red-400 text-sm mt-2 flex items-center gap-2"
+                    >
+                      <FaExclamationCircle />
+                      {errors.description.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Task Instructions */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Task Instructions *
+                </label>
+                <textarea
+                  {...register("taskInstruction", {
+                    required: "Task instructions are required",
+                  })}
+                  rows={4}
+                  placeholder="Provide clear, step-by-step instructions for participants..."
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all resize-none"
+                />
+                <AnimatePresence>
+                  {errors.taskInstruction && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-red-400 text-sm mt-2 flex items-center gap-2"
+                    >
+                      <FaExclamationCircle />
+                      {errors.taskInstruction.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Contest Type */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.9 }}
+              >
+                <label className="block text-sm font-semibold text-slate-300 mb-3">
+                  Contest Type *
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {contestTypes.map((type) => (
+                    <motion.label
+                      key={type.value}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="relative cursor-pointer"
+                    >
+                      <input
+                        {...register("contestType", {
+                          required: "Contest type is required",
+                        })}
+                        type="radio"
+                        value={type.value}
+                        className="peer sr-only"
+                      />
+                      <div className="bg-white/5 border border-white/10 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/20 rounded-xl p-4 text-center transition-all">
+                        <div className="text-3xl mb-2">{type.icon}</div>
+                        <div className="text-xs font-medium text-slate-300">
+                          {type.value}
+                        </div>
+                      </div>
+                    </motion.label>
+                  ))}
+                </div>
+                <AnimatePresence>
+                  {errors.contestType && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-red-400 text-sm mt-2 flex items-center gap-2"
+                    >
+                      <FaExclamationCircle />
+                      {errors.contestType.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Pricing Grid */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.0 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+              >
+                {/* Entry Fee */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Entry Fee ($) *
+                  </label>
+                  <div className="relative">
+                    <FaDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      {...register("price", {
+                        required: "Entry fee is required",
+                        min: { value: 0, message: "Must be positive" },
+                      })}
+                      type="number"
+                      step="0.01"
+                      placeholder="5.00"
+                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                    />
+                  </div>
+                  <AnimatePresence>
+                    {errors.price && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="text-red-400 text-sm mt-2 flex items-center gap-2"
+                      >
+                        <FaExclamationCircle />
+                        {errors.price.message}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Prize Money */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Prize Money ($) *
+                  </label>
+                  <div className="relative">
+                    <FaTrophy className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      {...register("prizeMoney", {
+                        required: "Prize money is required",
+                        min: { value: 0, message: "Must be positive" },
+                      })}
+                      type="number"
+                      step="0.01"
+                      placeholder="500.00"
+                      className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                    />
+                  </div>
+                  <AnimatePresence>
+                    {errors.prizeMoney && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="text-red-400 text-sm mt-2 flex items-center gap-2"
+                      >
+                        <FaExclamationCircle />
+                        {errors.prizeMoney.message}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+
+              {/* Deadline */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.1 }}
+              >
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Deadline *
+                </label>
+                <div className="relative">
+                  <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                  <DatePicker
+                    selected={deadline}
+                    onChange={(date) => {
+                      setDeadline(date);
+                      setValue("deadline", date?.toISOString());
+                    }}
+                    minDate={new Date()}
+                    showTimeSelect
+                    dateFormat="MMMM d, yyyy h:mm aa"
+                    placeholderText="Select contest deadline"
+                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                  />
+                </div>
+              </motion.div>
+
+              {/* Submit Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 }}
+                className="flex gap-4 pt-4"
+              >
+                <motion.button
+                  type="button"
+                  onClick={() => navigate("/dashboard/my-contests")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 px-6 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-semibold transition-all"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  onClick={handleSubmit(onSubmit)}
+                  disabled={createMutation.isPending}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-indigo-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {createMutation.isPending ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      >
+                        ⚡
+                      </motion.div>
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <FaRocket />
+                      Create Contest
+                    </>
+                  )}
+                </motion.button>
+              </motion.div>
             </div>
           </div>
+        </motion.div>
 
-          <div className="card-actions justify-end mt-6">
-            <button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-6 py-3 rounded-lg font-semibold transition-colors"
+        {/* Tips Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.3 }}
+          className="mt-8 bg-gradient-to-r from-emerald-600/20 to-teal-600/20 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6"
+        >
+          <div className="flex items-start gap-4">
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-teal-500 p-3 rounded-xl"
             >
-              {createMutation.isPending ? (
-                <span className="loading loading-spinner"></span>
-              ) : (
-                'Create Contest'
-              )}
-            </button>
+              <FaCheckCircle className="text-white text-xl" />
+            </motion.div>
+            <div>
+              <h3 className="text-lg font-bold text-white mb-2">
+                Pro Tips for Success
+              </h3>
+              <ul className="space-y-1 text-sm text-slate-300">
+                <li>• Use a high-quality, eye-catching banner image</li>
+                <li>• Write clear, detailed task instructions</li>
+                <li>• Set competitive prize amounts to attract participants</li>
+                <li>
+                  • Give participants enough time to create quality submissions
+                </li>
+              </ul>
+            </div>
           </div>
-        </form>
+        </motion.div>
       </div>
     </div>
   );
 };
 
 export default AddContest;
-
