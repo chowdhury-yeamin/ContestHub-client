@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { auth } from '../firebase/firebase.config';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -10,32 +9,19 @@ const api = axios.create({
   },
 });
 
+// Request interceptor: attach JWT token from localStorage
 api.interceptors.request.use(
-  async (config) => {
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      try {
-        const token = await currentUser.getIdToken();
-        config.headers.Authorization = `Bearer ${token}`;
-      } catch (error) {
-        const storedToken = localStorage.getItem('token');
-        if (storedToken) {
-          config.headers.Authorization = `Bearer ${storedToken}`;
-        }
-      }
-    } else {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        config.headers.Authorization = `Bearer ${storedToken}`;
-      }
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// Response interceptor: handle 401 Unauthorized
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -49,4 +35,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
