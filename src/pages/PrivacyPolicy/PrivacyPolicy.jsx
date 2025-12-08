@@ -360,13 +360,13 @@ const PrivacyPolicy = () => {
                   Contact Privacy Team
                 </motion.a>
                 <motion.a
-                  href="/help"
+                  href="/help-center"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-white/10 backdrop-blur-xl border-2 border-white text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg hover:bg-white/20 transition-all inline-flex items-center gap-3 justify-center"
                 >
                   <FaShieldAlt />
-                  Privacy FAQs
+                   FAQs
                 </motion.a>
               </div>
             </div>
