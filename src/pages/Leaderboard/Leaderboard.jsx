@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTrophy, FaMedal, FaAward, FaCrown, FaStar, FaFire } from "react-icons/fa";
+import { Link } from "react-router";
 
 // Mock data for demonstration
 const mockLeaderboard = [
@@ -469,9 +470,9 @@ const Leaderboard = () => {
             whileTap={{ scale: 0.95 }}
             className="inline-block"
           >
-            <button className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-2xl font-black text-lg sm:text-xl shadow-2xl hover:shadow-purple-500/50 transition-all duration-300">
+            <Link to="/all-contests" className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-2xl font-black text-lg sm:text-xl shadow-2xl hover:shadow-purple-500/50 transition-all duration-300">
               Join the Competition 🚀
-            </button>
+            </Link>
           </motion.div>
           <p className="mt-4 text-slate-400 text-sm sm:text-base">
             Compete with the best and earn your place in the hall of fame

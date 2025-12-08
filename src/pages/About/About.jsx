@@ -1,35 +1,51 @@
 import { motion } from "framer-motion";
-import { FaUsers, FaTrophy, FaLightbulb, FaRocket, FaStar, FaChartLine, FaShieldAlt, FaHeart, FaArrowRight, FaCheckCircle } from "react-icons/fa";
+import {
+  FaUsers,
+  FaTrophy,
+  FaLightbulb,
+  FaRocket,
+  FaStar,
+  FaChartLine,
+  FaShieldAlt,
+  FaHeart,
+  FaArrowRight,
+  FaCheckCircle,
+} from "react-icons/fa";
+import { useAuth } from "../../contexts/AuthContext";
 
 const About = () => {
   const features = [
     {
       icon: FaUsers,
       title: "Community Driven",
-      description: "Join thousands of creative individuals competing in exciting contests worldwide",
+      description:
+        "Join thousands of creative individuals competing in exciting contests worldwide",
       gradient: "from-blue-500 to-cyan-500",
-      iconBg: "bg-blue-500/20"
+      iconBg: "bg-blue-500/20",
     },
     {
       icon: FaTrophy,
       title: "Win Prizes",
-      description: "Compete for cash prizes and recognition in various creative categories",
+      description:
+        "Compete for cash prizes and recognition in various creative categories",
       gradient: "from-amber-500 to-orange-500",
-      iconBg: "bg-amber-500/20"
+      iconBg: "bg-amber-500/20",
     },
     {
       icon: FaLightbulb,
       title: "Showcase Talent",
-      description: "Display your skills and get noticed by potential employers and clients",
+      description:
+        "Display your skills and get noticed by potential employers and clients",
       gradient: "from-purple-500 to-pink-500",
-      iconBg: "bg-purple-500/20"
+      iconBg: "bg-purple-500/20",
     },
     {
       icon: FaRocket,
       title: "Grow Your Career",
-      description: "Build your portfolio and advance your creative career through contests",
+      description:
+        "Build your portfolio and advance your creative career through contests",
       gradient: "from-emerald-500 to-teal-500",
-      iconBg: "bg-emerald-500/20"
+      iconBg: "bg-emerald-500/20",
     },
   ];
 
@@ -44,24 +60,23 @@ const About = () => {
     {
       icon: FaShieldAlt,
       title: "Trust & Safety",
-      description: "We ensure fair play and secure transactions for all participants"
+      description:
+        "We ensure fair play and secure transactions for all participants",
     },
     {
       icon: FaHeart,
       title: "Community First",
-      description: "Building a supportive environment where creativity thrives"
+      description: "Building a supportive environment where creativity thrives",
     },
     {
       icon: FaChartLine,
       title: "Growth Focused",
-      description: "Helping you develop skills and advance your creative career"
+      description:
+        "Helping you develop skills and advance your creative career",
     },
   ];
 
-  const handleNavigate = (path) => {
-    console.log("Navigating to:", path);
-    // Replace with: navigate(path);
-  };
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
@@ -105,11 +120,16 @@ const About = () => {
           </motion.div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-6">
-            About <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">ContestHub</span>
+            About{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              ContestHub
+            </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-slate-300 max-w-4xl mx-auto leading-relaxed mb-8">
-            ContestHub is a premier platform connecting creative talents with exciting contest opportunities. Whether you're a designer, writer, entrepreneur, or gamer, we provide a space to{" "}
+            ContestHub is a premier platform connecting creative talents with
+            exciting contest opportunities. Whether you're a designer, writer,
+            entrepreneur, or gamer, we provide a space to{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 font-bold">
               showcase your skills
             </span>{" "}
@@ -131,8 +151,12 @@ const About = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity" />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center">
                   <stat.icon className="text-3xl text-indigo-400 mx-auto mb-2" />
-                  <div className="text-3xl font-black text-white mb-1">{stat.value}</div>
-                  <div className="text-sm text-slate-400 font-medium">{stat.label}</div>
+                  <div className="text-3xl font-black text-white mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-slate-400 font-medium">
+                    {stat.label}
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -166,13 +190,21 @@ const About = () => {
                 whileHover={{ y: -10, scale: 1.02 }}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity`}
+                />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-8 transition-all">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-xl ${feature.iconBg} mb-6 group-hover:scale-110 transition-transform`}>
+                  <div
+                    className={`inline-flex items-center justify-center w-16 h-16 rounded-xl ${feature.iconBg} mb-6 group-hover:scale-110 transition-transform`}
+                  >
                     <feature.icon className="text-3xl text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{feature.description}</p>
+                  <h3 className="text-2xl font-bold text-white mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-400 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -200,7 +232,9 @@ const About = () => {
                 Our Mission
               </h2>
               <p className="text-xl md:text-2xl text-slate-200 max-w-3xl mx-auto leading-relaxed">
-                To empower creative individuals worldwide by providing a platform where talent meets opportunity, fostering innovation, and rewarding excellence through engaging competitions.
+                To empower creative individuals worldwide by providing a
+                platform where talent meets opportunity, fostering innovation,
+                and rewarding excellence through engaging competitions.
               </p>
             </div>
           </div>
@@ -238,8 +272,12 @@ const About = () => {
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 mb-4 group-hover:scale-110 transition-transform">
                     <value.icon className="text-2xl text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{value.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{value.description}</p>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {value.title}
+                  </h3>
+                  <p className="text-slate-400 leading-relaxed">
+                    {value.description}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -267,9 +305,24 @@ const About = () => {
             <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 -translate-y-1/2 opacity-30" />
 
             {[
-              { step: "01", title: "Sign Up", desc: "Create your free account and complete your profile", icon: "🎯" },
-              { step: "02", title: "Browse & Join", desc: "Explore contests and register for the ones you like", icon: "🔍" },
-              { step: "03", title: "Compete & Win", desc: "Submit your work and compete for amazing prizes", icon: "🏆" },
+              {
+                step: "01",
+                title: "Sign Up",
+                desc: "Create your free account and complete your profile",
+                icon: "🎯",
+              },
+              {
+                step: "02",
+                title: "Browse & Join",
+                desc: "Explore contests and register for the ones you like",
+                icon: "🔍",
+              },
+              {
+                step: "03",
+                title: "Compete & Win",
+                desc: "Submit your work and compete for amazing prizes",
+                icon: "🏆",
+              },
             ].map((item, idx) => (
               <motion.div
                 key={idx}
@@ -286,7 +339,9 @@ const About = () => {
                   <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-4">
                     {item.step}
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">{item.title}</h3>
+                  <h3 className="text-2xl font-bold text-white mb-3">
+                    {item.title}
+                  </h3>
                   <p className="text-slate-400 leading-relaxed">{item.desc}</p>
                 </div>
               </motion.div>
@@ -311,7 +366,7 @@ const About = () => {
               transition={{ duration: 4, repeat: Infinity }}
               className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
             />
-            
+
             <div className="relative z-10">
               <motion.div
                 animate={{ y: [0, -10, 0] }}
@@ -324,20 +379,25 @@ const About = () => {
                 Ready to Get Started?
               </h2>
               <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-white/90">
-                Join our community today and start participating in amazing contests!
+                Join our community today and start participating in amazing
+                contests!
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.a
-                  href="/register"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-white/30 transition-all inline-flex items-center gap-3 justify-center"
-                >
-                  <FaRocket />
-                  Sign Up Now
-                  <FaArrowRight />
-                </motion.a>
+                {user ? (
+                  ""
+                ) : (
+                  <motion.a
+                    href="/register"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-white/30 transition-all inline-flex items-center gap-3 justify-center"
+                  >
+                    <FaRocket />
+                    Sign Up Now
+                    <FaArrowRight />
+                  </motion.a>
+                )}
                 <motion.a
                   href="/all-contests"
                   whileHover={{ scale: 1.05 }}

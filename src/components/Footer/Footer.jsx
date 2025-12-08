@@ -361,13 +361,6 @@ const Footer = () => {
             >
               Terms
             </motion.a>
-            <motion.a
-              href="/cookies"
-              whileHover={{ y: -2 }}
-              className="text-slate-400 hover:text-white transition-colors duration-300"
-            >
-              Cookies
-            </motion.a>
           </div>
         </motion.div>
 

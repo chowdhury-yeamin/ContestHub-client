@@ -3,14 +3,50 @@ import { Link, useNavigate } from "react-router-dom";
 import { useContests } from "../../hooks/useContests";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { FaSearch, FaTrophy, FaUsers, FaCalendarAlt, FaStar, FaRocket, FaCrown, FaFire, FaArrowRight, FaCheckCircle } from "react-icons/fa";
+import {
+  FaSearch,
+  FaTrophy,
+  FaUsers,
+  FaCalendarAlt,
+  FaStar,
+  FaRocket,
+  FaCrown,
+  FaFire,
+  FaArrowRight,
+  FaCheckCircle,
+} from "react-icons/fa";
 
 const contestCategories = [
-  { name: "Image Design", icon: "🎨", description: "Logo, graphics, and visual design contests", gradient: "from-pink-500 to-rose-500" },
-  { name: "Article Writing", icon: "✍️", description: "Writing competitions for creative minds", gradient: "from-blue-500 to-cyan-500" },
-  { name: "Business Ideas", icon: "💡", description: "Pitch your innovative ideas", gradient: "from-amber-500 to-orange-500" },
-  { name: "Gaming Reviews", icon: "🎮", description: "Share insights and reviews on games", gradient: "from-purple-500 to-pink-500" },
-  { name: "Photography", icon: "📸", description: "Capture and showcase your moments", gradient: "from-emerald-500 to-teal-500" },
+  {
+    name: "Image Design",
+    icon: "🎨",
+    description: "Logo, graphics, and visual design contests",
+    gradient: "from-pink-500 to-rose-500",
+  },
+  {
+    name: "Article Writing",
+    icon: "✍️",
+    description: "Writing competitions for creative minds",
+    gradient: "from-blue-500 to-cyan-500",
+  },
+  {
+    name: "Business Ideas",
+    icon: "💡",
+    description: "Pitch your innovative ideas",
+    gradient: "from-amber-500 to-orange-500",
+  },
+  {
+    name: "Gaming Reviews",
+    icon: "🎮",
+    description: "Share insights and reviews on games",
+    gradient: "from-purple-500 to-pink-500",
+  },
+  {
+    name: "Photography",
+    icon: "📸",
+    description: "Capture and showcase your moments",
+    gradient: "from-emerald-500 to-teal-500",
+  },
 ];
 
 const Home = () => {
@@ -27,14 +63,25 @@ const Home = () => {
     totalContests: 0,
     totalParticipants: 0,
     totalWinners: 1234,
-    totalPrizes: 0
+    totalPrizes: 0,
   });
 
   useEffect(() => {
     const totalContests = contests.length;
-    const totalParticipants = contests.reduce((acc, c) => acc + c.participantsCount, 0);
-    const totalPrizes = contests.reduce((acc, c) => acc + (c.prizeMoney || 0), 0);
-    setStats({ totalContests, totalParticipants, totalWinners: 1234, totalPrizes });
+    const totalParticipants = contests.reduce(
+      (acc, c) => acc + c.participantsCount,
+      0
+    );
+    const totalPrizes = contests.reduce(
+      (acc, c) => acc + (c.prizeMoney || 0),
+      0
+    );
+    setStats({
+      totalContests,
+      totalParticipants,
+      totalWinners: 1234,
+      totalPrizes,
+    });
   }, [contests]);
 
   const popularContests = contests
@@ -47,19 +94,22 @@ const Home = () => {
       name: "Alice Johnson",
       contest: "Logo Design Contest",
       prize: 500,
-      photoURL: "https://ui-avatars.com/api/?name=Alice+Johnson&background=6366F1&color=fff",
+      photoURL:
+        "https://ui-avatars.com/api/?name=Alice+Johnson&background=6366F1&color=fff",
     },
     {
       name: "Bob Smith",
       contest: "Article Writing Challenge",
       prize: 300,
-      photoURL: "https://ui-avatars.com/api/?name=Bob+Smith&background=8B5CF6&color=fff",
+      photoURL:
+        "https://ui-avatars.com/api/?name=Bob+Smith&background=8B5CF6&color=fff",
     },
     {
       name: "Charlie Brown",
       contest: "Business Idea Pitch",
       prize: 1000,
-      photoURL: "https://ui-avatars.com/api/?name=Charlie+Brown&background=F59E0B&color=fff",
+      photoURL:
+        "https://ui-avatars.com/api/?name=Charlie+Brown&background=F59E0B&color=fff",
     },
   ];
 
@@ -176,7 +226,7 @@ const Home = () => {
                       type="text"
                       value={searchType}
                       onChange={(e) => setSearchType(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+                      onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
                       placeholder="Search contests by type, category, or keyword..."
                       className="w-full pl-12 pr-4 py-4 bg-transparent text-white placeholder-slate-400 focus:outline-none"
                     />
@@ -205,10 +255,30 @@ const Home = () => {
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { label: "Active Contests", value: stats.totalContests, icon: FaFire, gradient: "from-orange-500 to-red-500" },
-              { label: "Participants", value: stats.totalParticipants.toLocaleString(), icon: FaUsers, gradient: "from-blue-500 to-cyan-500" },
-              { label: "Winners", value: stats.totalWinners.toLocaleString(), icon: FaCrown, gradient: "from-yellow-500 to-amber-500" },
-              { label: "Prize Pool", value: `$${stats.totalPrizes.toLocaleString()}`, icon: FaTrophy, gradient: "from-emerald-500 to-teal-500" },
+              {
+                label: "Active Contests",
+                value: stats.totalContests,
+                icon: FaFire,
+                gradient: "from-orange-500 to-red-500",
+              },
+              {
+                label: "Participants",
+                value: stats.totalParticipants.toLocaleString(),
+                icon: FaUsers,
+                gradient: "from-blue-500 to-cyan-500",
+              },
+              {
+                label: "Winners",
+                value: stats.totalWinners.toLocaleString(),
+                icon: FaCrown,
+                gradient: "from-yellow-500 to-amber-500",
+              },
+              {
+                label: "Prize Pool",
+                value: `$${stats.totalPrizes.toLocaleString()}`,
+                icon: FaTrophy,
+                gradient: "from-emerald-500 to-teal-500",
+              },
             ].map((stat, idx) => (
               <motion.div
                 key={idx}
@@ -219,9 +289,13 @@ const Home = () => {
                 whileHover={{ y: -5, scale: 1.02 }}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-2xl blur-xl`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-2xl blur-xl`}
+                />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-center">
-                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${stat.gradient} mb-3`}>
+                  <div
+                    className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${stat.gradient} mb-3`}
+                  >
                     <stat.icon className="text-white text-xl" />
                   </div>
                   <div className="text-3xl sm:text-4xl font-black text-white mb-1">
@@ -270,17 +344,27 @@ const Home = () => {
                 onClick={() => handleCategoryClick(cat.name)}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${cat.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-75 transition-opacity`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${cat.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-75 transition-opacity`}
+                />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/30 rounded-2xl p-6 text-center transition-all">
                   <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 3,
+                    }}
                     className="text-5xl mb-3"
                   >
                     {cat.icon}
                   </motion.div>
-                  <h3 className="font-bold text-white text-lg mb-2">{cat.name}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{cat.description}</p>
+                  <h3 className="font-bold text-white text-lg mb-2">
+                    {cat.name}
+                  </h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {cat.description}
+                  </p>
                 </div>
               </motion.button>
             ))}
@@ -364,11 +448,15 @@ const Home = () => {
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2 text-slate-300">
                           <FaUsers className="text-blue-400" />
-                          <span className="font-medium">{contest.participantsCount}</span>
+                          <span className="font-medium">
+                            {contest.participantsCount}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-300">
                           <FaTrophy className="text-amber-400" />
-                          <span className="font-medium">${contest.prizeMoney}</span>
+                          <span className="font-medium">
+                            ${contest.prizeMoney}
+                          </span>
                         </div>
                       </div>
 
@@ -404,26 +492,26 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { 
-                step: "01", 
+              {
+                step: "01",
                 icon: "🔍",
-                title: "Browse Contests", 
+                title: "Browse Contests",
                 desc: "Explore creative contests across categories and find the perfect match for your skills",
-                color: "from-blue-500 to-cyan-500"
+                color: "from-blue-500 to-cyan-500",
               },
-              { 
-                step: "02", 
+              {
+                step: "02",
                 icon: "🎯",
-                title: "Register & Participate", 
+                title: "Register & Participate",
                 desc: "Pay the entry fee, submit your work, and compete with talented creators worldwide",
-                color: "from-purple-500 to-pink-500"
+                color: "from-purple-500 to-pink-500",
               },
-              { 
-                step: "03", 
+              {
+                step: "03",
                 icon: "🏆",
-                title: "Win Prizes", 
+                title: "Win Prizes",
                 desc: "Get recognized for your talent, win amazing prizes, and build your reputation",
-                color: "from-amber-500 to-orange-500"
+                color: "from-amber-500 to-orange-500",
               },
             ].map((item, idx) => (
               <motion.div
@@ -435,13 +523,19 @@ const Home = () => {
                 whileHover={{ y: -10 }}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity`}
+                />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-8 text-center transition-all">
                   <div className="text-6xl mb-4">{item.icon}</div>
-                  <div className={`text-6xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r ${item.color}`}>
+                  <div
+                    className={`text-6xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r ${item.color}`}
+                  >
                     {item.step}
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">{item.title}</h3>
+                  <h3 className="text-2xl font-bold text-white mb-3">
+                    {item.title}
+                  </h3>
                   <p className="text-slate-400 leading-relaxed">{item.desc}</p>
                 </div>
               </motion.div>
@@ -481,7 +575,11 @@ const Home = () => {
                   <div className="relative inline-block mb-4">
                     <motion.div
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                       className="absolute -inset-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-md opacity-75"
                     />
                     <img
@@ -493,8 +591,12 @@ const Home = () => {
                       <FaTrophy className="text-white text-lg" />
                     </div>
                   </div>
-                  <h3 className="font-bold text-xl text-white mb-1">{winner.name}</h3>
-                  <p className="text-slate-400 text-sm mb-3">{winner.contest}</p>
+                  <h3 className="font-bold text-xl text-white mb-1">
+                    {winner.name}
+                  </h3>
+                  <p className="text-slate-400 text-sm mb-3">
+                    {winner.contest}
+                  </p>
                   <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
                     ${winner.prize}
                   </div>
@@ -521,7 +623,7 @@ const Home = () => {
               transition={{ duration: 4, repeat: Infinity }}
               className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
             />
-            
+
             <div className="relative z-10">
               <motion.div
                 animate={{ y: [0, -10, 0] }}
@@ -534,7 +636,8 @@ const Home = () => {
                 Become a Contest Creator
               </h2>
               <p className="text-lg md:text-2xl mb-8 max-w-3xl mx-auto text-white/90">
-                Create contests easily, manage participants, and declare winners. Start building your community today!
+                Create contests easily, manage participants, and declare
+                winners. Start building your community today!
               </p>
               <Link to="/dashboard">
                 <motion.button

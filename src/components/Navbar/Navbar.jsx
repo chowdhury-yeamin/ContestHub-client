@@ -11,6 +11,7 @@ import {
   FaSearch,
 } from "react-icons/fa";
 
+
 const Navbar = ({ user, logout }) => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
