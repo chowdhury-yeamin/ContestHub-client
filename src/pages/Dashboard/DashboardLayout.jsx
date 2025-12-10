@@ -2,7 +2,6 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
-  FaHome,
   FaTrophy,
   FaUser,
   FaPlus,
@@ -10,11 +9,11 @@ import {
   FaFileAlt,
   FaUsers,
   FaCog,
-  FaChartLine,
-  FaStar,
   FaCrown,
+  FaStar,
   FaRocket,
 } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
 const DashboardLayout = () => {
   const { user } = useAuth();
@@ -23,25 +22,60 @@ const DashboardLayout = () => {
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
 
-  const userRoutes = [
+  const [stats, setStats] = useState({
+    activeContests: 0,
+    totalWins: 0,
+    prizeMoney: 0,
+  });
+
+  // Fetch stats dynamically
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Active contests
+        const res1 = await fetch("/api/contests?status=approved");
+        const data1 = await res1.json();
+        const activeContests = data1.contests.length;
+
+        // User wins
+        const res2 = await fetch("/api/users/me/wins", {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+        const data2 = await res2.json();
+        const totalWins = data2.contests.length;
+        const prizeMoney = data2.contests.reduce(
+          (sum, c) => sum + (c.prize || 0),
+          0
+        );
+
+        setStats({ activeContests, totalWins, prizeMoney });
+      } catch (err) {
+        console.error("Failed to fetch stats:", err);
+      }
+    };
+
+    if (user) fetchStats();
+  }, [user]);
+
+  // -----------------------------
+  // ROLE-BASED ROUTES
+  // -----------------------------
+  const normalUserRoutes = [
     {
       path: "/dashboard/participated",
       label: "My Participated Contests",
-      icon: FaList,
       gradient: "from-blue-500 to-cyan-500",
       emoji: "📋",
     },
     {
       path: "/dashboard/winnings",
       label: "My Winning Contests",
-      icon: FaTrophy,
       gradient: "from-amber-500 to-orange-500",
       emoji: "🏆",
     },
     {
       path: "/dashboard/profile",
       label: "My Profile",
-      icon: FaUser,
       gradient: "from-purple-500 to-pink-500",
       emoji: "👤",
     },
@@ -51,81 +85,81 @@ const DashboardLayout = () => {
     {
       path: "/dashboard/add-contest",
       label: "Add Contest",
-      icon: FaPlus,
       gradient: "from-emerald-500 to-teal-500",
       emoji: "➕",
     },
     {
       path: "/dashboard/my-contests",
       label: "My Created Contests",
-      icon: FaList,
       gradient: "from-indigo-500 to-purple-500",
       emoji: "🎯",
     },
     {
       path: "/dashboard/submissions",
-      label: "Submitted Tasks",
-      icon: FaFileAlt,
+      label: "Submitted Contests",
       gradient: "from-pink-500 to-rose-500",
       emoji: "📄",
     },
-    ...userRoutes,
+    {
+      path: "/dashboard/profile",
+      label: "My Profile",
+      gradient: "from-purple-500 to-pink-500",
+      emoji: "👤",
+    }, // keep profile
   ];
 
   const adminRoutes = [
     {
       path: "/dashboard/manage-users",
       label: "Manage Users",
-      icon: FaUsers,
       gradient: "from-blue-500 to-cyan-500",
       emoji: "👥",
     },
     {
       path: "/dashboard/manage-contests",
       label: "Manage Contests",
-      icon: FaCog,
       gradient: "from-orange-500 to-red-500",
       emoji: "⚙️",
     },
-    ...creatorRoutes,
+    {
+      path: "/dashboard/profile",
+      label: "My Profile",
+      gradient: "from-purple-500 to-pink-500",
+      emoji: "👤",
+    }, // keep profile
   ];
 
   const routes =
     user?.role === "admin"
-      ? adminRoutes
+      ? [...adminRoutes]
       : user?.role === "creator"
-      ? creatorRoutes
-      : userRoutes;
+      ? [...creatorRoutes]
+      : [...normalUserRoutes];
 
-  const getRoleBadge = () => {
-    const roleConfig = {
-      admin: {
-        label: "Admin",
-        gradient: "from-red-500 to-orange-500",
-        icon: FaCrown,
-        emoji: "👑",
-      },
-      creator: {
-        label: "Creator",
-        gradient: "from-purple-500 to-pink-500",
-        icon: FaRocket,
-        emoji: "🚀",
-      },
-      user: {
-        label: "User",
-        gradient: "from-blue-500 to-cyan-500",
-        icon: FaStar,
-        emoji: "⭐",
-      },
-    };
-    return roleConfig[user?.role] || roleConfig.user;
-  };
-
-  const roleBadge = getRoleBadge();
+  // -----------------------------
+  // ROLE BADGE
+  // -----------------------------
+  const roleBadge = {
+    admin: {
+      label: "Admin",
+      gradient: "from-red-500 to-orange-500",
+      emoji: "👑",
+    },
+    creator: {
+      label: "Creator",
+      gradient: "from-purple-500 to-pink-500",
+      emoji: "🚀",
+    },
+    user: {
+      label: "User",
+      gradient: "from-blue-500 to-cyan-500",
+      emoji: "⭐",
+    },
+  }[user?.role ?? "user"];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
-      {/* Enhanced Animated Background */}
+      {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           style={{ y: y1 }}
@@ -146,7 +180,7 @@ const DashboardLayout = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 pt-24">
-        {/* Dashboard Header */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,7 +195,7 @@ const DashboardLayout = () => {
               <p className="text-lg text-slate-400">
                 Welcome back,{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-bold">
-                  {user?.name || "User"}
+                  {user?.displayName || user?.name || "User"}
                 </span>
               </p>
             </div>
@@ -195,7 +229,7 @@ const DashboardLayout = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Enhanced Sidebar */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -203,11 +237,8 @@ const DashboardLayout = () => {
               transition={{ duration: 0.6 }}
               className="relative sticky top-24"
             >
-              {/* Sidebar Background Glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20 rounded-2xl blur-xl" />
-
               <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                {/* Navigation Header */}
                 <div className="mb-6 pb-4 border-b border-white/10">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 animate-pulse" />
@@ -220,7 +251,7 @@ const DashboardLayout = () => {
                   </p>
                 </div>
 
-                {/* Navigation Links */}
+                {/* Links */}
                 <ul className="space-y-2">
                   {routes.map((route, idx) => {
                     const isActive = location.pathname === route.path;
@@ -234,13 +265,11 @@ const DashboardLayout = () => {
                         whileTap={{ scale: 0.98 }}
                         className="relative group"
                       >
-                        {/* Hover Glow Effect */}
                         {isActive && (
                           <div
                             className={`absolute inset-0 bg-gradient-to-r ${route.gradient} rounded-xl blur-md opacity-50`}
                           />
                         )}
-
                         <Link
                           to={route.path}
                           className={`relative flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
@@ -249,19 +278,8 @@ const DashboardLayout = () => {
                               : "text-slate-300 hover:bg-white/5 hover:text-white"
                           }`}
                         >
-                          {/* Emoji Icon */}
-                          <motion.span
-                            animate={isActive ? { scale: [1, 1.2, 1] } : {}}
-                            transition={{ duration: 0.5 }}
-                            className="text-xl"
-                          >
-                            {route.emoji}
-                          </motion.span>
-
-                          {/* Label */}
+                          <span className="text-xl">{route.emoji}</span>
                           <span className="flex-1 text-sm">{route.label}</span>
-
-                          {/* Active Indicator */}
                           {isActive && (
                             <motion.div
                               layoutId="activeIndicator"
@@ -295,19 +313,19 @@ const DashboardLayout = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Active Contests</span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                        12
+                        {stats.activeContests}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Total Wins</span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-                        5
+                        {stats.totalWins}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Prize Money</span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
-                        $2,500
+                        ${stats.prizeMoney.toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -316,7 +334,7 @@ const DashboardLayout = () => {
             </motion.div>
           </div>
 
-          {/* Enhanced Main Content */}
+          {/* Main Content */}
           <div className="lg:col-span-3">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -324,9 +342,7 @@ const DashboardLayout = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative group"
             >
-              {/* Content Background Glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl blur-xl group-hover:opacity-75 transition-opacity" />
-
               <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 min-h-[70vh]">
                 <Outlet />
               </div>

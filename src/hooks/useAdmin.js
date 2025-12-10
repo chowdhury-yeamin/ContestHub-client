@@ -9,8 +9,8 @@ export const useAllUsers = () => {
   return useQuery({
     queryKey: ["admin", "users"],
     queryFn: async () => {
-      const { data } = await api.get("/admin/users");
-      return data;
+      const response = await api.get("/admin/users");
+      return response.data;
     },
   });
 };
@@ -24,12 +24,11 @@ export const useChangeUserRole = () => {
 
   return useMutation({
     mutationFn: async ({ userId, newRole }) => {
-      const { data } = await api.put(`/admin/users/${userId}/role`, {
+      const response = await api.put(`/admin/users/${userId}/role`, {
         role: newRole,
       });
-      return data;
+      return response.data;
     },
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
@@ -44,8 +43,8 @@ export const useAdminContests = () => {
   return useQuery({
     queryKey: ["admin", "contests"],
     queryFn: async () => {
-      const { data } = await api.get("/admin/contests");
-      return data;
+      const response = await api.get("/admin/contests");
+      return response.data;
     },
   });
 };
@@ -59,8 +58,8 @@ export const useApproveContest = () => {
 
   return useMutation({
     mutationFn: async (contestId) => {
-      const { data } = await api.put(`/admin/contests/${contestId}/approve`);
-      return data;
+      const response = await api.put(`/admin/contests/${contestId}/approve`);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "contests"] });
@@ -78,10 +77,9 @@ export const useRejectContest = () => {
 
   return useMutation({
     mutationFn: async (contestId) => {
-      const { data } = await api.put(`/admin/contests/${contestId}/reject`);
-      return data;
+      const response = await api.put(`/admin/contests/${contestId}/reject`);
+      return response.data;
     },
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "contests"] });
     },
@@ -97,10 +95,9 @@ export const useAdminDeleteContest = () => {
 
   return useMutation({
     mutationFn: async (contestId) => {
-      const { data } = await api.delete(`/admin/contests/${contestId}`);
-      return data;
+      const response = await api.delete(`/admin/contests/${contestId}`);
+      return response.data;
     },
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "contests"] });
       queryClient.invalidateQueries({ queryKey: ["contests"] });

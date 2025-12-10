@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useContest,
-  useRegisterContest,
   useSubmitTask,
+  useRegisterContest,
 } from "../../hooks/useContests";
 import { useAuth } from "../../contexts/AuthContext";
 import Swal from "sweetalert2";
@@ -28,7 +28,7 @@ const ContestDetails = () => {
   // Check if contest has ended
   const isEnded = contest && new Date(contest.deadline) < new Date();
 
-  // Check if user is registered (mock - replace with API call)
+  // Check if user is registered ( replace with API call)
   const [isRegistered, setIsRegistered] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -62,7 +62,7 @@ const ContestDetails = () => {
     }
   }, [contest, isEnded]);
 
-  // TODO: Replace with actual payment integration - POST /payment/create-intent, then POST /contests/:id/register
+  //Replace with actual payment integration - POST /payment/create-intent, then POST /contests/:id/register
   const handleRegister = async () => {
     Swal.fire({
       title: "Processing Payment",
@@ -159,24 +159,24 @@ const ContestDetails = () => {
         <div className="relative h-64 md:h-96 rounded-3xl overflow-hidden mb-8">
           <img
             src={contest.image}
-            alt={contest.name}
+            alt={contest.title}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              {contest.name}
+              {contest.title}
             </h1>
             <div className="flex flex-wrap gap-2 sm:gap-4 text-sm sm:text-base md:text-lg">
               <span className="flex items-center gap-2">
                 <FaUsers /> {contest.participantsCount} Participants
               </span>
               <span className="flex items-center gap-2">
-                <FaTrophy /> ${contest.prizeMoney} Prize
+                <FaTrophy /> ${contest.prize} Prize
               </span>
               <span className="flex items-center gap-2">
                 <FaCalendarAlt />{" "}
-                {new Date(contest.deadline).toLocaleDateString()}
+                {new Date(contest.endDate).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -200,7 +200,7 @@ const ContestDetails = () => {
               <div className="card-body">
                 <h2 className="card-title">Task Instructions</h2>
                 <p className="text-muted whitespace-pre-line">
-                  {contest.taskInstruction}
+                  {contest.taskInstructions}
                 </p>
               </div>
             </div>

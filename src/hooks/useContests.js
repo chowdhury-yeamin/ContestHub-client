@@ -1,115 +1,55 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../services/api";
+import axios from "axios";
 
-/* ============================================================
-   GET ALL CONTESTS
-   GET /contests
-============================================================ */
+// ==================== Fetch all contests ====================
 export const useContests = () => {
   return useQuery({
     queryKey: ["contests"],
     queryFn: async () => {
       const { data } = await api.get("/contests");
-      return data;
+      if (data && Array.isArray(data.contests)) return data.contests;
+      if (Array.isArray(data)) return data;
+      return [];
     },
   });
 };
 
-/* ============================================================
-   SEARCH CONTESTS
-   GET /contests/search?type=...
-============================================================ */
-export const useSearchContests = (searchType) => {
-  return useQuery({
-    queryKey: ["contests", "search", searchType],
-    queryFn: async () => {
-      const { data } = await api.get(`/contests/search?type=${searchType}`);
-      return data;
-    },
-    enabled: !!searchType,
-  });
-};
-
-/* ============================================================
-   GET SINGLE CONTEST
-   GET /contests/:id
-============================================================ */
+// ==================== Fetch single contest ====================
 export const useContest = (id) => {
   return useQuery({
     queryKey: ["contest", id],
     queryFn: async () => {
       const { data } = await api.get(`/contests/${id}`);
-      return data;
+      return data.contest;
     },
-    enabled: !!id,
   });
 };
 
-/* ============================================================
-   CREATE CONTEST
-   POST /contests
-============================================================ */
-export const useCreateContest = () => {
+// ==================== Submit task ====================
+export const useSubmitTask = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (contestData) => {
-      const { data } = await api.post("/contests", contestData);
+    mutationFn: async ({ contestId, submissionData }) => {
+      const formData = new FormData();
+      for (const key in submissionData) {
+        formData.append(key, submissionData[key]);
+      }
+      const { data } = await axios.post(
+        `/api/contests/${contestId}/submit`,
+        formData
+      );
       return data;
     },
-
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contests"] });
+      queryClient.invalidateQueries({ queryKey: ["contest"] });
     },
   });
 };
 
-/* ============================================================
-   UPDATE CONTEST
-   PUT /contests/:id
-============================================================ */
-export const useUpdateContest = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, data }) => {
-      const res = await api.put(`/contests/${id}`, data);
-      return res.data;
-    },
-
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ["contest", id] });
-      queryClient.invalidateQueries({ queryKey: ["contests"] });
-    },
-  });
-};
-
-/* ============================================================
-   DELETE CONTEST
-   DELETE /contests/:id
-============================================================ */
-export const useDeleteContest = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id) => {
-      const { data } = await api.delete(`/contests/${id}`);
-      return data;
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contests"] });
-    },
-  });
-};
-
-/* ============================================================
-   REGISTER FOR CONTEST
-   POST /contests/:id/register
-============================================================ */
+// ==================== Register contest ====================
 export const useRegisterContest = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ contestId, paymentData }) => {
       const { data } = await api.post(
@@ -118,55 +58,72 @@ export const useRegisterContest = () => {
       );
       return data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contest"] });
+    },
+  });
+};
 
-    onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ["contest", vars.contestId] });
+// ==================== Create a new contest ====================
+export const useCreateContest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (contestData) => {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/contests",
+        contestData
+      );
+      return data;
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contests"] });
     },
   });
 };
 
-/* ============================================================
-   SUBMIT CONTEST WORK
-   POST /contests/:id/submit
-============================================================ */
-export const useSubmitTask = () => {
+// ==================== Delete a contest ====================
+export const useDeleteContest = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ contestId, submissionData }) => {
-      const { data } = await api.post(
-        `/contests/${contestId}/submit`,
-        submissionData
-      );
+    mutationFn: async (contestId) => {
+      const { data } = await api.delete(`/contests/${contestId}`);
       return data;
     },
-
-    onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ["contest", vars.contestId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contests"] });
     },
   });
 };
 
-/* ============================================================
-   DECLARE WINNER
-   POST /contests/:id/declare-winner
-============================================================ */
+// ==================== Declare a submission winner ====================
 export const useDeclareWinner = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ contestId, winnerId }) => {
-      const { data } = await api.post(
-        `/contests/${contestId}/declare-winner`,
-        { winnerId }
-      );
+    mutationFn: async ({ submissionId, isWinner = true, score = null }) => {
+      const { data } = await api.post(`/submissions/${submissionId}/winner`, {
+        isWinner,
+        score,
+      });
       return data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+      queryClient.invalidateQueries({ queryKey: ["contest"] });
+    },
+  });
+};
 
-    onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ["contest", vars.contestId] });
+// ==================== Update a contest ====================
+export const useUpdateContest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ contestId, updateData }) => {
+      const { data } = await api.put(`/contests/${contestId}`, updateData);
+      return data;
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contests"] });
+      queryClient.invalidateQueries({ queryKey: ["contest"] });
     },
   });
 };

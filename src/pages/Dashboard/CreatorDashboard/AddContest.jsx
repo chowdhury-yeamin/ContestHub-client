@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useCreateContest } from "../../../hooks/useContests";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
@@ -16,6 +15,7 @@ import {
   FaRocket,
   FaFileAlt,
 } from "react-icons/fa";
+import { useCreateContest } from "../../../hooks/useContests";
 
 const AddContest = () => {
   const navigate = useNavigate();
@@ -35,6 +35,7 @@ const AddContest = () => {
     { value: "Business Ideas", icon: "💡" },
     { value: "Gaming Reviews", icon: "🎮" },
     { value: "Video Content", icon: "🎥" },
+    { value: "Coding Challenges", icon: "💻" },
     { value: "Photography", icon: "📸" },
     { value: "Other", icon: "⭐" },
   ];
@@ -70,10 +71,14 @@ const AddContest = () => {
 
     try {
       const contestData = {
-        ...data,
-        deadline: deadline.toISOString(),
-        price: parseFloat(data.price),
+        name: data.name,
+        description: data.description,
+        image: data.image,
+        type: data.contestType,
+        entryFee: parseFloat(data.price),
         prizeMoney: parseFloat(data.prizeMoney),
+        deadline: deadline.toISOString(),
+        taskInstruction: data.taskInstruction,
       };
 
       await createMutation.mutateAsync(contestData);
@@ -97,7 +102,7 @@ const AddContest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden py-12">
+    <div className="min-h-screen rounded-2xl bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden py-12">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -226,7 +231,7 @@ const AddContest = () => {
                       required: "Image URL is required",
                     })}
                     type="url"
-                    placeholder="https://example.com/contest-banner.jpg"
+                    placeholder="https://example.com/image.jpg"
                     className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all"
                   />
                 </div>
@@ -503,37 +508,6 @@ const AddContest = () => {
                   )}
                 </motion.button>
               </motion.div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Tips Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.3 }}
-          className="mt-8 bg-gradient-to-r from-emerald-600/20 to-teal-600/20 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6"
-        >
-          <div className="flex items-start gap-4">
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-teal-500 p-3 rounded-xl"
-            >
-              <FaCheckCircle className="text-white text-xl" />
-            </motion.div>
-            <div>
-              <h3 className="text-lg font-bold text-white mb-2">
-                Pro Tips for Success
-              </h3>
-              <ul className="space-y-1 text-sm text-slate-300">
-                <li>• Use a high-quality, eye-catching banner image</li>
-                <li>• Write clear, detailed task instructions</li>
-                <li>• Set competitive prize amounts to attract participants</li>
-                <li>
-                  • Give participants enough time to create quality submissions
-                </li>
-              </ul>
             </div>
           </div>
         </motion.div>

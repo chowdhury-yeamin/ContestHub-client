@@ -1,15 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
-  FaGoogle,
   FaUser,
   FaEnvelope,
   FaLock,
-  FaImage,
-  FaCheckCircle,
   FaRocket,
   FaTrophy,
   FaStar,
@@ -18,12 +15,13 @@ import {
 } from "react-icons/fa";
 
 const Register = () => {
-  const { register: registerUser, googleSignIn } = useAuth();
+  const { register: registerUser } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
+  const { user } = useAuth();
 
   const {
     register,
@@ -37,17 +35,9 @@ const Register = () => {
       data.name,
       data.email,
       data.password,
-      data.photoURL
+      "", // photoURL
+      "user" // default role
     );
-    setLoading(false);
-    if (result.success) {
-      navigate("/");
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    const result = await googleSignIn();
     setLoading(false);
     if (result.success) {
       navigate("/");
@@ -76,6 +66,12 @@ const Register = () => {
       color: "from-emerald-500 to-teal-500",
     },
   ];
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/", { replace: true });
+    }
+  }, [loading, user, navigate]);
 
   return (
     <div className="min-h-screen pt-24 bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden flex items-center justify-center pb-12 px-4 sm:px-6 lg:px-8">
@@ -130,7 +126,7 @@ const Register = () => {
                 Join the Best
               </span>
               <br />
-              <span className="text-white">Creator Community</span>
+              <span className="text-white">Community</span>
             </h1>
 
             <p className="text-xl text-slate-300 mb-8 leading-relaxed">
@@ -327,33 +323,6 @@ const Register = () => {
                   )}
                 </div>
 
-                {/* Photo URL Input */}
-                <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
-                    Photo URL <span className="text-slate-500">(Optional)</span>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <FaImage className="text-slate-400" />
-                    </div>
-                    <input
-                      {...register("photoURL")}
-                      type="url"
-                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-                      placeholder="https://example.com/photo.jpg"
-                    />
-                  </div>
-                  {errors.photoURL && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-2 text-sm text-red-400 flex items-center gap-1"
-                    >
-                      ⚠️ {errors.photoURL.message}
-                    </motion.p>
-                  )}
-                </div>
-
                 {/* Sign Up Button */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -381,31 +350,6 @@ const Register = () => {
                       <FaRocket />
                     </>
                   )}
-                </motion.button>
-
-                {/* Divider */}
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/10"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-slate-950/50 text-slate-400 font-medium">
-                      OR CONTINUE WITH
-                    </span>
-                  </div>
-                </div>
-
-                {/* Google Sign Up */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full bg-white/5 backdrop-blur-xl border border-white/20 hover:border-white/40 text-white py-4 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-                >
-                  <FaGoogle className="text-xl" />
-                  <span>Sign up with Google</span>
                 </motion.button>
               </form>
 

@@ -139,7 +139,7 @@ const Profile = () => {
     return {
       title: "Beginner",
       icon: FaFire,
-      gradient: "from-slate-500 to-slate-600",
+      gradient: "from-slate-400 to-slate-500",
       emoji: "🔥",
     };
   };
@@ -232,17 +232,17 @@ const Profile = () => {
                   {userStatus.emoji}
                 </motion.span>
                 <span
-                  className={`text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r ${userStatus.gradient}`}
+                  className={`text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-600 to-slate-800`}
                 >
                   {userStatus.title}
                 </span>
               </div>
 
               {profile?.bio && (
-                <p className="text-slate-400 mb-4 max-w-2xl">{profile.bio}</p>
+                <p className="text-slate-700 mb-4 max-w-2xl">{profile.bio}</p>
               )}
 
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start text-sm text-slate-400">
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start text-sm text-slate-700">
                 {(profile?.email || user?.email) && (
                   <div className="flex items-center gap-2">
                     <FaEnvelope className="text-blue-400" />

@@ -16,7 +16,6 @@ import {
 const Login = () => {
   const { login, googleSignIn } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
@@ -27,24 +26,23 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data) => {
     setLoading(true);
     const result = await login(data.email, data.password);
     setLoading(false);
-    if (result.success) {
-      navigate("/");
-    }
+    if (result.success) navigate("/");
   };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
     const result = await googleSignIn();
     setLoading(false);
-    if (result.success) {
-      navigate("/");
-    }
+    if (result.success) navigate("/");
   };
 
+  
   const features = [
     {
       icon: FaTrophy,
@@ -65,7 +63,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen pt-24 bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden flex items-center justify-center pb-12 px-4 sm:px-6 lg:px-8">
-      {/* Animated Background Elements */}
+      {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           style={{ y: y1 }}
@@ -76,10 +74,7 @@ const Login = () => {
           className="absolute top-40 right-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3],
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 8, repeat: Infinity }}
           className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-600/20 rounded-full blur-3xl"
         />
@@ -87,7 +82,7 @@ const Login = () => {
 
       <div className="max-w-6xl w-full relative z-10">
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          {/* Left Side - Branding & Features */}
+          {/* Left Side */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -118,13 +113,11 @@ const Login = () => {
               <br />
               <span className="text-white">Creative Journey</span>
             </h1>
-
             <p className="text-xl text-slate-300 mb-8 leading-relaxed">
               Join thousands of talented creators competing in amazing contests
               and winning incredible prizes.
             </p>
 
-            {/* Features */}
             <div className="space-y-4">
               {features.map((feature, idx) => (
                 <motion.div
@@ -145,29 +138,6 @@ const Login = () => {
                 </motion.div>
               ))}
             </div>
-
-            {/* Decorative Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mt-12 grid grid-cols-3 gap-4"
-            >
-              {[
-                { value: "50K+", label: "Creators" },
-                { value: "1,234", label: "Winners" },
-                { value: "$500K+", label: "Prizes" },
-              ].map((stat, idx) => (
-                <div key={idx} className="text-center">
-                  <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-slate-400 font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
           </motion.div>
 
           {/* Right Side - Login Form */}
@@ -178,9 +148,7 @@ const Login = () => {
             className="relative"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl blur-xl opacity-30" />
-
             <div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 md:p-10">
-              {/* Mobile Title */}
               <div className="md:hidden text-center mb-8">
                 <h2 className="text-3xl font-black text-white mb-2">
                   Welcome Back
@@ -202,7 +170,7 @@ const Login = () => {
               </div>
 
               <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                {/* Email Input */}
+                {/* Email */}
                 <div>
                   <label className="block text-sm font-semibold text-white mb-2">
                     Email Address
@@ -235,7 +203,7 @@ const Login = () => {
                   )}
                 </div>
 
-                {/* Password Input */}
+                {/* Password */}
                 <div>
                   <label className="block text-sm font-semibold text-white mb-2">
                     Password
@@ -268,7 +236,7 @@ const Login = () => {
                   )}
                 </div>
 
-                {/* Sign In Button */}
+                {/* Sign In */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -323,7 +291,6 @@ const Login = () => {
                 </motion.button>
               </form>
 
-              {/* Mobile Sign Up Link */}
               <div className="md:hidden mt-6 text-center">
                 <p className="text-slate-400 text-sm">
                   Don't have an account?{" "}

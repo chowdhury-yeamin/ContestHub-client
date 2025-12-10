@@ -3,7 +3,16 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useContests } from "../../hooks/useContests";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaUsers, FaTrophy, FaSearch, FaFire, FaClock, FaFilter, FaStar, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaUsers,
+  FaTrophy,
+  FaSearch,
+  FaFire,
+  FaClock,
+  FaFilter,
+  FaStar,
+  FaCalendarAlt,
+} from "react-icons/fa";
 
 const AllContests = () => {
   const { data: contests = [], isLoading } = useContests();
@@ -30,7 +39,9 @@ const AllContests = () => {
 
   // Apply category filter
   if (activeTab !== "all") {
-    filteredContests = filteredContests.filter((c) => c.contestType === activeTab);
+    filteredContests = filteredContests.filter(
+      (c) => c.contestType === activeTab
+    );
   }
 
   // Apply search filter
@@ -124,10 +135,14 @@ const AllContests = () => {
           </motion.div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-4">
-            Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Contests</span>
+            Explore{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              Contests
+            </span>
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Discover amazing opportunities to showcase your talent and win incredible prizes
+            Discover amazing opportunities to showcase your talent and win
+            incredible prizes
           </p>
         </motion.div>
 
@@ -183,8 +198,16 @@ const AllContests = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { value: "popular", label: "Most Popular", icon: FaFire },
-                    { value: "prize-high", label: "Highest Prize", icon: FaTrophy },
-                    { value: "prize-low", label: "Lowest Prize", icon: FaTrophy },
+                    {
+                      value: "prize-high",
+                      label: "Highest Prize",
+                      icon: FaTrophy,
+                    },
+                    {
+                      value: "prize-low",
+                      label: "Lowest Prize",
+                      icon: FaTrophy,
+                    },
                     { value: "newest", label: "Newest", icon: FaClock },
                   ].map((option) => (
                     <motion.button
@@ -254,7 +277,11 @@ const AllContests = () => {
           className="text-center mb-8"
         >
           <p className="text-slate-400 text-lg">
-            Found <span className="text-white font-bold">{filteredContests.length}</span> contest{filteredContests.length !== 1 ? "s" : ""}
+            Found{" "}
+            <span className="text-white font-bold">
+              {filteredContests.length}
+            </span>{" "}
+            contest{filteredContests.length !== 1 ? "s" : ""}
           </p>
         </motion.div>
 
@@ -268,7 +295,9 @@ const AllContests = () => {
             >
               <FaTrophy className="text-6xl text-indigo-500" />
             </motion.div>
-            <p className="text-slate-400 text-lg">Loading amazing contests...</p>
+            <p className="text-slate-400 text-lg">
+              Loading amazing contests...
+            </p>
           </div>
         ) : filteredContests.length === 0 ? (
           <motion.div
@@ -328,7 +357,7 @@ const AllContests = () => {
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-                      
+
                       {/* Type Badge */}
                       <motion.div
                         initial={{ x: 100 }}
@@ -340,8 +369,8 @@ const AllContests = () => {
 
                       {/* Prize Badge */}
                       <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center gap-2">
-                        <FaTrophy className="text-amber-400" />
-                        ${contest.prizeMoney.toLocaleString()}
+                        <FaTrophy className="text-amber-400" />$
+                        {contest.prizeMoney.toLocaleString()}
                       </div>
                     </div>
 
@@ -361,8 +390,12 @@ const AllContests = () => {
                             <FaUsers className="text-blue-400" />
                           </div>
                           <div>
-                            <div className="text-xs text-slate-500">Participants</div>
-                            <div className="font-bold text-white">{contest.participantsCount}</div>
+                            <div className="text-xs text-slate-500">
+                              Participants
+                            </div>
+                            <div className="font-bold text-white">
+                              {contest.participantsCount}
+                            </div>
                           </div>
                         </div>
 
@@ -371,9 +404,15 @@ const AllContests = () => {
                             <FaCalendarAlt className="text-amber-400" />
                           </div>
                           <div className="text-right">
-                            <div className="text-xs text-slate-500">Deadline</div>
+                            <div className="text-xs text-slate-500">
+                              Deadline
+                            </div>
                             <div className="font-bold text-white text-sm">
-                              {contest.deadline ? new Date(contest.deadline).toLocaleDateString() : "TBA"}
+                              {contest.deadline
+                                ? new Date(
+                                    contest.deadline
+                                  ).toLocaleDateString()
+                                : "TBA"}
                             </div>
                           </div>
                         </div>
@@ -404,7 +443,8 @@ const AllContests = () => {
             className="text-center mt-12"
           >
             <p className="text-slate-400">
-              Showing all {filteredContests.length} contest{filteredContests.length !== 1 ? "s" : ""}
+              Showing all {filteredContests.length} contest
+              {filteredContests.length !== 1 ? "s" : ""}
             </p>
           </motion.div>
         )}

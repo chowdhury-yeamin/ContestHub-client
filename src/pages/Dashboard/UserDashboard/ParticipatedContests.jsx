@@ -1,5 +1,5 @@
 import { useParticipatedContests } from "../../../hooks/useUsers";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FaCalendarAlt,
@@ -11,12 +11,37 @@ import {
   FaEye,
   FaChartLine,
 } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const ParticipatedContests = () => {
   const { data: participated = [], isLoading } = useParticipatedContests();
   const [currentPage, setCurrentPage] = useState(1);
+  const { loading, user } = useAuth(); // Changed from loadingAuth to loading
+
+  const navigate = useNavigate();
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login");
+    }
+  }, [loading, user, navigate]); // Changed from loadingAuth to loading
+
+  if (loading || isLoading) {
+    // Changed from loadingAuth to loading
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <FaTrophy className="text-6xl text-indigo-500" />
+        </motion.div>
+        <p className="mt-4 text-slate-400">Loading your contests...</p>
+      </div>
+    );
+  }
 
   // Pagination
   const totalPages = Math.ceil(participated.length / itemsPerPage);
@@ -37,20 +62,6 @@ const ParticipatedContests = () => {
       0
     ),
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        >
-          <FaTrophy className="text-6xl text-indigo-500" />
-        </motion.div>
-        <p className="mt-4 text-slate-400">Loading your contests...</p>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -83,30 +94,30 @@ const ParticipatedContests = () => {
               {
                 label: "Total Contests",
                 value: stats.total,
-                icon: FaTrophy,
-                gradient: "from-blue-500 to-cyan-500",
                 emoji: "🎯",
+                gradient: "from-blue-500 to-cyan-500",
+                icon: FaTrophy,
               },
               {
                 label: "Submitted",
                 value: stats.submitted,
-                icon: FaCheckCircle,
-                gradient: "from-emerald-500 to-teal-500",
                 emoji: "✅",
+                gradient: "from-emerald-500 to-teal-500",
+                icon: FaCheckCircle,
               },
               {
                 label: "Pending",
                 value: stats.pending,
-                icon: FaClock,
-                gradient: "from-amber-500 to-orange-500",
                 emoji: "⏳",
+                gradient: "from-amber-500 to-orange-500",
+                icon: FaClock,
               },
               {
                 label: "Prize Pool",
                 value: `$${stats.totalPrizePool.toLocaleString()}`,
-                icon: FaChartLine,
-                gradient: "from-purple-500 to-pink-500",
                 emoji: "💰",
+                gradient: "from-purple-500 to-pink-500",
+                icon: FaChartLine,
               },
             ].map((stat, idx) => (
               <motion.div
@@ -192,7 +203,6 @@ const ParticipatedContests = () => {
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-6 transition-all">
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Contest Image */}
@@ -281,7 +291,7 @@ const ParticipatedContests = () => {
             ))}
           </div>
 
-          {/* Enhanced Pagination */}
+          {/* Pagination */}
           {totalPages > 1 && (
             <motion.div
               initial={{ opacity: 0 }}

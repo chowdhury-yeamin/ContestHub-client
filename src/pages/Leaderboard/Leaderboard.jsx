@@ -1,39 +1,62 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaTrophy, FaMedal, FaAward, FaCrown, FaStar, FaFire } from "react-icons/fa";
-import { Link } from "react-router";
-
-// Mock data for demonstration
-const mockLeaderboard = [
-  { _id: "1", name: "Alex Rivera", photoURL: "https://ui-avatars.com/api/?name=Alex+Rivera&background=6366F1&color=fff&size=200", wins: 47, totalPrizes: 15000, rank: 1 },
-  { _id: "2", name: "Sophia Chen", photoURL: "https://ui-avatars.com/api/?name=Sophia+Chen&background=8B5CF6&color=fff&size=200", wins: 42, totalPrizes: 13200, rank: 2 },
-  { _id: "3", name: "Marcus Johnson", photoURL: "https://ui-avatars.com/api/?name=Marcus+Johnson&background=F59E0B&color=fff&size=200", wins: 38, totalPrizes: 11800, rank: 3 },
-  { _id: "4", name: "Emma Williams", photoURL: "https://ui-avatars.com/api/?name=Emma+Williams&background=10B981&color=fff&size=200", wins: 35, totalPrizes: 9500, rank: 4 },
-  { _id: "5", name: "James Brown", photoURL: "https://ui-avatars.com/api/?name=James+Brown&background=3B82F6&color=fff&size=200", wins: 32, totalPrizes: 8900, rank: 5 },
-  { _id: "6", name: "Olivia Davis", photoURL: "https://ui-avatars.com/api/?name=Olivia+Davis&background=EC4899&color=fff&size=200", wins: 29, totalPrizes: 7800, rank: 6 },
-  { _id: "7", name: "Liam Garcia", photoURL: "https://ui-avatars.com/api/?name=Liam+Garcia&background=8B5CF6&color=fff&size=200", wins: 26, totalPrizes: 7200, rank: 7 },
-  { _id: "8", name: "Ava Martinez", photoURL: "https://ui-avatars.com/api/?name=Ava+Martinez&background=06B6D4&color=fff&size=200", wins: 23, totalPrizes: 6500, rank: 8 },
-  { _id: "9", name: "Noah Wilson", photoURL: "https://ui-avatars.com/api/?name=Noah+Wilson&background=F59E0B&color=fff&size=200", wins: 21, totalPrizes: 5900, rank: 9 },
-  { _id: "10", name: "Isabella Taylor", photoURL: "https://ui-avatars.com/api/?name=Isabella+Taylor&background=10B981&color=fff&size=200", wins: 19, totalPrizes: 5300, rank: 10 }
-];
+import { useState, useEffect } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  FaTrophy,
+  FaMedal,
+  FaAward,
+  FaCrown,
+  FaStar,
+  FaFire,
+  FaSearch,
+  FaFilter,
+  FaChartLine,
+  FaUsers,
+  FaDollarSign,
+  FaGem,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { FaFilterCircleXmark } from "react-icons/fa6";
 
 const Leaderboard = () => {
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const isLoading = false;
-  const leaderboard = mockLeaderboard;
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 300], [0, -50]);
+  const y2 = useTransform(scrollY, [0, 300], [0, 50]);
+
+  // Fetch all users
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch("/api/leaderboard");
+        const data = await response.json();
+        setLeaderboard(data.leaderboard);
+      } catch (err) {
+        console.error("Failed to fetch leaderboard:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, []);
+
+  // Filter and sort leaderboard
+  const filteredLeaderboard = leaderboard
+    .filter((user) => user.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      if (filter === "wins") return b.wins - a.wins;
+      if (filter === "prizes") return b.totalPrizes - a.totalPrizes;
+      return b.wins - a.wins;
+    });
 
   const getRankIcon = (rank) => {
-    if (rank === 1) return <FaCrown className="text-yellow-400 text-6xl drop-shadow-2xl animate-pulse" />;
-    if (rank === 2) return <FaMedal className="text-slate-300 text-5xl drop-shadow-xl" />;
-    if (rank === 3) return <FaAward className="text-amber-600 text-5xl drop-shadow-xl" />;
+    if (rank === 1) return <FaCrown className="text-6xl drop-shadow-2xl" />;
+    if (rank === 2) return <FaMedal className="text-5xl drop-shadow-xl" />;
+    if (rank === 3) return <FaAward className="text-5xl drop-shadow-xl" />;
     return null;
-  };
-
-  const getPodiumHeight = (rank) => {
-    if (rank === 1) return "h-64";
-    if (rank === 2) return "h-52";
-    if (rank === 3) return "h-44";
-    return "h-32";
   };
 
   const getRankBadgeColor = (rank) => {
@@ -43,440 +66,509 @@ const Leaderboard = () => {
     return "from-slate-600 to-slate-700";
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+  const totalWins = leaderboard.reduce((acc, user) => acc + user.wins, 0);
+  const totalPrizes = leaderboard.reduce(
+    (acc, user) => acc + (user.totalPrizes || 0),
+    0
+  );
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100
-      }
-    }
-  };
+  const stats = [
+    {
+      label: "Total Champions",
+      value: leaderboard.length,
+      icon: FaUsers,
+      color: "from-indigo-500 to-purple-500",
+    },
+    {
+      label: "Total Wins",
+      value: totalWins,
+      icon: FaTrophy,
+      color: "from-amber-500 to-orange-500",
+    },
+    {
+      label: "Prize Pool",
+      value: `$${totalPrizes.toLocaleString()}`,
+      icon: FaDollarSign,
+      color: "from-emerald-500 to-teal-500",
+    },
+    {
+      label: "Active Legends",
+      value: leaderboard.filter((u) => u.wins > 0).length,
+      icon: FaFire,
+      color: "from-red-500 to-rose-500",
+    },
+  ];
 
   if (isLoading) {
     return (
-      <div className="flex justify-center  items-center min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900">
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 360]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         >
-          <FaTrophy className="text-yellow-400 text-6xl" />
+          <FaTrophy className="text-6xl text-amber-400" />
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 relative overflow-hidden pt-13">
+    <div className=" min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden pt-24 pb-16">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          style={{ y: y1 }}
+          className="absolute top-20 left-10 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl"
+        />
+        <motion.div
+          style={{ y: y2 }}
+          className="absolute top-40 right-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"
+        />
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.6, 0.3],
           }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-600/30 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.5, 0.2],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-600/30 rounded-full blur-3xl"
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-600/20 rounded-full blur-3xl"
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative z-10">
-        {/* Page Header with Glassmorphism */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Page Header */}
         <motion.div
-          initial={{ opacity: 0, y: -50 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "spring" }}
-          className="text-center mb-12 sm:mb-16"
+          className="text-center mb-12"
         >
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-block mb-4"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-6 py-2 mb-6"
           >
-            <div className="bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 p-4 rounded-full">
-              <FaTrophy className="text-5xl sm:text-6xl text-white drop-shadow-2xl" />
-            </div>
+            <motion.span
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            >
+              🏆
+            </motion.span>
+            <span className="text-sm text-slate-300 font-medium">
+              Celebrating Our Champions
+            </span>
           </motion.div>
-          
-          <h1 className="text-5xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-300 to-orange-400 mb-4 tracking-tight">
-            Hall of Champions
+
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-300 to-orange-400">
+              Hall of
+            </span>
+            <br />
+            <span className="text-white">Champions</span>
           </h1>
-          
-          <p className="text-lg sm:text-2xl text-slate-300 font-light max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
             Where legends are made and victories are celebrated
           </p>
-
-          {/* Stats Bar */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8 flex flex-wrap justify-center gap-4 sm:gap-8"
-          >
-            {[
-              { label: "Total Winners", value: "1,234", icon: FaStar },
-              { label: "Prizes Awarded", value: "$500K+", icon: FaTrophy },
-              { label: "Active Champions", value: leaderboard.length, icon: FaFire }
-            ].map((stat, idx) => (
-              <motion.div
-                key={idx}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-6 py-4 min-w-[140px]"
-              >
-                <stat.icon className="text-3xl text-amber-400 mx-auto mb-2" />
-                <div className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-slate-400 mt-1">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
         </motion.div>
 
-        {/* Podium Top 3 - Enhanced */}
+        {/* Stats Grid */}
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="relative flex flex-col sm:flex-row justify-center items-end gap-4 sm:gap-8 mb-16 sm:mb-24 px-4"
-        >
-          {/* 2nd Place */}
-          {leaderboard[1] && (
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.05, y: -10 }}
-              className="flex flex-col items-center w-full sm:w-auto order-2 sm:order-1"
-            >
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="relative"
-              >
-                <div className="absolute -inset-1 bg-gradient-to-r from-slate-300 to-slate-500 rounded-3xl blur-xl opacity-75 animate-pulse" />
-                <div className="relative bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-white/50">
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                    {getRankIcon(2)}
-                  </div>
-                  
-                  <div className="mt-8 relative">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full blur-md"
-                    />
-                    <img
-                      src={leaderboard[1].photoURL}
-                      alt={leaderboard[1].name}
-                      className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-xl relative z-10 mx-auto"
-                    />
-                  </div>
-                  
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mt-4 text-center">{leaderboard[1].name}</h3>
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    <FaTrophy className="text-yellow-600" />
-                    <p className="text-lg sm:text-xl font-bold text-slate-800">{leaderboard[1].wins} Wins</p>
-                  </div>
-                  <div className="mt-3 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <p className="text-sm text-slate-700 font-semibold">${leaderboard[1].totalPrizes.toLocaleString()} earned</p>
-                  </div>
-                </div>
-              </motion.div>
-              
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="mt-4 bg-gradient-to-r from-slate-300 to-slate-500 text-white px-8 py-3 rounded-full font-black text-xl shadow-lg"
-              >
-                2nd Place
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* 1st Place - CHAMPION */}
-          {leaderboard[0] && (
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.05, y: -15 }}
-              className="flex flex-col items-center w-full sm:w-auto order-1 sm:order-2 mb-8 sm:mb-0"
-            >
-              <motion.div
-                animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="relative"
-              >
-                {/* Glowing effect */}
-                <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 rounded-3xl blur-2xl opacity-75 animate-pulse" />
-                
-                <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 rounded-3xl p-8 sm:p-10 shadow-2xl border-4 border-yellow-300">
-                  {/* Sparkle effects */}
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.5, 1, 0.5]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute -top-4 -right-4 text-4xl"
-                  >
-                    ✨
-                  </motion.div>
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.5, 1, 0.5]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                    className="absolute -top-4 -left-4 text-4xl"
-                  >
-                    ✨
-                  </motion.div>
-                  
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2">
-                    {getRankIcon(1)}
-                  </div>
-                  
-                  <div className="mt-12 relative">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full blur-lg"
-                    />
-                    <div className="absolute -inset-2 bg-white/30 rounded-full animate-ping" />
-                    <img
-                      src={leaderboard[0].photoURL}
-                      alt={leaderboard[0].name}
-                      className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-2xl relative z-10 mx-auto"
-                    />
-                  </div>
-                  
-                  <h3 className="text-2xl sm:text-3xl font-black text-white mt-6 text-center drop-shadow-lg">{leaderboard[0].name}</h3>
-                  <div className="flex items-center justify-center gap-2 mt-3">
-                    <FaTrophy className="text-white text-xl" />
-                    <p className="text-xl sm:text-2xl font-black text-white drop-shadow-lg">{leaderboard[0].wins} Wins</p>
-                  </div>
-                  <div className="mt-4 bg-white/90 backdrop-blur-sm rounded-xl px-6 py-3">
-                    <p className="text-base sm:text-lg text-amber-700 font-black">${leaderboard[0].totalPrizes.toLocaleString()} earned</p>
-                  </div>
-                </div>
-              </motion.div>
-              
-              <motion.div
-                animate={{
-                  scale: [1, 1.15, 1],
-                  boxShadow: [
-                    "0 0 20px rgba(251, 191, 36, 0.5)",
-                    "0 0 40px rgba(251, 191, 36, 0.8)",
-                    "0 0 20px rgba(251, 191, 36, 0.5)"
-                  ]
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="mt-6 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 text-white px-10 py-4 rounded-full font-black text-2xl shadow-2xl"
-              >
-                🏆 CHAMPION
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* 3rd Place */}
-          {leaderboard[2] && (
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.05, y: -10 }}
-              className="flex flex-col items-center w-full sm:w-auto order-3"
-            >
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="relative"
-              >
-                <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-3xl blur-xl opacity-75 animate-pulse" />
-                <div className="relative bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-amber-300">
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                    {getRankIcon(3)}
-                  </div>
-                  
-                  <div className="mt-8 relative">
-                    <motion.div
-                      animate={{ rotate: -360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full blur-md"
-                    />
-                    <img
-                      src={leaderboard[2].photoURL}
-                      alt={leaderboard[2].name}
-                      className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-xl relative z-10 mx-auto"
-                    />
-                  </div>
-                  
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mt-4 text-center drop-shadow-lg">{leaderboard[2].name}</h3>
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    <FaTrophy className="text-yellow-300" />
-                    <p className="text-lg sm:text-xl font-bold text-white">{leaderboard[2].wins} Wins</p>
-                  </div>
-                  <div className="mt-3 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <p className="text-sm text-amber-900 font-semibold">${leaderboard[2].totalPrizes.toLocaleString()} earned</p>
-                  </div>
-                </div>
-              </motion.div>
-              
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                className="mt-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-3 rounded-full font-black text-xl shadow-lg"
-              >
-                3rd Place
-              </motion.div>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Full Leaderboard Table - Glassmorphism Design */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-4 sm:p-8 shadow-2xl"
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 sm:mb-8 text-center">
-            Complete Rankings
-          </h2>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/20">
-                  <th className="text-left py-4 px-4 text-slate-300 font-semibold text-sm sm:text-base">Rank</th>
-                  <th className="text-left py-4 px-4 text-slate-300 font-semibold text-sm sm:text-base">Player</th>
-                  <th className="text-center py-4 px-4 text-slate-300 font-semibold text-sm sm:text-base">Wins</th>
-                  <th className="text-right py-4 px-4 text-slate-300 font-semibold text-sm sm:text-base hidden sm:table-cell">Total Prizes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leaderboard.map((user, index) => (
-                  <motion.tr
-                    key={user._id}
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    whileHover={{
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      scale: 1.02
-                    }}
-                    className="border-b border-white/5 transition-all duration-300 cursor-pointer"
+          {stats.map((stat, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + idx * 0.1 }}
+              whileHover={{ y: -5, scale: 1.02 }}
+              className="relative group"
+            >
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-0 group-hover:opacity-30 transition-opacity rounded-2xl blur-xl`}
+              />
+              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 text-center">
+                <div
+                  className={`inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r ${stat.color} mb-2`}
+                >
+                  <stat.icon className="text-white text-lg" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-white">
+                  {stat.value}
+                </div>
+                <div className="text-xs text-slate-400 font-medium">
+                  {stat.label}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Filter/Search Controls */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12"
+        >
+          {/* Filter Select */}
+          <div className="relative w-full sm:w-auto">
+            <FaFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="relative w-full sm:w-64 pl-12 pr-4 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
+            >
+              <option value="all" className="bg-slate-900">
+                Default (Wins)
+              </option>
+              <option value="wins" className="bg-slate-900">
+                Most Wins
+              </option>
+              <option value="prizes" className="bg-slate-900">
+                Highest Prizes
+              </option>
+            </select>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative w-full sm:w-auto">
+            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+            <input
+              type="text"
+              placeholder="Search champions..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="relative w-full sm:w-80 pl-12 pr-4 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            />
+          </div>
+        </motion.div>
+
+        {/* Podium Top 3 */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+          className="mb-16"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 rounded-3xl blur-2xl opacity-30" />
+            <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-12">
+              <div className="flex flex-col sm:flex-row justify-center items-end gap-8 sm:gap-12">
+                {/* 2nd Place */}
+                {filteredLeaderboard[1] && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2 }}
+                    className="flex flex-col items-center order-2 sm:order-1"
                   >
-                    <td className="py-4 px-4">
-                      {index < 3 ? (
+                    <div className="relative mb-6">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 4,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="absolute -inset-4 bg-gradient-to-r from-slate-300 to-slate-500 rounded-full blur-lg opacity-50"
+                      />
+                      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-r from-slate-300 to-slate-500 p-1">
+                        <img
+                          src={filteredLeaderboard[1].photoURL}
+                          alt={filteredLeaderboard[1].name}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+                        <div className="text-slate-300">{getRankIcon(2)}</div>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-xl sm:text-2xl font-black text-white mb-1">
+                        {filteredLeaderboard[1].name}
+                      </h3>
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <FaTrophy className="text-slate-300" />
+                        <span className="text-2xl font-black text-slate-300">
+                          {filteredLeaderboard[1].wins}
+                        </span>
+                        <span className="text-slate-400">wins</span>
+                      </div>
+                      <p className="text-sm text-amber-400 font-semibold">
+                        $
+                        {filteredLeaderboard[1].totalPrizes?.toLocaleString() ||
+                          0}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* 1st Place */}
+                {filteredLeaderboard[0] && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.1 }}
+                    className="flex flex-col items-center order-1 sm:order-2 sm:scale-110"
+                  >
+                    <div className="relative mb-8">
+                      <motion.div
+                        animate={{
+                          rotate: 360,
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="absolute -inset-6 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 rounded-full blur-2xl opacity-75"
+                      />
+                      <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 p-1">
+                        <img
+                          src={filteredLeaderboard[0].photoURL}
+                          alt={filteredLeaderboard[0].name}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2">
                         <motion.div
-                          animate={{ rotate: [0, 10, -10, 0] }}
-                          transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }}
-                          className={`w-10 h-10 rounded-full bg-gradient-to-br ${getRankBadgeColor(index + 1)} flex items-center justify-center font-black text-white shadow-lg`}
+                          animate={{
+                            y: [0, -5, 0],
+                            rotate: [0, 5, -5, 0],
+                          }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="text-yellow-400"
+                        >
+                          {getRankIcon(1)}
+                        </motion.div>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400 mb-2">
+                        {filteredLeaderboard[0].name}
+                      </h3>
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <FaTrophy className="text-yellow-400" />
+                        <span className="text-3xl font-black text-yellow-400">
+                          {filteredLeaderboard[0].wins}
+                        </span>
+                        <span className="text-slate-300">wins</span>
+                      </div>
+                      <p className="text-lg text-amber-400 font-bold">
+                        $
+                        {filteredLeaderboard[0].totalPrizes?.toLocaleString() ||
+                          0}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* 3rd Place */}
+                {filteredLeaderboard[2] && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.3 }}
+                    className="flex flex-col items-center order-3"
+                  >
+                    <div className="relative mb-6">
+                      <motion.div
+                        animate={{ rotate: -360 }}
+                        transition={{
+                          duration: 5,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="absolute -inset-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full blur-lg opacity-50"
+                      />
+                      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 p-1">
+                        <img
+                          src={filteredLeaderboard[2].photoURL}
+                          alt={filteredLeaderboard[2].name}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+                        <div className="text-amber-500">{getRankIcon(3)}</div>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-xl sm:text-2xl font-black text-white mb-1">
+                        {filteredLeaderboard[2].name}
+                      </h3>
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <FaTrophy className="text-amber-500" />
+                        <span className="text-2xl font-black text-amber-500">
+                          {filteredLeaderboard[2].wins}
+                        </span>
+                        <span className="text-slate-400">wins</span>
+                      </div>
+                      <p className="text-sm text-amber-400 font-semibold">
+                        $
+                        {filteredLeaderboard[2].totalPrizes?.toLocaleString() ||
+                          0}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Full Leaderboard Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.4 }}
+          className="relative mb-12"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl blur-xl opacity-20" />
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden">
+            <div className="p-6 sm:p-8 border-b border-white/10">
+              <h2 className="text-3xl sm:text-4xl font-black text-white flex items-center gap-3">
+                <FaChartLine className="text-indigo-400" />
+                Complete Rankings
+              </h2>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left py-4 px-4 sm:px-6 text-slate-300 font-semibold text-sm">
+                      RANK
+                    </th>
+                    <th className="text-left py-4 px-4 sm:px-6 text-slate-300 font-semibold text-sm">
+                      CHAMPION
+                    </th>
+                    <th className="text-center py-4 px-4 sm:px-6 text-slate-300 font-semibold text-sm">
+                      WINS
+                    </th>
+                    <th className="text-right py-4 px-4 sm:px-6 text-slate-300 font-semibold text-sm hidden sm:table-cell">
+                      TOTAL PRIZES
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredLeaderboard.map((user, index) => (
+                    <motion.tr
+                      key={user._id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 1.5 + index * 0.05 }}
+                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                    >
+                      <td className="py-4 px-4 sm:px-6">
+                        <div
+                          className={`inline-flex items-center justify-center w-10 h-10 rounded-xl font-black text-white ${
+                            index < 3
+                              ? `bg-gradient-to-r ${getRankBadgeColor(
+                                  index + 1
+                                )}`
+                              : "bg-white/10"
+                          }`}
                         >
                           {index + 1}
-                        </motion.div>
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-slate-700/50 flex items-center justify-center font-bold text-slate-300">
-                          {index + 1}
                         </div>
-                      )}
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="relative">
-                          <img
-                            src={user.photoURL}
-                            alt={user.name}
-                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-white/30 shadow-lg"
-                          />
+                      </td>
+                      <td className="py-4 px-4 sm:px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+                            {user.name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-white font-semibold">
+                            {user.name}
+                          </span>
                           {index < 3 && (
                             <motion.div
-                              animate={{ scale: [1, 1.2, 1] }}
-                              transition={{ duration: 1, repeat: Infinity }}
-                              className="absolute -top-1 -right-1 text-lg"
+                              animate={{ rotate: [0, 10, -10, 0] }}
+                              transition={{ duration: 2, repeat: Infinity }}
                             >
-                              {index === 0 ? "👑" : index === 1 ? "🥈" : "🥉"}
+                              {index === 0 && (
+                                <FaCrown className="text-yellow-400" />
+                              )}
+                              {index === 1 && (
+                                <FaMedal className="text-slate-300" />
+                              )}
+                              {index === 2 && (
+                                <FaAward className="text-amber-500" />
+                              )}
                             </motion.div>
                           )}
                         </div>
-                        <span className="font-semibold text-white text-sm sm:text-base">{user.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-center">
-                      <motion.span
-                        whileHover={{ scale: 1.1 }}
-                        className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full font-bold text-white text-xs sm:text-sm ${
-                          index < 3
-                            ? "bg-gradient-to-r from-amber-500 to-orange-500 shadow-lg"
-                            : "bg-slate-700/50"
-                        }`}
-                      >
-                        <FaTrophy className={index < 3 ? "text-yellow-300" : "text-slate-400"} />
-                        {user.wins}
-                      </motion.span>
-                    </td>
-                    <td className="py-4 px-4 text-right hidden sm:table-cell">
-                      <span className="font-bold text-green-400 text-sm sm:text-base">
-                        ${user.totalPrizes.toLocaleString()}
-                      </span>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+                      </td>
+                      <td className="py-4 px-4 sm:px-6 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <FaTrophy className="text-amber-400 text-sm" />
+                          <span className="text-white font-bold text-lg">
+                            {user.wins}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 sm:px-6 text-right hidden sm:table-cell">
+                        <span className="text-emerald-400 font-bold text-lg">
+                          ${user.totalPrizes?.toLocaleString() || 0}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </motion.div>
 
         {/* Call to Action */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-12 sm:mt-16 text-center"
+          transition={{ delay: 1.6 }}
+          className="relative"
         >
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-block"
-          >
-            <Link to="/all-contests" className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-2xl font-black text-lg sm:text-xl shadow-2xl hover:shadow-purple-500/50 transition-all duration-300">
-              Join the Competition 🚀
-            </Link>
-          </motion.div>
-          <p className="mt-4 text-slate-400 text-sm sm:text-base">
-            Compete with the best and earn your place in the hall of fame
-          </p>
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl blur-2xl opacity-50" />
+          <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-12 md:p-16 text-center text-white overflow-hidden">
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.6, 0.3],
+              }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            />
+
+            <div className="relative z-10">
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="text-6xl mb-6"
+              >
+                🚀
+              </motion.div>
+              <h2 className="text-4xl md:text-5xl font-black mb-6">
+                Ready to Join the Legends?
+              </h2>
+              <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-white/90">
+                Compete in exciting contests, showcase your talent, and climb
+                the leaderboard to become the next champion!
+              </p>
+              <Link to="/all-contests">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-white/30 transition-all inline-flex items-center gap-3"
+                >
+                  <FaFire />
+                  Join the Competition
+                  <FaTrophy />
+                </motion.button>
+              </Link>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>

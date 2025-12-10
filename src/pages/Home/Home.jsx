@@ -14,7 +14,11 @@ import {
   FaFire,
   FaArrowRight,
   FaCheckCircle,
+  FaMedal,
 } from "react-icons/fa";
+import { useWinners } from "../../hooks/useWinners";
+
+
 
 const contestCategories = [
   {
@@ -59,10 +63,12 @@ const Home = () => {
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
 
+  const { data: winnersData = [] } = useWinners();
+
   const [stats, setStats] = useState({
     totalContests: 0,
     totalParticipants: 0,
-    totalWinners: 1234,
+    totalWinners: 0,
     totalPrizes: 0,
   });
 
@@ -76,42 +82,22 @@ const Home = () => {
       (acc, c) => acc + (c.prizeMoney || 0),
       0
     );
+    const totalWinners = Array.isArray(winnersData) ? winnersData.length : 0;
+
     setStats({
       totalContests,
       totalParticipants,
-      totalWinners: 1234,
+      totalWinners,
       totalPrizes,
     });
-  }, [contests]);
+  }, [contests, winnersData]);
 
   const popularContests = contests
     .filter((c) => c.status === "confirmed")
     .sort((a, b) => b.participantsCount - a.participantsCount)
     .slice(0, 6);
 
-  const recentWinners = [
-    {
-      name: "Alice Johnson",
-      contest: "Logo Design Contest",
-      prize: 500,
-      photoURL:
-        "https://ui-avatars.com/api/?name=Alice+Johnson&background=6366F1&color=fff",
-    },
-    {
-      name: "Bob Smith",
-      contest: "Article Writing Challenge",
-      prize: 300,
-      photoURL:
-        "https://ui-avatars.com/api/?name=Bob+Smith&background=8B5CF6&color=fff",
-    },
-    {
-      name: "Charlie Brown",
-      contest: "Business Idea Pitch",
-      prize: 1000,
-      photoURL:
-        "https://ui-avatars.com/api/?name=Charlie+Brown&background=F59E0B&color=fff",
-    },
-  ];
+  const topWinners = Array.isArray(winnersData) ? winnersData.slice(0, 5) : [];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -148,10 +134,7 @@ const Home = () => {
           className="absolute top-40 right-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3],
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 8, repeat: Infinity }}
           className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-600/20 rounded-full blur-3xl"
         />
@@ -166,7 +149,6 @@ const Home = () => {
           className="relative mb-20"
         >
           <div className="text-center mb-12">
-            {/* Floating Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -180,11 +162,11 @@ const Home = () => {
                 🎯
               </motion.span>
               <span className="text-sm text-slate-300 font-medium">
-                Join 50,000+ creators worldwide
+                Join {stats.totalParticipants.toLocaleString()}+ creators
+                worldwide
               </span>
             </motion.div>
 
-            {/* Main Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -210,7 +192,6 @@ const Home = () => {
               </span>
             </motion.p>
 
-            {/* Search Bar */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -237,8 +218,7 @@ const Home = () => {
                     onClick={handleSearch}
                     className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all flex items-center justify-center gap-2"
                   >
-                    <FaSearch />
-                    <span>Search</span>
+                    <FaSearch /> <span>Search</span>
                   </motion.button>
                 </div>
               </div>
@@ -282,12 +262,12 @@ const Home = () => {
             ].map((stat, idx) => (
               <motion.div
                 key={idx}
+                className="relative group"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ y: -5, scale: 1.02 }}
-                className="relative group"
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-2xl blur-xl`}
@@ -330,19 +310,18 @@ const Home = () => {
               Find the perfect contest that matches your skills
             </p>
           </div>
-
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {contestCategories.map((cat, idx) => (
               <motion.button
                 key={idx}
+                onClick={() => handleCategoryClick(cat.name)}
+                className="relative group"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05 }}
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleCategoryClick(cat.name)}
-                className="relative group"
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${cat.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-75 transition-opacity`}
@@ -393,8 +372,7 @@ const Home = () => {
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/20 hover:border-white/40 text-white px-6 py-3 rounded-xl font-semibold transition-all"
               >
-                View All
-                <FaArrowRight />
+                View All <FaArrowRight />
               </motion.button>
             </Link>
           </div>
@@ -408,18 +386,18 @@ const Home = () => {
                 <FaTrophy className="text-6xl text-indigo-500" />
               </motion.div>
             </div>
-          ) : (
+          ) : popularContests.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {popularContests.map((contest, idx) => (
                 <motion.div
                   key={contest._id}
+                  onClick={() => handleContestClick(contest._id)}
+                  className="group relative cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                   whileHover={{ y: -10, scale: 1.02 }}
-                  className="group relative cursor-pointer"
-                  onClick={() => handleContestClick(contest._id)}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity" />
                   <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl overflow-hidden transition-all">
@@ -436,7 +414,6 @@ const Home = () => {
                         ${contest.prizeMoney.toLocaleString()}
                       </div>
                     </div>
-
                     <div className="p-6">
                       <h3 className="text-xl font-bold text-white mb-2 line-clamp-1">
                         {contest.name}
@@ -444,7 +421,6 @@ const Home = () => {
                       <p className="text-slate-400 mb-4 line-clamp-2 text-sm">
                         {contest.description}
                       </p>
-
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2 text-slate-300">
                           <FaUsers className="text-blue-400" />
@@ -459,7 +435,6 @@ const Home = () => {
                           </span>
                         </div>
                       </div>
-
                       <motion.div
                         whileHover={{ scale: 1.02 }}
                         className="mt-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center py-3 rounded-xl font-semibold shadow-lg group-hover:shadow-indigo-500/50 transition-all"
@@ -471,140 +446,94 @@ const Home = () => {
                 </motion.div>
               ))}
             </div>
+          ) : (
+            <div className="text-center py-20">
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="text-8xl mb-6"
+              >
+                🎯
+              </motion.div>
+              <h3 className="text-2xl font-black text-white mb-2">
+                No Contests Available
+              </h3>
+              <p className="text-slate-400">
+                Check back soon for exciting new contests!
+              </p>
+            </div>
           )}
         </motion.section>
 
-        {/* How It Works */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">
-              How ContestHub Works
-            </h2>
-            <p className="text-xl text-slate-400">
-              Start your journey in three simple steps
-            </p>
-          </div>
+        {/* Recent Winners Section */}
+        {winnersData.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mb-20"
+          >
+            <div className="text-center mb-12">
+              <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">
+                Recent Winners
+              </h2>
+              <p className="text-xl text-slate-400">
+                Celebrating our talented champions
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "01",
-                icon: "🔍",
-                title: "Browse Contests",
-                desc: "Explore creative contests across categories and find the perfect match for your skills",
-                color: "from-blue-500 to-cyan-500",
-              },
-              {
-                step: "02",
-                icon: "🎯",
-                title: "Register & Participate",
-                desc: "Pay the entry fee, submit your work, and compete with talented creators worldwide",
-                color: "from-purple-500 to-pink-500",
-              },
-              {
-                step: "03",
-                icon: "🏆",
-                title: "Win Prizes",
-                desc: "Get recognized for your talent, win amazing prizes, and build your reputation",
-                color: "from-amber-500 to-orange-500",
-              },
-            ].map((item, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                whileHover={{ y: -10 }}
-                className="relative group"
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity`}
-                />
-                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-8 text-center transition-all">
-                  <div className="text-6xl mb-4">{item.icon}</div>
-                  <div
-                    className={`text-6xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r ${item.color}`}
-                  >
-                    {item.step}
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">
-                    {item.title}
-                  </h3>
-                  <p className="text-slate-400 leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
-
-        {/* Recent Winners */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">
-              Recent Winners
-            </h2>
-            <p className="text-xl text-slate-400">
-              Celebrating our talented champions
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {recentWinners.map((winner, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                whileHover={{ y: -10, scale: 1.05 }}
-                className="relative group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity" />
-                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-amber-500/50 rounded-2xl p-6 text-center transition-all">
-                  <div className="relative inline-block mb-4">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="absolute -inset-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-md opacity-75"
-                    />
-                    <img
-                      src={winner.photoURL}
-                      alt={winner.name}
-                      className="relative w-24 h-24 rounded-full border-4 border-white/20"
-                    />
-                    <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 w-10 h-10 rounded-full flex items-center justify-center">
-                      <FaTrophy className="text-white text-lg" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {winnersData.slice(0, 3).map((winner, idx) => (
+                <motion.div
+                  key={winner._id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  whileHover={{ y: -10, scale: 1.05 }}
+                  className="relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity" />
+                  <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-amber-500/50 rounded-2xl p-6 text-center transition-all">
+                    <div className="relative inline-block mb-4">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="absolute -inset-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-md opacity-75"
+                      />
+                      <img
+                        src={
+                          winner.photoURL ||
+                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            winner.name
+                          )}&background=6366F1&color=fff&size=200`
+                        }
+                        alt={winner.name}
+                        className="relative w-24 h-24 rounded-full border-4 border-white/20"
+                      />
+                      <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 w-10 h-10 rounded-full flex items-center justify-center">
+                        <FaTrophy className="text-white text-lg" />
+                      </div>
+                    </div>
+                    <h3 className="font-bold text-xl text-white mb-1">
+                      {winner.name}
+                    </h3>
+                    <p className="text-slate-400 text-sm mb-3">
+                      {winner.contestName || "Contest Winner"}
+                    </p>
+                    <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+                      ${winner.prizeMoney}
                     </div>
                   </div>
-                  <h3 className="font-bold text-xl text-white mb-1">
-                    {winner.name}
-                  </h3>
-                  <p className="text-slate-400 text-sm mb-3">
-                    {winner.contest}
-                  </p>
-                  <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-                    ${winner.prize}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+        )}
 
         {/* Creator CTA */}
         <motion.section

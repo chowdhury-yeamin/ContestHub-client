@@ -50,8 +50,8 @@ const About = () => {
   ];
 
   const stats = [
-    { value: "50K+", label: "Active Users", icon: FaUsers },
-    { value: "$500K+", label: "Prizes Awarded", icon: FaTrophy },
+    { value: "10K+", label: "Active Users", icon: FaUsers },
+    { value: "$50K+", label: "Prizes Awarded", icon: FaTrophy },
     { value: "1.2K+", label: "Contests Held", icon: FaStar },
     { value: "98%", label: "Success Rate", icon: FaChartLine },
   ];
