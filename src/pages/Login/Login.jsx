@@ -28,21 +28,44 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (formData) => {
     setLoading(true);
-    const result = await login(data.email, data.password);
-    setLoading(false);
-    if (result.success) navigate("/");
+    try {
+      const result = await login(formData.email, formData.password);
+      setLoading(false);
+
+      if (result && result.success && result.token) {
+        localStorage.setItem("token", result.token); // store token
+        setToken(result.token); // update context
+        navigate("/");
+      } else {
+        console.error("Login failed:", result.message);
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    const result = await googleSignIn();
-    setLoading(false);
-    if (result.success) navigate("/");
+    try {
+      const result = await googleSignIn();
+      setLoading(false);
+
+      if (result && result.success && result.token) {
+        localStorage.setItem("token", result.token);
+        setToken(result.token);
+        navigate("/");
+      } else {
+        console.error("Google login failed:", result);
+      }
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      setLoading(false);
+    }
   };
 
-  
   const features = [
     {
       icon: FaTrophy,
@@ -236,7 +259,7 @@ const Login = () => {
                   )}
                 </div>
 
-                {/* Sign In */}
+                {/* Sign In Button */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -277,7 +300,7 @@ const Login = () => {
                   </div>
                 </div>
 
-                {/* Google Sign In */}
+                {/* Google Sign In Button */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}

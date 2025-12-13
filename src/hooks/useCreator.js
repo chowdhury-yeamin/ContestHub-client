@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../services/api";
 
-
 export const useMyContests = () => {
   return useQuery({
     queryKey: ["creator", "contests"],
@@ -11,7 +10,6 @@ export const useMyContests = () => {
     },
   });
 };
-
 
 export const useContestSubmissions = (contestId) => {
   return useQuery({

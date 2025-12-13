@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../services/api";
-import axios from "axios";
 
 // ==================== Fetch all contests ====================
 export const useContests = () => {
@@ -35,9 +34,14 @@ export const useSubmitTask = () => {
       for (const key in submissionData) {
         formData.append(key, submissionData[key]);
       }
-      const { data } = await axios.post(
-        `/api/contests/${contestId}/submit`,
-        formData
+      const { data } = await api.post(
+        `/contests/${contestId}/submit`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       return data;
     },
@@ -69,10 +73,7 @@ export const useCreateContest = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (contestData) => {
-      const { data } = await axios.post(
-        "http://localhost:5000/api/contests",
-        contestData
-      );
+      const { data } = await api.post("/contests", contestData);
       return data;
     },
     onSuccess: () => {

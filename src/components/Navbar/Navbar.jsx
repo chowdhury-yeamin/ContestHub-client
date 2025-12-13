@@ -33,6 +33,7 @@ const Navbar = ({ user, logout }) => {
     { name: "Leaderboard", path: "/leaderboard", icon: "🏆" },
     { name: "About", path: "/about", icon: "ℹ️" },
     { name: "Contact", path: "/contact", icon: "📧" },
+    { name: "Dashboard", path: "/dashboard", icon: "☰" },
   ];
 
   const handleLogout = () => {
@@ -130,15 +131,15 @@ const Navbar = ({ user, logout }) => {
             </Link>
 
             {/* Desktop Nav */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-4">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.name}
                   to={link.path}
                   className={({ isActive }) =>
-                    `relative px-4 py-2 rounded-lg transition-colors group ${
+                    `relative px-3 py-1 group ${
                       isActive
-                        ? "text-white"
+                        ? "text-white "
                         : "text-slate-300 hover:text-white"
                     }`
                   }
@@ -148,7 +149,7 @@ const Navbar = ({ user, logout }) => {
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span className="relative z-10 flex items-center gap-2 font-medium">
+                      <span className="relative z-10 flex items-center gap-1 font-medium">
                         <span className="text-lg">{link.icon}</span>
                         {link.name}
                       </span>
@@ -309,8 +310,6 @@ const Navbar = ({ user, logout }) => {
                       <span className="font-medium">{link.name}</span>
                     </NavLink>
                   ))}
-
-                  
 
                   {!user && (
                     <>

@@ -3,13 +3,19 @@ import api from "../services/api";
 
 /* ============================================================
    USERS — GET ALL
-   GET /admin/users
 ============================================================ */
 export const useAllUsers = () => {
   return useQuery({
     queryKey: ["admin", "users"],
     queryFn: async () => {
       const response = await api.get("/admin/users");
+
+      // Force correct shape
+      if (!Array.isArray(response.data)) {
+        console.error("❌ API response is not an array:", response.data);
+        return [];
+      }
+
       return response.data;
     },
   });
@@ -17,7 +23,6 @@ export const useAllUsers = () => {
 
 /* ============================================================
    USERS — CHANGE ROLE
-   PUT /admin/users/:id/role
 ============================================================ */
 export const useChangeUserRole = () => {
   const queryClient = useQueryClient();
@@ -27,17 +32,26 @@ export const useChangeUserRole = () => {
       const response = await api.put(`/admin/users/${userId}/role`, {
         role: newRole,
       });
+
+      if (!response.data) {
+        throw new Error("Invalid API response on role update");
+      }
+
       return response.data;
     },
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      queryClient.invalidateQueries(["admin", "users"]);
+    },
+
+    onError: (error) => {
+      console.error("❌ Role update failed:", error);
     },
   });
 };
 
 /* ============================================================
    CONTESTS — GET ALL
-   GET /admin/contests
 ============================================================ */
 export const useAdminContests = () => {
   return useQuery({
@@ -51,14 +65,14 @@ export const useAdminContests = () => {
 
 /* ============================================================
    CONTESTS — APPROVE
-   PUT /admin/contests/:id/approve
 ============================================================ */
 export const useApproveContest = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (contestId) => {
-      const response = await api.put(`/admin/contests/${contestId}/approve`);
+      const response = await api.put(`/admin/contests/${contestId}/status`, {
+        status: "confirmed",
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -70,14 +84,14 @@ export const useApproveContest = () => {
 
 /* ============================================================
    CONTESTS — REJECT
-   PUT /admin/contests/:id/reject
 ============================================================ */
 export const useRejectContest = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (contestId) => {
-      const response = await api.put(`/admin/contests/${contestId}/reject`);
+      const response = await api.put(`/admin/contests/${contestId}/status`, {
+        status: "rejected",
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -88,7 +102,6 @@ export const useRejectContest = () => {
 
 /* ============================================================
    CONTESTS — DELETE
-   DELETE /admin/contests/:id
 ============================================================ */
 export const useAdminDeleteContest = () => {
   const queryClient = useQueryClient();
@@ -99,8 +112,8 @@ export const useAdminDeleteContest = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "contests"] });
-      queryClient.invalidateQueries({ queryKey: ["contests"] });
+      queryClient.invalidateQueries(["admin", "contests"]);
+      queryClient.invalidateQueries(["contests"]);
     },
   });
 };

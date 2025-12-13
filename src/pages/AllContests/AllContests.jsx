@@ -32,7 +32,15 @@ const AllContests = () => {
     }
   }, [searchParams]);
 
-  const contestTypes = ["all", ...new Set(contests.map((c) => c.contestType))];
+  // Fix: Filter out undefined/null values from contest types
+  const contestTypes = [
+    "all",
+    ...new Set(
+      contests
+        .map((c) => c.contestType)
+        .filter((type) => type !== undefined && type !== null && type !== "")
+    ),
+  ];
 
   // Filter and sort contests
   let filteredContests = contests.filter((c) => c.status === "confirmed");
@@ -48,9 +56,9 @@ const AllContests = () => {
   if (searchQuery.trim()) {
     filteredContests = filteredContests.filter(
       (c) =>
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.contestType.toLowerCase().includes(searchQuery.toLowerCase())
+        c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.contestType?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
 
@@ -58,11 +66,11 @@ const AllContests = () => {
   filteredContests = [...filteredContests].sort((a, b) => {
     switch (sortBy) {
       case "popular":
-        return b.participantsCount - a.participantsCount;
+        return (b.participantsCount || 0) - (a.participantsCount || 0);
       case "prize-high":
-        return b.prizeMoney - a.prizeMoney;
+        return (b.prizeMoney || 0) - (a.prizeMoney || 0);
       case "prize-low":
-        return a.prizeMoney - b.prizeMoney;
+        return (a.prizeMoney || 0) - (b.prizeMoney || 0);
       case "newest":
         return new Date(b.deadline || 0) - new Date(a.deadline || 0);
       default:
@@ -263,7 +271,7 @@ const AllContests = () => {
                 )}
                 <span className="relative z-10 flex items-center gap-2">
                   {type === "all" && <FaStar className="text-amber-400" />}
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                  {type && type.charAt(0).toUpperCase() + type.slice(1)}
                 </span>
               </motion.button>
             ))}
@@ -364,13 +372,13 @@ const AllContests = () => {
                         animate={{ x: 0 }}
                         className="absolute top-4 right-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg"
                       >
-                        {contest.contestType}
+                        {contest.contestType || "General"}
                       </motion.div>
 
                       {/* Prize Badge */}
                       <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center gap-2">
                         <FaTrophy className="text-amber-400" />$
-                        {contest.prizeMoney.toLocaleString()}
+                        {(contest.prizeMoney || 0).toLocaleString()}
                       </div>
                     </div>
 
@@ -394,7 +402,7 @@ const AllContests = () => {
                               Participants
                             </div>
                             <div className="font-bold text-white">
-                              {contest.participantsCount}
+                              {contest.participantsCount || 0}
                             </div>
                           </div>
                         </div>

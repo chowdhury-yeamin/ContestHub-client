@@ -25,32 +25,46 @@ const DashboardLayout = () => {
   const [stats, setStats] = useState({
     activeContests: 0,
     totalWins: 0,
-    prizeMoney: 0,
+    totalWinnings: 0,
+    totalContests: 0,
+    totalParticipants: 0,
+    totalSubmissions: 0,
+    totalPrizes: 0,
+    pendingContests: 0,
+    rejectedContests: 0,
+    totalUsers: 0,
   });
 
   // Fetch stats dynamically
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Active contests
-        const res1 = await fetch("/api/contests?status=approved");
-        const data1 = await res1.json();
-        const activeContests = data1.contests.length;
+        const token = localStorage.getItem("token");
 
-        // User wins
-        const res2 = await fetch("/api/users/me/wins", {
-          headers: { Authorization: `Bearer ${user?.token}` },
+        if (!token) {
+          console.error("No token found in localStorage");
+          return;
+        }
+
+        const response = await fetch("http://localhost:5000/api/stats", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
-        const data2 = await res2.json();
-        const totalWins = data2.contests.length;
-        const prizeMoney = data2.contests.reduce(
-          (sum, c) => sum + (c.prize || 0),
-          0
-        );
 
-        setStats({ activeContests, totalWins, prizeMoney });
-      } catch (err) {
-        console.error("Failed to fetch stats:", err);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || `HTTP error! status: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
       }
     };
 
@@ -126,7 +140,7 @@ const DashboardLayout = () => {
       label: "My Profile",
       gradient: "from-purple-500 to-pink-500",
       emoji: "👤",
-    }, // keep profile
+    },
   ];
 
   const routes =
@@ -242,9 +256,7 @@ const DashboardLayout = () => {
                 <div className="mb-6 pb-4 border-b border-white/10">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 animate-pulse" />
-                    <h2 className="text-xl font-black text-white">
-                      Navigation
-                    </h2>
+                    <h2 className="text-xl font-black text-white">Dashboard</h2>
                   </div>
                   <p className="text-xs text-slate-400">
                     Quick access to your features
@@ -310,22 +322,49 @@ const DashboardLayout = () => {
                     Quick Stats
                   </h3>
                   <div className="space-y-2">
+                    {/* Active Contests */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Active Contests</span>
+                      <span className="text-slate-400">
+                        {user?.role === "user"
+                          ? "Participated"
+                          : "Active Contests"}
+                      </span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                        {stats.activeContests}
+                        {stats?.activeContests || stats?.totalContests || 0}
                       </span>
                     </div>
+
+                    {/* Wins / Participants */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Total Wins</span>
+                      <span className="text-slate-400">
+                        {user?.role === "user"
+                          ? "Total Wins"
+                          : user?.role === "admin"
+                          ? "Total Users"
+                          : "Participants"}
+                      </span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-                        {stats.totalWins}
+                        {stats?.totalWins ||
+                          stats?.totalUsers ||
+                          stats?.totalParticipants ||
+                          0}
                       </span>
                     </div>
+
+                    {/* Prize Money / Winnings */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Prize Money</span>
+                      <span className="text-slate-400">
+                        {user?.role === "user"
+                          ? "Total Winnings"
+                          : "Prize Pool"}
+                      </span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
-                        ${stats.prizeMoney.toLocaleString()}
+                        $
+                        {(
+                          stats?.totalWinnings ||
+                          stats?.totalPrizes ||
+                          0
+                        ).toLocaleString()}
                       </span>
                     </div>
                   </div>

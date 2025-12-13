@@ -30,7 +30,7 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch("/api/leaderboard");
+        const response = await fetch("http://localhost:5000/api/leaderboard");
         const data = await response.json();
         setLeaderboard(data.leaderboard);
       } catch (err) {
@@ -214,22 +214,16 @@ const Leaderboard = () => {
           className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12"
         >
           {/* Filter Select */}
-          <div className="relative w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
             <FaFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="relative w-full sm:w-64 pl-12 pr-4 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
+              className="select h-14 w-full pl-12 pr-4 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
             >
-              <option value="all" className="bg-slate-900">
-                Default (Wins)
-              </option>
-              <option value="wins" className="bg-slate-900">
-                Most Wins
-              </option>
-              <option value="prizes" className="bg-slate-900">
-                Highest Prizes
-              </option>
+              <option value="all">Default (Wins)</option>
+              <option value="wins">Most Wins</option>
+              <option value="prizes">Highest Prizes</option>
             </select>
           </div>
 

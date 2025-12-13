@@ -1,41 +1,75 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
-// GET /api/users/me
+/* =========================
+   USER PROFILE
+   GET /api/users/me
+========================= */
 export const useUserProfile = () => {
+  const { token } = useAuth();
+
   return useQuery({
     queryKey: ["user", "profile"],
+    enabled: !!token, // 🔥 DO NOT REMOVE
     queryFn: async () => {
-      const { data } = await api.get("/users/me");
+      const { data } = await api.get("/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return data.user;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 };
 
-// GET /api/users/me/registrations
+/* =========================
+   PARTICIPATED CONTESTS
+   GET /api/users/me/registrations
+========================= */
 export const useParticipatedContests = () => {
+  const { token } = useAuth();
+
   return useQuery({
-    queryKey: ["user", "participated"],
+    queryKey: ["user", "participatedContests"],
+    enabled: !!token, // 🔥 REQUIRED
     queryFn: async () => {
-      const { data } = await api.get("/users/me/registrations");
-      return data.contests || [];
+      const res = await api.get("/users/me/registrations", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data.registrations || [];
     },
   });
 };
 
-// GET /api/users/me/wins
+/* =========================
+   WINNING CONTESTS
+   GET /api/users/me/wins
+========================= */
 export const useWinningContests = () => {
+  const { token } = useAuth();
+
   return useQuery({
     queryKey: ["user", "winnings"],
+    enabled: !!token,
     queryFn: async () => {
-      const { data } = await api.get("/users/me/wins");
+      const { data } = await api.get("/users/me/wins", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return data.contests || [];
     },
   });
 };
 
-// GET /api/leaderboard
+/* =========================
+   LEADERBOARD (PUBLIC)
+   GET /api/leaderboard
+========================= */
 export const useLeaderboard = () => {
   return useQuery({
     queryKey: ["leaderboard"],
@@ -46,13 +80,21 @@ export const useLeaderboard = () => {
   });
 };
 
-// PUT /api/users/me
+/* =========================
+   UPDATE PROFILE
+   PUT /api/users/me
+========================= */
 export const useUpdateProfile = () => {
+  const { token } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (profileData) => {
-      const { data } = await api.put("/users/me", profileData);
+      const { data } = await api.put("/users/me", profileData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return data.user;
     },
     onSuccess: () => {

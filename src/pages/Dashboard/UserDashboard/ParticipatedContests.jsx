@@ -15,9 +15,10 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 
 const ParticipatedContests = () => {
-  const { data: participated = [], isLoading } = useParticipatedContests();
+  const { data, isLoading } = useParticipatedContests();
+  const participated = data?.registrations || [];
   const [currentPage, setCurrentPage] = useState(1);
-  const { loading, user } = useAuth(); // Changed from loadingAuth to loading
+  const { loading, user } = useAuth();
 
   const navigate = useNavigate();
   const itemsPerPage = 10;
@@ -26,10 +27,8 @@ const ParticipatedContests = () => {
     if (!loading && !user) {
       navigate("/login");
     }
-  }, [loading, user, navigate]); // Changed from loadingAuth to loading
-
+  }, [loading, user, navigate]);
   if (loading || isLoading) {
-    // Changed from loadingAuth to loading
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <motion.div

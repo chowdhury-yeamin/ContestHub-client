@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { auth, googleProvider } from "../firebase/firebase.config";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../firebase/firebase.config";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -10,6 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch(`${API_URL}/users/me`, {
+        const response = await fetch(`${API_URL}/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -31,7 +32,6 @@ export const AuthProvider = ({ children }) => {
           const data = await response.json();
           setUser(data.user);
         } else {
-          // Token is invalid
           localStorage.removeItem("token");
           setUser(null);
         }
@@ -39,6 +39,7 @@ export const AuthProvider = ({ children }) => {
         console.error("Auth check failed:", error);
         localStorage.removeItem("token");
         setUser(null);
+        setToken(null);
       } finally {
         setLoading(false);
       }
@@ -74,6 +75,8 @@ export const AuthProvider = ({ children }) => {
         background: "#0f172a",
         color: "#fff",
         confirmButtonColor: "#6366F1",
+        timer: 1500,
+        showConfirmButton: false,
       });
 
       setLoading(false);
@@ -110,6 +113,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       localStorage.setItem("token", data.token);
+      setToken(data.token);
       setUser(data.user);
 
       Swal.fire({
@@ -119,6 +123,8 @@ export const AuthProvider = ({ children }) => {
         background: "#0f172a",
         color: "#fff",
         confirmButtonColor: "#6366F1",
+        timer: 1500,
+        showConfirmButton: false,
       });
 
       setLoading(false);
@@ -137,42 +143,118 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  async function googleSignIn() {
+  const googleSignIn = async () => {
     try {
+      console.log("🚀 Starting Google Sign-In...");
+      setLoading(true);
+
+      // Step 1: Sign in with Firebase
       const provider = new GoogleAuthProvider();
+      provider.addScope("email");
+      provider.addScope("profile");
+
+      console.log("📱 Opening Google popup...");
       const result = await signInWithPopup(auth, provider);
+      const firebaseUser = result.user;
 
-      const user = result.user;
-      if (!user) throw new Error("No user returned from Firebase");
+      if (!firebaseUser) {
+        throw new Error("No user returned from Firebase");
+      }
 
-      const idToken = await user.getIdToken();
-      if (!idToken) throw new Error("Failed to get Firebase ID token");
+      console.log("✅ Firebase sign-in successful:", firebaseUser.email);
 
+      // Step 2: Get Firebase ID token
+      console.log("🔑 Getting ID token...");
+      const idToken = await firebaseUser.getIdToken();
+
+      if (!idToken) {
+        throw new Error("Failed to get Firebase ID token");
+      }
+
+      console.log("✅ Got ID token, length:", idToken.length);
+
+      // Step 3: Send to backend
+      console.log("📤 Sending to backend:", `${API_URL}/auth/google`);
       const response = await fetch(`${API_URL}/auth/google`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ idToken }),
       });
 
-      const data = await response.json().catch(() => null);
-      if (!data) throw new Error("Invalid JSON response from backend");
-      if (data.error) throw new Error(data.error);
+      console.log("📥 Backend response status:", response.status);
 
-      if (!data.user || !data.token)
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        console.error("❌ Backend error:", errorData);
+        throw new Error(errorData.error || `Backend error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("✅ Backend response:", {
+        hasUser: !!data.user,
+        hasToken: !!data.token,
+      });
+
+      if (!data.user || !data.token) {
         throw new Error("Incomplete backend response");
+      }
 
-      console.log("Backend auth response:", data);
+      // Step 4: Save token and user
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
 
-      return { user: data.user, token: data.token };
+      console.log("✅ Google sign-in complete!");
+
+      Swal.fire({
+        title: "Success!",
+        text: "Google sign-in successful",
+        icon: "success",
+        background: "#0f172a",
+        color: "#fff",
+        confirmButtonColor: "#6366F1",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setLoading(false);
+      return { success: true, user: data.user };
     } catch (err) {
-      console.error("Google sign-in error:", err.message || err);
-      alert(`Login failed: ${err.message || err}`);
+      console.error("❌ Google sign-in error:", err);
+
+      let errorMessage = "Failed to sign in with Google";
+
+      if (err.code === "auth/popup-closed-by-user") {
+        errorMessage = "Sign-in cancelled";
+      } else if (err.code === "auth/popup-blocked") {
+        errorMessage =
+          "Popup was blocked by browser. Please allow popups for this site.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      Swal.fire({
+        title: "Sign-In Failed",
+        text: errorMessage,
+        icon: "error",
+        background: "#0f172a",
+        color: "#fff",
+        confirmButtonColor: "#6366F1",
+      });
+
+      setLoading(false);
+      return { success: false, error: errorMessage };
     }
-  }
+  };
 
   const logout = async () => {
     localStorage.removeItem("token");
     setUser(null);
+    setToken(null);
+
     Swal.fire({
       title: "Success!",
       text: "Logged out successfully",
@@ -180,6 +262,8 @@ export const AuthProvider = ({ children }) => {
       background: "#0f172a",
       color: "#fff",
       confirmButtonColor: "#6366F1",
+      timer: 1500,
+      showConfirmButton: false,
     });
   };
 
@@ -196,6 +280,8 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         loading,
+        token,
+        setToken,
         login,
         register,
         googleSignIn,

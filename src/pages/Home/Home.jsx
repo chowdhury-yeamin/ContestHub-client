@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useContests } from "../../hooks/useContests";
 import { useAuth } from "../../contexts/AuthContext";
@@ -7,97 +7,62 @@ import {
   FaSearch,
   FaTrophy,
   FaUsers,
-  FaCalendarAlt,
-  FaStar,
-  FaRocket,
-  FaCrown,
   FaFire,
+  FaCrown,
   FaArrowRight,
-  FaCheckCircle,
-  FaMedal,
+  FaRocket,
 } from "react-icons/fa";
 import { useWinners } from "../../hooks/useWinners";
-
-
-
-const contestCategories = [
-  {
-    name: "Image Design",
-    icon: "🎨",
-    description: "Logo, graphics, and visual design contests",
-    gradient: "from-pink-500 to-rose-500",
-  },
-  {
-    name: "Article Writing",
-    icon: "✍️",
-    description: "Writing competitions for creative minds",
-    gradient: "from-blue-500 to-cyan-500",
-  },
-  {
-    name: "Business Ideas",
-    icon: "💡",
-    description: "Pitch your innovative ideas",
-    gradient: "from-amber-500 to-orange-500",
-  },
-  {
-    name: "Gaming Reviews",
-    icon: "🎮",
-    description: "Share insights and reviews on games",
-    gradient: "from-purple-500 to-pink-500",
-  },
-  {
-    name: "Photography",
-    icon: "📸",
-    description: "Capture and showcase your moments",
-    gradient: "from-emerald-500 to-teal-500",
-  },
-];
+import {
+  CheckCircle,
+  Search,
+  Upload,
+  Trophy,
+  ShieldCheck,
+  Zap,
+  BadgeCheck,
+} from "lucide-react";
+import BrandsSwiper from "./BrandsSwiper";
 
 const Home = () => {
   const { data: contests = [], isLoading } = useContests();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchType, setSearchType] = useState("");
-  const [activeCategory, setActiveCategory] = useState(null);
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
 
   const { data: winnersData = [] } = useWinners();
 
-  const [stats, setStats] = useState({
-    totalContests: 0,
-    totalParticipants: 0,
-    totalWinners: 0,
-    totalPrizes: 0,
-  });
+  const contestsArray = Array.isArray(contests) ? contests : [];
+  const winnersArray = Array.isArray(winnersData) ? winnersData : [];
 
-  useEffect(() => {
-    const totalContests = contests.length;
-    const totalParticipants = contests.reduce(
-      (acc, c) => acc + c.participantsCount,
+ 
+  const stats = useMemo(() => {
+    const totalContests = contestsArray.length;
+    const totalParticipants = contestsArray.reduce(
+      (acc, c) => acc + (c.participantsCount || 0),
       0
     );
-    const totalPrizes = contests.reduce(
+    const totalPrizes = contestsArray.reduce(
       (acc, c) => acc + (c.prizeMoney || 0),
       0
     );
-    const totalWinners = Array.isArray(winnersData) ? winnersData.length : 0;
+    const totalWinners = winnersArray.length;
 
-    setStats({
+    return {
       totalContests,
       totalParticipants,
       totalWinners,
       totalPrizes,
-    });
-  }, [contests, winnersData]);
+    };
+  }, [contestsArray.length, winnersArray.length]);
 
-  const popularContests = contests
+  const popularContests = contestsArray
     .filter((c) => c.status === "confirmed")
-    .sort((a, b) => b.participantsCount - a.participantsCount)
+    .sort((a, b) => (b.participantsCount || 0) - (a.participantsCount || 0))
     .slice(0, 6);
-
-  const topWinners = Array.isArray(winnersData) ? winnersData.slice(0, 5) : [];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -117,9 +82,87 @@ const Home = () => {
   };
 
   const handleCategoryClick = (categoryName) => {
-    setActiveCategory(categoryName);
     navigate(`/all-contests?type=${encodeURIComponent(categoryName)}`);
   };
+
+  const contestCategories = [
+    {
+      name: "Image Design",
+      icon: "🎨",
+      description: "Logo, graphics, and visual design contests",
+      gradient: "from-pink-500 to-rose-500",
+    },
+    {
+      name: "Article Writing",
+      icon: "✍️",
+      description: "Writing competitions for creative minds",
+      gradient: "from-blue-500 to-cyan-500",
+    },
+    {
+      name: "Business Ideas",
+      icon: "💡",
+      description: "Pitch your innovative ideas",
+      gradient: "from-amber-500 to-orange-500",
+    },
+    {
+      name: "Gaming Reviews",
+      icon: "🎮",
+      description: "Share insights and reviews on games",
+      gradient: "from-purple-500 to-pink-500",
+    },
+    {
+      name: "Photography",
+      icon: "📸",
+      description: "Capture and showcase your moments",
+      gradient: "from-emerald-500 to-teal-500",
+    },
+  ];
+
+  const steps = [
+    {
+      icon: <Search className="w-10 h-10" />,
+      title: "Browse Contests",
+      desc: "Explore active contests and pick the one that fits your skills.",
+    },
+    {
+      icon: <Upload className="w-10 h-10" />,
+      title: "Join",
+      desc: "Enter instantly — no unnecessary steps or friction.",
+    },
+    {
+      icon: <CheckCircle className="w-10 h-10" />,
+      title: "Submit",
+      desc: "Upload your best work with confidence and clarity.",
+    },
+    {
+      icon: <Trophy className="w-10 h-10" />,
+      title: "Win Prizes",
+      desc: "Stand out, collect rewards, and build your reputation.",
+    },
+  ];
+
+  const features = [
+    {
+      icon: <Zap className="w-10 h-10" />,
+      title: "Fast Payouts",
+      desc: "Winners get paid without delays or excuses.",
+    },
+    {
+      icon: <BadgeCheck className="w-10 h-10" />,
+      title: "Trusted by Creators",
+      desc: "A growing community that relies on transparent contests.",
+    },
+    {
+      icon: <CheckCircle className="w-10 h-10" />,
+      title: "Easy Submissions",
+      desc: "Join and submit your work in minutes, not hours.",
+    },
+    {
+      icon: <ShieldCheck className="w-10 h-10" />,
+      title: "Secure & Verified",
+      desc: "Every contest is verified to prevent fraud and fake hosts.",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
@@ -192,7 +235,8 @@ const Home = () => {
               </span>
             </motion.p>
 
-            <motion.div
+            <motion.form
+              onSubmit={handleSearch}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -207,22 +251,21 @@ const Home = () => {
                       type="text"
                       value={searchType}
                       onChange={(e) => setSearchType(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
                       placeholder="Search contests by type, category, or keyword..."
                       className="w-full pl-12 pr-4 py-4 bg-transparent text-white placeholder-slate-400 focus:outline-none"
                     />
                   </div>
                   <motion.button
+                    type="submit"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={handleSearch}
                     className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all flex items-center justify-center gap-2"
                   >
                     <FaSearch /> <span>Search</span>
                   </motion.button>
                 </div>
               </div>
-            </motion.div>
+            </motion.form>
           </div>
         </motion.section>
 
@@ -405,13 +448,15 @@ const Home = () => {
                       <motion.img
                         whileHover={{ scale: 1.1 }}
                         transition={{ duration: 0.6 }}
-                        src={contest.image}
+                        src={
+                          contest.image || "https://via.placeholder.com/400x300"
+                        }
                         alt={contest.name}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
                       <div className="absolute top-4 right-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                        ${contest.prizeMoney.toLocaleString()}
+                        ${(contest.prizeMoney || 0).toLocaleString()}
                       </div>
                     </div>
                     <div className="p-6">
@@ -425,13 +470,13 @@ const Home = () => {
                         <div className="flex items-center gap-2 text-slate-300">
                           <FaUsers className="text-blue-400" />
                           <span className="font-medium">
-                            {contest.participantsCount}
+                            {contest.participantsCount || 0}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-300">
                           <FaTrophy className="text-amber-400" />
                           <span className="font-medium">
-                            ${contest.prizeMoney}
+                            ${contest.prizeMoney || 0}
                           </span>
                         </div>
                       </div>
@@ -466,7 +511,7 @@ const Home = () => {
         </motion.section>
 
         {/* Recent Winners Section */}
-        {winnersData.length > 0 && (
+        {winnersArray.length > 0 && (
           <motion.section
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -483,7 +528,7 @@ const Home = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {winnersData.slice(0, 3).map((winner, idx) => (
+              {winnersArray.slice(0, 3).map((winner, idx) => (
                 <motion.div
                   key={winner._id}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -513,7 +558,7 @@ const Home = () => {
                           )}&background=6366F1&color=fff&size=200`
                         }
                         alt={winner.name}
-                        className="relative w-24 h-24 rounded-full border-4 border-white/20"
+                        className="relative w-24 h-24 rounded-full border-4 border-white/20 object-cover"
                       />
                       <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 w-10 h-10 rounded-full flex items-center justify-center">
                         <FaTrophy className="text-white text-lg" />
@@ -526,7 +571,7 @@ const Home = () => {
                       {winner.contestName || "Contest Winner"}
                     </p>
                     <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-                      ${winner.prizeMoney}
+                      ${winner.prizeMoney || 0}
                     </div>
                   </div>
                 </motion.div>
@@ -534,6 +579,143 @@ const Home = () => {
             </div>
           </motion.section>
         )}
+
+        {/* How It Works Section */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="text-center mb-12">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl sm:text-5xl font-black text-white mb-4"
+            >
+              How It Works
+            </motion.h2>
+            <p className="text-xl text-slate-400">
+              A simple process built for creators
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {steps.map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -10, scale: 1.03 }}
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-opacity" />
+                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-8 text-center transition-all">
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 3,
+                    }}
+                    className="text-indigo-400 mb-4 flex justify-center"
+                  >
+                    {step.icon}
+                  </motion.div>
+                  <h3 className="text-xl font-bold text-white mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {step.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Why Choose Us */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="text-center mb-12">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl sm:text-5xl font-black text-white mb-4"
+            >
+              Why Choose Us?
+            </motion.h2>
+            <p className="text-xl text-slate-400">
+              What makes our platform stand out
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {features.map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -10, scale: 1.03 }}
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-opacity" />
+                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-8 text-center transition-all">
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 3,
+                    }}
+                    className="text-indigo-400 mb-4 flex justify-center"
+                  >
+                    {item.icon}
+                  </motion.div>
+                  <h3 className="text-xl font-bold text-white mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Trusted by Creators Worldwide */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="text-center mb-8">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl sm:text-5xl font-black text-white mb-4"
+            >
+              Trusted by Creators Worldwide
+            </motion.h2>
+          </div>
+          <BrandsSwiper />
+        </motion.section>
 
         {/* Creator CTA */}
         <motion.section
