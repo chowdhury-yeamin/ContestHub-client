@@ -128,3 +128,22 @@ export const useUpdateContest = () => {
     },
   });
 };
+
+// ==================== All Creator Submissions ====================
+export const useAllCreatorSubmissions = () => {
+  return useQuery({
+    queryKey: ["creator", "all-submissions"],
+    queryFn: async () => {
+      const response = await api.get("/creator/all-submissions");
+
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      if (response.data && Array.isArray(response.data.submissions)) {
+        return response.data.submissions;
+      }
+
+      return [];
+    },
+  });
+};

@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useUserProfile, useUpdateProfile } from "../../../hooks/useUsers";
+import {
+  useUserProfile,
+  useUpdateProfile,
+  useUserStats,
+} from "../../../hooks/useUsers";
 import { useAuth } from "../../../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -10,11 +14,6 @@ import {
   ResponsiveContainer,
   Legend,
   Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
 } from "recharts";
 import {
   FaUser,
@@ -37,19 +36,16 @@ import {
   FaClipboardCheck,
   FaPlusCircle,
   FaChartBar,
-  FaAward,
-  FaGem,
   FaRocket,
-  FaBolt,
   FaFlag,
   FaUserShield,
-  FaUserTie,
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const Profile = () => {
   const { user } = useAuth();
   const { data: profile, isLoading, refetch } = useUserProfile();
+  const { data: stats, isLoading: statsLoading } = useUserStats();
   const updateMutation = useUpdateProfile();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -99,87 +95,86 @@ const Profile = () => {
 
   const chartData = profile
     ? [
-        { name: "Won", value: profile.wonCount || 0, color: "#10b981" },
+        { name: "Won", value: user.wonCount || 0, color: "#10b981" },
         {
           name: "Participated",
-          value: (profile.participatedCount || 0) - (profile.wonCount || 0),
+          value: (user.participatedCount || 0) - (user.wonCount || 0),
           color: "#6366f1",
         },
       ]
     : [];
 
-  const winPercentage = profile?.participatedCount
-    ? (((profile.wonCount || 0) / profile.participatedCount) * 100).toFixed(1)
+  const winPercentage = user?.participatedCount
+    ? (((user.wonCount || 0) / user.participatedCount) * 100).toFixed(1)
     : 0;
 
   const getUserStatus = () => {
-    const wins = profile?.wonCount || 0;
+    const wins = user.wonCount || 0;
     if (wins >= 10)
       return {
         title: "Legend",
         icon: FaCrown,
-        gradient: "from-amber-500 to-orange-500",
+        gradient: "from-amber-400 to-orange-500",
         emoji: "👑",
       };
     if (wins >= 5)
       return {
         title: "Expert",
         icon: FaTrophy,
-        gradient: "from-purple-500 to-pink-500",
+        gradient: "from-purple-400 to-pink-500",
         emoji: "🏆",
       };
     if (wins >= 3)
       return {
         title: "Pro",
         icon: FaMedal,
-        gradient: "from-blue-500 to-cyan-500",
+        gradient: "from-blue-400 to-cyan-500",
         emoji: "🥇",
       };
     if (wins >= 1)
       return {
         title: "Rising Star",
         icon: FaStar,
-        gradient: "from-emerald-500 to-teal-500",
+        gradient: "from-emerald-400 to-teal-500",
         emoji: "⭐",
       };
     return {
       title: "Beginner",
       icon: FaFire,
-      gradient: "from-slate-400 to-slate-500",
+      gradient: "from-slate-400 to-slate-600",
       emoji: "🔥",
     };
   };
 
   const userStatus = getUserStatus();
 
-  // Role-specific data
   const roleConfig = {
     admin: {
       title: "Admin Dashboard",
       icon: FaShieldAlt,
-      gradient: "from-red-500 to-orange-500",
+      gradient: "from-red-400 to-orange-500",
       badge: "👨‍💼",
-      bgGradient: "from-red-600/20 via-orange-600/20 to-yellow-600/20",
+      bgGradient: "from-red-600/30 via-orange-600/30 to-yellow-600/30",
     },
     creator: {
       title: "Creator Dashboard",
       icon: FaRocket,
-      gradient: "from-purple-500 to-pink-500",
+      gradient: "from-purple-400 to-pink-500",
       badge: "🎨",
-      bgGradient: "from-purple-600/20 via-pink-600/20 to-rose-600/20",
+      bgGradient: "from-purple-600/30 via-pink-600/30 to-rose-600/30",
     },
     user: {
       title: "My Profile",
       icon: FaUser,
       gradient: userStatus.gradient,
       badge: userStatus.emoji,
-      bgGradient: "from-indigo-600/20 via-purple-600/20 to-pink-600/20",
+      bgGradient: "from-indigo-600/30 via-purple-600/30 to-pink-600/30",
     },
   };
 
   const currentRole = roleConfig[userRole] || roleConfig.user;
 
-  if (isLoading) {
+  if (isLoading || statsLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <motion.div
@@ -189,9 +184,11 @@ const Profile = () => {
             scale: { duration: 1, repeat: Infinity },
           }}
         >
-          <currentRole.icon className="text-6xl text-indigo-500" />
+          <currentRole.icon className="text-6xl text-indigo-400" />
         </motion.div>
-        <p className="mt-4 text-slate-400">Loading your profile...</p>
+        <p className="mt-4 text-slate-300 font-medium">
+          Loading your profile...
+        </p>
       </div>
     );
   }
@@ -212,10 +209,10 @@ const Profile = () => {
           {currentRole.badge}
         </motion.div>
         <div>
-          <h2 className="text-3xl font-black text-white">
+          <h2 className="text-3xl font-black text-white drop-shadow-lg">
             {currentRole.title}
           </h2>
-          <p className="text-slate-400">
+          <p className="text-slate-200 font-medium">
             {userRole === "admin" && "Manage platform and oversee operations"}
             {userRole === "creator" && "Create and manage your contests"}
             {userRole === "user" && "Track your contest participation"}
@@ -223,16 +220,16 @@ const Profile = () => {
         </div>
       </motion.div>
 
-      {/* Profile Header - Universal */}
+      {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative group"
       >
         <div
-          className={`absolute inset-0 bg-gradient-to-r ${currentRole.gradient} rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity`}
+          className={`absolute inset-0 bg-gradient-to-r ${currentRole.gradient} rounded-2xl blur-2xl opacity-40 group-hover:opacity-60 transition-opacity`}
         />
-        <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
+        <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-8 shadow-2xl">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="relative">
               <motion.div whileHover={{ scale: 1.05 }} className="relative">
@@ -248,10 +245,10 @@ const Profile = () => {
                     )}&background=6366F1&color=fff&size=200`
                   }
                   alt={profile?.name || user?.name}
-                  className="relative w-32 h-32 rounded-full border-4 border-white/20 object-cover"
+                  className="relative w-32 h-32 rounded-full border-4 border-white/30 object-cover shadow-xl"
                 />
                 <div
-                  className={`absolute -bottom-2 -right-2 bg-gradient-to-r ${currentRole.gradient} w-12 h-12 rounded-full flex items-center justify-center border-4 border-slate-950`}
+                  className={`absolute -bottom-2 -right-2 bg-gradient-to-r ${currentRole.gradient} w-12 h-12 rounded-full flex items-center justify-center border-4 border-slate-900 shadow-lg`}
                 >
                   <currentRole.icon className="text-white text-xl" />
                 </div>
@@ -259,36 +256,28 @@ const Profile = () => {
             </div>
 
             <div className="flex-1 text-center md:text-left">
-              <h3 className="text-3xl font-black text-white mb-2">
+              <h3 className="text-3xl font-black text-white mb-2 drop-shadow-lg">
                 {user?.name || user?.displayName || profile?.name || "User"}
               </h3>
-              <div className="flex items-center gap-2 justify-center md:justify-start mb-4">
-                <motion.span className="text-2xl">
-                  {currentRole.badge}
-                </motion.span>
-                <span
-                  className={`text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r ${currentRole.gradient} uppercase`}
-                >
-                  {userRole}
-                </span>
-              </div>
-              {profile?.bio && (
-                <p className="text-slate-400 mb-4 max-w-2xl">{profile.bio}</p>
+              {(profile?.bio || user?.bio) && (
+                <p className="text-slate-100 mb-4 max-w-2xl font-medium">
+                  {profile?.bio || user?.bio}
+                </p>
               )}
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start text-sm text-slate-400">
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start text-sm text-slate-200 font-medium">
                 {(profile?.email || user?.email) && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-lg">
                     <FaEnvelope className="text-blue-400" />
                     <span>{profile?.email || user?.email}</span>
                   </div>
                 )}
-                {profile?.address && (
-                  <div className="flex items-center gap-2">
+                {(profile?.address || user?.address) && (
+                  <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-lg">
                     <FaMapMarkerAlt className="text-emerald-400" />
-                    <span>{profile.address}</span>
+                    <span>{profile?.address || user?.address}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-lg">
                   <FaCalendarAlt className="text-purple-400" />
                   <span>
                     Joined{" "}
@@ -307,7 +296,7 @@ const Profile = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsEditing(true)}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all flex items-center gap-2"
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold shadow-xl hover:shadow-indigo-500/50 transition-all flex items-center gap-2"
             >
               <FaEdit />
               Edit Profile
@@ -316,37 +305,37 @@ const Profile = () => {
         </div>
       </motion.div>
 
-      {/* ADMIN ROLE UI */}
-      {userRole === "admin" && (
+      {/* ADMIN ROLE */}
+      {userRole === "admin" && stats && (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
                 label: "Total Users",
-                value: "1,234",
+                value: stats.totalUsers || 0,
                 icon: FaUsers,
-                gradient: "from-blue-500 to-cyan-500",
+                gradient: "from-blue-400 to-cyan-500",
                 emoji: "👥",
               },
               {
                 label: "Pending Contests",
-                value: "23",
+                value: stats.pendingContests || 0,
                 icon: FaClipboardCheck,
-                gradient: "from-amber-500 to-orange-500",
+                gradient: "from-amber-400 to-orange-500",
                 emoji: "⏳",
               },
               {
-                label: "Approved Contests",
-                value: "156",
+                label: "Total Contests",
+                value: stats.totalContests || 0,
                 icon: FaCheckCircle,
-                gradient: "from-emerald-500 to-teal-500",
+                gradient: "from-emerald-400 to-teal-500",
                 emoji: "✅",
               },
               {
-                label: "Platform Revenue",
-                value: "$45.2K",
+                label: "Total Prizes",
+                value: `$${(stats.totalPrizes || 0).toLocaleString()}`,
                 icon: FaChartBar,
-                gradient: "from-purple-500 to-pink-500",
+                gradient: "from-purple-400 to-pink-500",
                 emoji: "💰",
               },
             ].map((stat, idx) => (
@@ -355,23 +344,25 @@ const Profile = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={{ y: -5, scale: 1.02 }}
+                whileHover={{ y: -5, scale: 1.03 }}
                 className="relative group"
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-xl blur-lg`}
+                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-20 group-hover:opacity-40 transition-opacity rounded-xl blur-lg`}
                 />
-                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-2xl">{stat.emoji}</span>
+                <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-xl p-5 shadow-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-3xl drop-shadow-lg">
+                      {stat.emoji}
+                    </span>
                     <stat.icon
-                      className={`text-lg text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
+                      className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
                     />
                   </div>
-                  <div className="text-3xl font-black text-white mb-1">
+                  <div className="text-4xl font-black text-white mb-2 drop-shadow-lg">
                     {stat.value}
                   </div>
-                  <div className="text-xs text-slate-400 font-medium">
+                  <div className="text-sm text-slate-200 font-bold">
                     {stat.label}
                   </div>
                 </div>
@@ -384,9 +375,9 @@ const Profile = () => {
             animate={{ opacity: 1 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-orange-600/10 rounded-2xl blur-xl" />
-            <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-              <h3 className="text-xl font-black text-white mb-6 flex items-center gap-2">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-2xl blur-xl" />
+            <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-6 shadow-xl">
+              <h3 className="text-2xl font-black text-white mb-6 flex items-center gap-2 drop-shadow-lg">
                 <FaUsersCog className="text-red-400" />
                 Admin Privileges
               </h3>
@@ -414,13 +405,17 @@ const Profile = () => {
                   <motion.div
                     key={idx}
                     whileHover={{ scale: 1.05, y: -5 }}
-                    className="bg-white/5 border border-white/10 rounded-xl p-4 cursor-pointer hover:bg-white/10 transition-all"
+                    className="bg-slate-800/50 border-2 border-white/20 rounded-xl p-5 cursor-pointer hover:bg-slate-800/80 transition-all shadow-lg"
                   >
                     <item.icon
-                      className={`text-3xl text-${item.color}-400 mb-3`}
+                      className={`text-4xl text-${item.color}-400 mb-3 drop-shadow-lg`}
                     />
-                    <h4 className="font-bold text-white mb-1">{item.title}</h4>
-                    <p className="text-sm text-slate-400">{item.desc}</p>
+                    <h4 className="font-black text-white mb-2 text-lg">
+                      {item.title}
+                    </h4>
+                    <p className="text-sm text-slate-200 font-medium">
+                      {item.desc}
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -429,38 +424,38 @@ const Profile = () => {
         </>
       )}
 
-      {/* CREATOR ROLE UI */}
-      {userRole === "creator" && (
+      {/* CREATOR ROLE */}
+      {userRole === "creator" && stats && (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
                 label: "Contests Created",
-                value: profile?.contestsCreated || 0,
+                value: stats.totalContests || 0,
                 icon: FaPlusCircle,
-                gradient: "from-purple-500 to-pink-500",
+                gradient: "from-purple-400 to-pink-500",
                 emoji: "📝",
               },
               {
                 label: "Total Participants",
-                value: "1,847",
+                value: stats.totalParticipants || 0,
                 icon: FaUsers,
-                gradient: "from-blue-500 to-cyan-500",
+                gradient: "from-blue-400 to-cyan-500",
                 emoji: "👥",
               },
               {
-                label: "Prizes Distributed",
-                value: "$12.5K",
+                label: "Total Submissions",
+                value: stats.totalSubmissions || 0,
                 icon: FaTrophy,
-                gradient: "from-amber-500 to-orange-500",
-                emoji: "💰",
+                gradient: "from-amber-400 to-orange-500",
+                emoji: "📄",
               },
               {
-                label: "Avg. Participation",
-                value: "47",
+                label: "Total Prizes",
+                value: `$${(stats.totalPrizes || 0).toLocaleString()}`,
                 icon: FaChartLine,
-                gradient: "from-emerald-500 to-teal-500",
-                emoji: "📊",
+                gradient: "from-emerald-400 to-teal-500",
+                emoji: "💰",
               },
             ].map((stat, idx) => (
               <motion.div
@@ -468,23 +463,25 @@ const Profile = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={{ y: -5, scale: 1.02 }}
+                whileHover={{ y: -5, scale: 1.03 }}
                 className="relative group"
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-xl blur-lg`}
+                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-20 group-hover:opacity-40 transition-opacity rounded-xl blur-lg`}
                 />
-                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-2xl">{stat.emoji}</span>
+                <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-xl p-5 shadow-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-3xl drop-shadow-lg">
+                      {stat.emoji}
+                    </span>
                     <stat.icon
-                      className={`text-lg text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
+                      className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
                     />
                   </div>
-                  <div className="text-3xl font-black text-white mb-1">
+                  <div className="text-4xl font-black text-white mb-2 drop-shadow-lg">
                     {stat.value}
                   </div>
-                  <div className="text-xs text-slate-400 font-medium">
+                  <div className="text-sm text-slate-200 font-bold">
                     {stat.label}
                   </div>
                 </div>
@@ -498,9 +495,9 @@ const Profile = () => {
               animate={{ opacity: 1, x: 0 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-2xl blur-xl" />
-              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl blur-xl" />
+              <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-6 shadow-xl">
+                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2 drop-shadow-lg">
                   <FaRocket className="text-purple-400" />
                   Creator Tools
                 </h3>
@@ -526,12 +523,12 @@ const Profile = () => {
                     <motion.div
                       key={idx}
                       whileHover={{ scale: 1.03, x: 5 }}
-                      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 cursor-pointer transition-all"
+                      className="flex items-center gap-3 p-4 bg-slate-800/50 rounded-xl border-2 border-white/20 hover:bg-slate-800/80  transition-all shadow-lg"
                     >
                       <tool.icon
                         className={`text-2xl text-${tool.color}-400`}
                       />
-                      <span className="text-white font-semibold">
+                      <span className="text-white font-bold text-lg">
                         {tool.title}
                       </span>
                     </motion.div>
@@ -545,25 +542,44 @@ const Profile = () => {
               animate={{ opacity: 1, x: 0 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-purple-600/10 rounded-2xl blur-xl" />
-              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl blur-xl" />
+              <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-6 shadow-xl">
+                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2 drop-shadow-lg">
                   <FaChartBar className="text-indigo-400" />
                   Performance Stats
                 </h3>
                 <div className="space-y-4">
                   {[
-                    { label: "Success Rate", value: "87%", color: "emerald" },
-                    { label: "Avg. Submissions", value: "47", color: "blue" },
-                    { label: "Total Revenue", value: "$12.5K", color: "amber" },
+                    {
+                      label: "Pending",
+                      value: stats.pendingContests || 0,
+                      color: "amber",
+                    },
+                    {
+                      label: "Rejected",
+                      value: stats.rejectedContests || 0,
+                      color: "red",
+                    },
+                    {
+                      label: "Avg. Participants",
+                      value:
+                        stats.totalContests > 0
+                          ? Math.round(
+                              stats.totalParticipants / stats.totalContests
+                            )
+                          : 0,
+                      color: "blue",
+                    },
                   ].map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-3 bg-white/5 rounded-xl"
+                      className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border-2 border-white/20 shadow-lg"
                     >
-                      <span className="text-slate-400">{item.label}</span>
+                      <span className="text-slate-200 font-bold text-lg">
+                        {item.label}
+                      </span>
                       <span
-                        className={`text-2xl font-black text-${item.color}-400`}
+                        className={`text-3xl font-black text-${item.color}-400 drop-shadow-lg`}
                       >
                         {item.value}
                       </span>
@@ -576,30 +592,30 @@ const Profile = () => {
         </>
       )}
 
-      {/* USER ROLE UI */}
+      {/* USER ROLE */}
       {userRole === "user" && (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
                 label: "Participated",
-                value: profile?.participatedCount || 0,
+                value: user?.participatedCount || 0,
                 icon: FaChartLine,
-                gradient: "from-blue-500 to-cyan-500",
+                gradient: "from-blue-400 to-cyan-500",
                 emoji: "📊",
               },
               {
                 label: "Won",
-                value: profile?.wonCount || 0,
+                value: user?.wonCount || 0,
                 icon: FaTrophy,
-                gradient: "from-amber-500 to-orange-500",
+                gradient: "from-amber-400 to-orange-500",
                 emoji: "🏆",
               },
               {
                 label: "Win Rate",
                 value: `${winPercentage}%`,
                 icon: FaStar,
-                gradient: "from-emerald-500 to-teal-500",
+                gradient: "from-emerald-400 to-teal-500",
                 emoji: "⭐",
               },
               {
@@ -615,23 +631,25 @@ const Profile = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={{ y: -5, scale: 1.02 }}
+                whileHover={{ y: -5, scale: 1.03 }}
                 className="relative group"
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-xl blur-lg`}
+                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-20 group-hover:opacity-40 transition-opacity rounded-xl blur-lg`}
                 />
-                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-2xl">{stat.emoji}</span>
+                <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-xl p-5 shadow-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-3xl drop-shadow-lg">
+                      {stat.emoji}
+                    </span>
                     <stat.icon
-                      className={`text-lg text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
+                      className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
                     />
                   </div>
-                  <div className="text-3xl font-black text-white mb-1">
+                  <div className="text-4xl font-black text-white mb-2 drop-shadow-lg">
                     {stat.value}
                   </div>
-                  <div className="text-xs text-slate-400 font-medium">
+                  <div className="text-sm text-slate-200 font-bold">
                     {stat.label}
                   </div>
                 </div>
@@ -645,10 +663,10 @@ const Profile = () => {
               animate={{ opacity: 1, x: 0 }}
               className="relative group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl blur-xl" />
-              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2">
-                  <span className="text-2xl">📈</span> Win Percentage
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur-xl" />
+              <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-6 shadow-xl">
+                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2 drop-shadow-lg">
+                  <span className="text-3xl">📈</span> Win Percentage
                 </h3>
                 {profile && profile.participatedCount > 0 ? (
                   <>
@@ -673,29 +691,34 @@ const Profile = () => {
                         </Pie>
                         <Tooltip
                           contentStyle={{
-                            backgroundColor: "rgba(15, 23, 42, 0.9)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                            borderRadius: "0.5rem",
+                            backgroundColor: "rgba(15, 23, 42, 0.95)",
+                            border: "2px solid rgba(255, 255, 255, 0.2)",
+                            borderRadius: "0.75rem",
                             color: "#fff",
+                            fontWeight: "bold",
                           }}
                         />
-                        <Legend />
+                        <Legend
+                          wrapperStyle={{ color: "#fff", fontWeight: "bold" }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="text-center mt-4 pt-4 border-t border-white/10">
-                      <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-1">
+                    <div className="text-center mt-4 pt-4 border-t-2 border-white/20">
+                      <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-2 drop-shadow-lg">
                         {winPercentage}%
                       </div>
-                      <p className="text-sm text-slate-400 font-medium">
+                      <p className="text-base text-slate-200 font-bold">
                         Overall Win Rate
                       </p>
                     </div>
                   </>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="text-6xl mb-4">📊</div>
-                    <p className="text-slate-400">No participation data yet</p>
-                    <p className="text-sm text-slate-500 mt-2">
+                    <div className="text-7xl mb-4 drop-shadow-lg">📊</div>
+                    <p className="text-slate-200 font-bold text-lg">
+                      No participation data yet
+                    </p>
+                    <p className="text-sm text-slate-300 mt-2 font-medium">
                       Start participating in contests!
                     </p>
                   </div>
@@ -708,21 +731,21 @@ const Profile = () => {
               animate={{ opacity: 1, x: 0 }}
               className="relative group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-pink-600/10 to-rose-600/10 rounded-2xl blur-xl" />
-              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🎯</span> Quick Stats
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-rose-500/20 rounded-2xl blur-xl" />
+              <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-6 shadow-xl">
+                <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2 drop-shadow-lg">
+                  <span className="text-3xl">🎯</span> Quick Stats
                 </h3>
                 <div className="space-y-4">
                   {[
                     {
                       label: "Total Contests",
-                      value: profile?.participatedCount || 0,
+                      value: user?.participatedCount || 0,
                       gradient: "from-blue-400 to-cyan-400",
                     },
                     {
                       label: "Total Wins",
-                      value: profile?.wonCount || 0,
+                      value: user?.wonCount || 0,
                       gradient: "from-emerald-400 to-teal-400",
                     },
                     {
@@ -734,13 +757,13 @@ const Profile = () => {
                     <motion.div
                       key={idx}
                       whileHover={{ scale: 1.03, x: 5 }}
-                      className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:border-white/30 hover:bg-white/10 transition-all cursor-pointer"
+                      className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border-2 border-white/20 hover:bg-slate-800/80 transition-all cursor-pointer shadow-lg"
                     >
-                      <span className="text-slate-400 font-medium">
+                      <span className="text-slate-200 font-bold text-lg">
                         {item.label}
                       </span>
                       <span
-                        className={`font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r ${item.gradient}`}
+                        className={`font-black text-3xl text-transparent bg-clip-text bg-gradient-to-r ${item.gradient} drop-shadow-lg`}
                       >
                         {item.value}
                       </span>
@@ -751,16 +774,16 @@ const Profile = () => {
             </motion.div>
           </div>
 
-          {/* Achievement Badges - Only for Users */}
+          {/* Achievement Badges */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="relative group"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-orange-600/20 to-red-600/20 rounded-2xl blur-xl" />
-            <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <h3 className="text-2xl font-black text-white mb-6 text-center flex items-center justify-center gap-2">
-                <span className="text-3xl">🏅</span> Achievement Badges
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/30 via-orange-500/30 to-red-500/30 rounded-2xl blur-xl" />
+            <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-8 shadow-xl">
+              <h3 className="text-3xl font-black text-white mb-8 text-center flex items-center justify-center gap-3 drop-shadow-lg">
+                <span className="text-4xl">🏅</span> Achievement Badges
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
@@ -768,31 +791,31 @@ const Profile = () => {
                     name: "First Win",
                     unlocked: (profile?.wonCount || 0) >= 1,
                     emoji: "🥇",
-                    gradient: "from-amber-500 to-orange-500",
+                    gradient: "from-amber-400 to-orange-500",
                   },
                   {
                     name: "Hat Trick",
                     unlocked: (profile?.wonCount || 0) >= 3,
                     emoji: "🎩",
-                    gradient: "from-purple-500 to-pink-500",
+                    gradient: "from-purple-400 to-pink-500",
                   },
                   {
                     name: "High Five",
                     unlocked: (profile?.wonCount || 0) >= 5,
                     emoji: "✋",
-                    gradient: "from-blue-500 to-cyan-500",
+                    gradient: "from-blue-400 to-cyan-500",
                   },
                   {
                     name: "Perfect 10",
                     unlocked: (profile?.wonCount || 0) >= 10,
                     emoji: "💯",
-                    gradient: "from-emerald-500 to-teal-500",
+                    gradient: "from-emerald-400 to-teal-500",
                   },
                   {
                     name: "Legend",
                     unlocked: (profile?.wonCount || 0) >= 20,
                     emoji: "👑",
-                    gradient: "from-red-500 to-orange-500",
+                    gradient: "from-red-400 to-orange-500",
                   },
                 ].map((badge, idx) => (
                   <motion.div
@@ -800,16 +823,16 @@ const Profile = () => {
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
-                    whileHover={{ scale: badge.unlocked ? 1.1 : 1 }}
-                    className={`relative text-center p-4 rounded-xl border ${
+                    whileHover={{ scale: badge.unlocked ? 1.15 : 1 }}
+                    className={`relative text-center p-5 rounded-xl border-2 ${
                       badge.unlocked
-                        ? "border-white/20 bg-white/5"
-                        : "border-white/5 bg-white/[0.02] opacity-40"
+                        ? "border-white/30 bg-slate-800/70 shadow-lg"
+                        : "border-white/10 bg-slate-800/30 opacity-50"
                     }`}
                   >
                     {badge.unlocked && (
                       <div
-                        className={`absolute inset-0 bg-gradient-to-r ${badge.gradient} rounded-xl blur-md opacity-30`}
+                        className={`absolute inset-0 bg-gradient-to-r ${badge.gradient} rounded-xl blur-md opacity-40`}
                       />
                     )}
                     <div className="relative">
@@ -841,7 +864,7 @@ const Profile = () => {
         </>
       )}
 
-      {/* Edit Modal - Universal */}
+      {/* Edit Modal  */}
       <AnimatePresence>
         {isEditing && (
           <motion.div

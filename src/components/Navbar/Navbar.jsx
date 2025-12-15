@@ -33,7 +33,7 @@ const Navbar = ({ user, logout }) => {
     { name: "Leaderboard", path: "/leaderboard", icon: "🏆" },
     { name: "About", path: "/about", icon: "ℹ️" },
     { name: "Contact", path: "/contact", icon: "📧" },
-    { name: "Dashboard", path: "/dashboard", icon: "☰" },
+    { name: "Dashboard", path: "/dashboard/participated", icon: "☰" },
   ];
 
   const handleLogout = () => {

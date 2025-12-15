@@ -221,8 +221,12 @@ const ManageUsers = () => {
                     >
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold">
-                            {user.name.charAt(0).toUpperCase()}
+                          <div className="w-10 h-10 ">
+                            <img
+                              src={user.photoURL}
+                              alt=""
+                              className="rounded-full "
+                            />
                           </div>
                           <span className="text-white font-semibold">
                             {user.name}

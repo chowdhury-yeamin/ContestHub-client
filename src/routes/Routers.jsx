@@ -103,7 +103,7 @@ export const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "participated",
+            path: "/dashboard/participated",
             element: <ParticipatedContests />,
           },
           {

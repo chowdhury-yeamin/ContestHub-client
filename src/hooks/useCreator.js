@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import api from "../services/api";
 
 export const useMyContests = () => {
@@ -16,7 +16,15 @@ export const useContestSubmissions = (contestId) => {
     queryKey: ["creator", "submissions", contestId],
     queryFn: async () => {
       const response = await api.get(`/contests/${contestId}/submissions`);
-      return response.data;
+
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      if (response.data && Array.isArray(response.data.submissions)) {
+        return response.data.submissions;
+      }
+
+      return [];
     },
     enabled: !!contestId,
   });

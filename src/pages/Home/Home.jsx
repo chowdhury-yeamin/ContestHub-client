@@ -38,7 +38,6 @@ const Home = () => {
   const contestsArray = Array.isArray(contests) ? contests : [];
   const winnersArray = Array.isArray(winnersData) ? winnersData : [];
 
- 
   const stats = useMemo(() => {
     const totalContests = contestsArray.length;
     const totalParticipants = contestsArray.reduce(
@@ -57,7 +56,7 @@ const Home = () => {
       totalWinners,
       totalPrizes,
     };
-  }, [contestsArray.length, winnersArray.length]);
+  }, [contestsArray, winnersArray]);
 
   const popularContests = contestsArray
     .filter((c) => c.status === "confirmed")
@@ -205,7 +204,7 @@ const Home = () => {
                 🎯
               </motion.span>
               <span className="text-sm text-slate-300 font-medium">
-                Join {stats.totalParticipants.toLocaleString()}+ creators
+                Join 100+ creators
                 worldwide
               </span>
             </motion.div>
@@ -280,7 +279,8 @@ const Home = () => {
             {[
               {
                 label: "Active Contests",
-                value: stats.totalContests,
+                value: contestsArray.filter((c) => c.status === "confirmed")
+                  .length,
                 icon: FaFire,
                 gradient: "from-orange-500 to-red-500",
               },

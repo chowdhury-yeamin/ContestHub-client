@@ -110,7 +110,7 @@ const DashboardLayout = () => {
     },
     {
       path: "/dashboard/submissions",
-      label: "Submitted Contests",
+      label: "Submitted Tasks",
       gradient: "from-pink-500 to-rose-500",
       emoji: "📄",
     },
@@ -119,7 +119,7 @@ const DashboardLayout = () => {
       label: "My Profile",
       gradient: "from-purple-500 to-pink-500",
       emoji: "👤",
-    }, // keep profile
+    },
   ];
 
   const adminRoutes = [
@@ -193,7 +193,7 @@ const DashboardLayout = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 pt-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 sm:pt-28 lg:px-8 py-8 relative z-10 lg:pt-24">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

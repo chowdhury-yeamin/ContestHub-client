@@ -11,7 +11,7 @@ export const useUserProfile = () => {
 
   return useQuery({
     queryKey: ["user", "profile"],
-    enabled: !!token, // 🔥 DO NOT REMOVE
+    enabled: !!token,
     queryFn: async () => {
       const { data } = await api.get("/users/me", {
         headers: {
@@ -33,14 +33,22 @@ export const useParticipatedContests = () => {
 
   return useQuery({
     queryKey: ["user", "participatedContests"],
-    enabled: !!token, // 🔥 REQUIRED
+    enabled: !!token, 
     queryFn: async () => {
       const res = await api.get("/users/me/registrations", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return res.data.registrations || [];
+      
+      // Handle both response formats
+      if (Array.isArray(res.data)) {
+        return { registrations: res.data };
+      }
+      
+      return {
+        registrations: res.data.registrations || []
+      };
     },
   });
 };
@@ -100,5 +108,27 @@ export const useUpdateProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", "profile"] });
     },
+  });
+};
+
+/* =========================
+   USER STATS (Role-based)
+   GET /api/stats
+========================= */
+export const useUserStats = () => {
+  const { token } = useAuth();
+
+  return useQuery({
+    queryKey: ["user", "stats"],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data } = await api.get("/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    },
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 };

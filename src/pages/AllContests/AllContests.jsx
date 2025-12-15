@@ -24,7 +24,6 @@ const AllContests = () => {
   const [sortBy, setSortBy] = useState("popular");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Update active tab when URL params change
   useEffect(() => {
     const typeParam = searchParams.get("type");
     if (typeParam) {
@@ -32,7 +31,6 @@ const AllContests = () => {
     }
   }, [searchParams]);
 
-  // Fix: Filter out undefined/null values from contest types
   const contestTypes = [
     "all",
     ...new Set(
@@ -42,7 +40,6 @@ const AllContests = () => {
     ),
   ];
 
-  // Filter and sort contests
   let filteredContests = contests.filter((c) => c.status === "confirmed");
 
   // Apply category filter
@@ -62,7 +59,6 @@ const AllContests = () => {
     );
   }
 
-  // Apply sorting
   filteredContests = [...filteredContests].sort((a, b) => {
     switch (sortBy) {
       case "popular":
@@ -79,6 +75,7 @@ const AllContests = () => {
   });
 
   const handleContestClick = (contestId) => {
+    console.log("Clicking contest with ID:", contestId);
     if (!user) {
       navigate("/login");
     } else {
@@ -143,7 +140,7 @@ const AllContests = () => {
           </motion.div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-4">
-            Explore{" "}
+            Explore
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
               Contests
             </span>
@@ -285,164 +282,167 @@ const AllContests = () => {
           className="text-center mb-8"
         >
           <p className="text-slate-400 text-lg">
-            Found{" "}
+            Found
             <span className="text-white font-bold">
-              {filteredContests.length}
-            </span>{" "}
+              {" "}
+              {filteredContests.length}{" "}
+            </span>
             contest{filteredContests.length !== 1 ? "s" : ""}
           </p>
         </motion.div>
 
         {/* Contests Grid */}
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-24">
+        <div>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-24">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="mb-4"
+              >
+                <FaTrophy className="text-6xl text-indigo-500" />
+              </motion.div>
+              <p className="text-slate-400 text-lg">
+                Loading amazing contests...
+              </p>
+            </div>
+          ) : filteredContests.length === 0 ? (
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="mb-4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-24"
             >
-              <FaTrophy className="text-6xl text-indigo-500" />
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="text-8xl mb-6"
+              >
+                🔍
+              </motion.div>
+              <h3 className="text-3xl font-bold text-white mb-3">
+                No contests found
+              </h3>
+              <p className="text-xl text-slate-400 mb-6">
+                Try adjusting your filters or search query
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={clearFilters}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all"
+              >
+                Clear All Filters
+              </motion.button>
             </motion.div>
-            <p className="text-slate-400 text-lg">
-              Loading amazing contests...
-            </p>
-          </div>
-        ) : filteredContests.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-24"
-          >
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="text-8xl mb-6"
-            >
-              🔍
-            </motion.div>
-            <h3 className="text-3xl font-bold text-white mb-3">
-              No contests found
-            </h3>
-            <p className="text-xl text-slate-400 mb-6">
-              Try adjusting your filters or search query
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={clearFilters}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all"
-            >
-              Clear All Filters
-            </motion.button>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatePresence mode="popLayout">
-              {filteredContests.map((contest, idx) => (
-                <motion.div
-                  key={contest._id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3, delay: idx * 0.05 }}
-                  whileHover={{ y: -10, scale: 1.02 }}
-                  className="group relative cursor-pointer"
-                  onClick={() => handleContestClick(contest._id)}
-                >
-                  {/* Glow Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity" />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {filteredContests.map((contest, idx) => (
+                  <motion.div
+                    key={contest._id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    whileHover={{ y: -10, scale: 1.02 }}
+                    className="group relative cursor-pointer"
+                    onClick={() => handleContestClick(contest._id)}
+                  >
+                    {/* Glow Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity" />
 
-                  {/* Card */}
-                  <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl overflow-hidden transition-all">
-                    {/* Image */}
-                    <div className="relative h-48 overflow-hidden">
-                      <motion.img
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.6 }}
-                        src={contest.image}
-                        alt={contest.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                    {/* Card */}
+                    <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl overflow-hidden transition-all">
+                      {/* Image */}
+                      <div className="relative h-48 overflow-hidden">
+                        <motion.img
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.6 }}
+                          src={contest.image}
+                          alt={contest.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
 
-                      {/* Type Badge */}
-                      <motion.div
-                        initial={{ x: 100 }}
-                        animate={{ x: 0 }}
-                        className="absolute top-4 right-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg"
-                      >
-                        {contest.contestType || "General"}
-                      </motion.div>
+                        {/* Type Badge */}
+                        <motion.div
+                          initial={{ x: 100 }}
+                          animate={{ x: 0 }}
+                          className="absolute top-4 right-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg"
+                        >
+                          {contest.contestType || "General"}
+                        </motion.div>
 
-                      {/* Prize Badge */}
-                      <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center gap-2">
-                        <FaTrophy className="text-amber-400" />$
-                        {(contest.prizeMoney || 0).toLocaleString()}
+                        {/* Prize Badge */}
+                        <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center gap-2">
+                          <FaTrophy className="text-amber-400" />$
+                          {(contest.prizeMoney || 0).toLocaleString()}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Content */}
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-white mb-2 line-clamp-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all">
-                        {contest.name}
-                      </h3>
-                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                        {contest.description}
-                      </p>
+                      {/* Content */}
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold text-white mb-2 line-clamp-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all">
+                          {contest.name}
+                        </h3>
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                          {contest.description}
+                        </p>
 
-                      {/* Stats */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-slate-300">
-                          <div className="bg-blue-500/20 p-2 rounded-lg">
-                            <FaUsers className="text-blue-400" />
-                          </div>
-                          <div>
-                            <div className="text-xs text-slate-500">
-                              Participants
+                        {/* Stats */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2 text-slate-300">
+                            <div className="bg-blue-500/20 p-2 rounded-lg">
+                              <FaUsers className="text-blue-400" />
                             </div>
-                            <div className="font-bold text-white">
-                              {contest.participantsCount || 0}
+                            <div>
+                              <div className="text-xs text-slate-500">
+                                Participants
+                              </div>
+                              <div className="font-bold text-white">
+                                {contest.participantsCount || 0}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-slate-300">
+                            <div className="bg-amber-500/20 p-2 rounded-lg">
+                              <FaCalendarAlt className="text-amber-400" />
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs text-slate-500">
+                                Deadline
+                              </div>
+                              <div className="font-bold text-white text-sm">
+                                {contest.deadline
+                                  ? new Date(
+                                      contest.deadline
+                                    ).toLocaleDateString()
+                                  : "TBA"}
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 text-slate-300">
-                          <div className="bg-amber-500/20 p-2 rounded-lg">
-                            <FaCalendarAlt className="text-amber-400" />
-                          </div>
-                          <div className="text-right">
-                            <div className="text-xs text-slate-500">
-                              Deadline
-                            </div>
-                            <div className="font-bold text-white text-sm">
-                              {contest.deadline
-                                ? new Date(
-                                    contest.deadline
-                                  ).toLocaleDateString()
-                                : "TBA"}
-                            </div>
-                          </div>
-                        </div>
+                        {/* Button */}
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-lg group-hover:shadow-indigo-500/50 transition-all"
+                        >
+                          View Details
+                        </motion.button>
                       </div>
-
-                      {/* Button */}
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-lg group-hover:shadow-indigo-500/50 transition-all"
-                      >
-                        View Details
-                      </motion.button>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
 
-        {/* Load More (if needed) */}
+        {/* Load More  */}
         {filteredContests.length > 0 && !isLoading && (
           <motion.div
             initial={{ opacity: 0 }}

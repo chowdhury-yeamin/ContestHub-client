@@ -10,13 +10,19 @@ export const useAllUsers = () => {
     queryFn: async () => {
       const response = await api.get("/admin/users");
 
-      // Force correct shape
-      if (!Array.isArray(response.data)) {
-        console.error("❌ API response is not an array:", response.data);
-        return [];
+      // Handle both response formats: direct array or {users: [...]}
+      if (Array.isArray(response.data)) {
+        return response.data;
       }
 
-      return response.data;
+      // If response has a users property, use that
+      if (response.data && Array.isArray(response.data.users)) {
+        return response.data.users;
+      }
+
+      // Fallback to empty array if data is unexpected
+      console.error("❌ Unexpected API response format:", response.data);
+      return [];
     },
   });
 };
@@ -58,7 +64,17 @@ export const useAdminContests = () => {
     queryKey: ["admin", "contests"],
     queryFn: async () => {
       const response = await api.get("/admin/contests");
-      return response.data;
+
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+
+      if (response.data && Array.isArray(response.data.contests)) {
+        return response.data.contests;
+      }
+
+      console.error("❌ Unexpected API response format:", response.data);
+      return [];
     },
   });
 };

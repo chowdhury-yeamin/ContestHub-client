@@ -26,7 +26,7 @@ const ContestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: contest, isLoading } = useContest(id);
+  const { data: contest, isLoading, error } = useContest(id);
   const registerMutation = useRegisterContest();
   const submitMutation = useSubmitTask();
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -161,9 +161,44 @@ const ContestDetails = () => {
           <h2 className="text-3xl font-black text-white mb-2">
             Contest Not Found
           </h2>
-          <p className="text-slate-400">
+          <p className="text-slate-400 mb-6">
             The contest you're looking for doesn't exist.
           </p>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Add this check for error
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-8xl mb-6"
+          >
+            ❌
+          </motion.div>
+          <h2 className="text-3xl font-black text-white mb-2">
+            Contest Not Found
+          </h2>
+          <p className="text-slate-400 mb-6">
+            The contest you're looking for doesn't exist.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold"
+          >
+            Go to Home
+          </button>
         </div>
       </div>
     );
@@ -243,7 +278,7 @@ const ContestDetails = () => {
                   >
                     <FaTrophy className="text-amber-400" />
                     <span className="font-semibold">
-                      ${contest.prize || contest.prizeMoney}
+                      ${contest.prizeMoney || contest.prize || 0}
                     </span>
                   </motion.div>
                   <motion.div
@@ -306,7 +341,7 @@ const ContestDetails = () => {
                     </h2>
                   </div>
                   <p className="text-slate-300 text-lg leading-relaxed whitespace-pre-line">
-                    {contest.taskInstructions}
+                    {contest.taskInstruction}
                   </p>
                 </div>
               </motion.div>
@@ -416,7 +451,7 @@ const ContestDetails = () => {
                     </h3>
                   </div>
                   <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-6">
-                    ${contest.price}
+                    ${contest.prizeMoney}
                   </div>
 
                   {!isRegistered ? (

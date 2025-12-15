@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 
 const Login = () => {
-  const { login, googleSignIn } = useAuth();
+  const { user, login, googleSignIn } = useAuth();
   const navigate = useNavigate();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
@@ -46,6 +46,8 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  const { setToken } = useAuth();
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -83,6 +85,9 @@ const Login = () => {
       color: "from-blue-500 to-cyan-500",
     },
   ];
+  {
+    user ? navigate("/") : null;
+  }
 
   return (
     <div className="min-h-screen pt-24 bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden flex items-center justify-center pb-12 px-4 sm:px-6 lg:px-8">

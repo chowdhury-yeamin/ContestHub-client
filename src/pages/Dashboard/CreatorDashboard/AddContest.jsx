@@ -27,6 +27,7 @@ const AddContest = () => {
     formState: { errors },
     setValue,
     watch,
+    reset, // 👈 ADD THIS - this is the reset function from useForm
   } = useForm();
 
   const contestTypes = [
@@ -48,6 +49,7 @@ const AddContest = () => {
       8) *
     100;
 
+  // 👇 FIXED: Remove resetForm parameter, use reset from useForm
   const onSubmit = async (data) => {
     if (!deadline) {
       Swal.fire({
@@ -86,16 +88,21 @@ const AddContest = () => {
       Swal.fire({
         icon: "success",
         title: "Contest Created!",
-        text: "Your contest has been submitted for approval",
+        text: "Your contest has been successfully submitted.",
         confirmButtonColor: "#6366F1",
+        timer: 2000,
+        showConfirmButton: false,
       });
 
-      navigate("/dashboard/my-contests");
+      // 👇 FIXED: Use reset() from useForm hook
+      reset();
+      setDeadline(null); // Also reset the deadline state
     } catch (error) {
+      console.error("❌ Error:", error);
       Swal.fire({
         icon: "error",
-        title: "Creation Failed",
-        text: "Failed to create contest. Please try again.",
+        title: "Submission Failed",
+        text: error.message || "Something went wrong",
         confirmButtonColor: "#6366F1",
       });
     }
@@ -179,7 +186,7 @@ const AddContest = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-xl opacity-20" />
           <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8">
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Contest Name */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -480,7 +487,7 @@ const AddContest = () => {
                   Cancel
                 </motion.button>
                 <motion.button
-                  onClick={handleSubmit(onSubmit)}
+                  type="submit"
                   disabled={createMutation.isPending}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -508,7 +515,7 @@ const AddContest = () => {
                   )}
                 </motion.button>
               </motion.div>
-            </div>
+            </form>
           </div>
         </motion.div>
       </div>
