@@ -73,9 +73,6 @@ const Register = () => {
     }
   }, [loading, user, navigate]);
 
-  {
-    user ? navigate("/") : null;
-  }
 
   return (
     <div className="min-h-screen pt-24 bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden flex items-center justify-center pb-12 px-4 sm:px-6 lg:px-8">
