@@ -37,14 +37,12 @@ const DashboardLayout = () => {
 
   // Fetch stats dynamically
   useEffect(() => {
+    if (!user) return;
+
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
-
-        if (!token) {
-          console.error("No token found in localStorage");
-          return;
-        }
+        if (!token) return console.error("No token found in localStorage");
 
         const response = await fetch(
           "https://contest-hub-server-psi.vercel.app/api/stats",
@@ -58,20 +56,33 @@ const DashboardLayout = () => {
         );
 
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({}));
           throw new Error(
             errorData.error || `HTTP error! status: ${response.status}`
           );
         }
 
         const data = await response.json();
-        setStats(data);
-      } catch (error) {
-        console.error("Failed to fetch stats:", error);
+
+        // Map API data safely to state without touching UI
+        setStats((prev) => ({
+          activeContests: data.activeContests ?? prev.activeContests,
+          totalWins: data.totalWins ?? prev.totalWins,
+          totalWinnings: data.totalWinnings ?? prev.totalWinnings,
+          totalContests: data.totalContests ?? prev.totalContests,
+          totalParticipants: data.totalParticipants ?? prev.totalParticipants,
+          totalSubmissions: data.totalSubmissions ?? prev.totalSubmissions,
+          totalPrizes: data.totalPrizes ?? prev.totalPrizes,
+          pendingContests: data.pendingContests ?? prev.pendingContests,
+          rejectedContests: data.rejectedContests ?? prev.rejectedContests,
+          totalUsers: data.totalUsers ?? prev.totalUsers,
+        }));
+      } catch (err) {
+        console.error("Failed to fetch stats:", err);
       }
     };
 
-    if (user) fetchStats();
+    fetchStats();
   }, [user]);
 
   // -----------------------------
@@ -331,7 +342,7 @@ const DashboardLayout = () => {
                     Quick Stats
                   </h3>
                   <div className="space-y-2">
-                    {/* Active Contests */}
+                    {/* Participated / Active Contests */}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">
                         {user?.role === "user"
@@ -339,11 +350,13 @@ const DashboardLayout = () => {
                           : "Active Contests"}
                       </span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                        {stats?.activeContests || stats?.totalContests || 0}
+                        {user?.role === "user"
+                          ? user?.participatedCount || 0
+                          : stats?.activeContests || 0}
                       </span>
                     </div>
 
-                    {/* Wins / Participants */}
+                    {/* Wins / Participants / Users */}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">
                         {user?.role === "user"
@@ -353,14 +366,15 @@ const DashboardLayout = () => {
                           : "Participants"}
                       </span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-                        {stats?.totalWins ||
-                          stats?.totalUsers ||
-                          stats?.totalParticipants ||
-                          0}
+                        {user?.role === "user"
+                          ? user?.totalWins || 0
+                          : user?.role === "admin"
+                          ? stats?.totalUsers || 0
+                          : stats?.totalParticipants || 0}
                       </span>
                     </div>
 
-                    {/* Prize Money / Winnings */}
+                    {/* Winnings / Prize Pool */}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">
                         {user?.role === "user"
@@ -369,11 +383,9 @@ const DashboardLayout = () => {
                       </span>
                       <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
                         $
-                        {(
-                          stats?.totalWinnings ||
-                          stats?.totalPrizes ||
-                          0
-                        ).toLocaleString()}
+                        {user?.role === "user"
+                          ? user?.totalWinnings || 0
+                          : stats?.totalPrizes || 0}
                       </span>
                     </div>
                   </div>

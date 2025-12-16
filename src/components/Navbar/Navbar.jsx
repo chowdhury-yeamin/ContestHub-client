@@ -172,20 +172,23 @@ const Navbar = ({ user, logout }) => {
 
             {/* Right Section */}
             <div className="flex items-center gap-3">
-              {/* Theme toggle removed to preserve original color scheme */}
               {/* Desktop Dropdown */}
               {user ? (
                 <div className="relative" ref={dropdownRef}>
                   <div
                     onClick={() => setDropdownOpen(!isDropdownOpen)}
-                    className="p-4 md:py-1 md:px-2 border flex items-center rounded-full cursor-pointer hover:shadow-md transition"
+                    className=" border-2 border-white/30 flex items-center rounded-[50%] cursor-pointer hover:shadow-md transition"
                   >
                     <img
-                      className="rounded-full"
-                      src={user?.photoURL || "https://via.placeholder.com/30"}
-                      alt="profile"
-                      height="30"
-                      width="30"
+                      src={
+                        user?.photoURL ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          user?.name || "User"
+                        )}&background=6366F1&color=fff&size=64`
+                      }
+                      alt={user?.name}
+                      className="relative w-12 h-12 rounded-full border-2 border-white/30 object-cover shadow-xl"
+                      key={user?.photoURL}
                     />
                   </div>
 
@@ -195,7 +198,7 @@ const Navbar = ({ user, logout }) => {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute right-0 top-full z-50 mt-2 rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white overflow-hidden text-sm"
+                        className="absolute right-0 top-full z-50 mt-2 rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white/20 overflow-hidden text-sm"
                       >
                         <div className="flex flex-col cursor-pointer">
                           {user && (
@@ -205,13 +208,13 @@ const Navbar = ({ user, logout }) => {
                           )}
                           <Link
                             to="/dashboard"
-                            className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                            className="px-4 py-3 hover:bg-neutral-800 transition font-semibold"
                           >
                             Dashboard
                           </Link>
                           <div
                             onClick={handleLogout}
-                            className="px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer"
+                            className="px-4 py-3 hover:bg-neutral-800 transition font-semibold cursor-pointer"
                           >
                             Logout
                           </div>

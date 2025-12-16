@@ -230,65 +230,69 @@ const ParticipatedContests = () => {
                     {/* Contest Info */}
                     <div className="flex-1">
                       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-                        <div>
-                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all">
-                            {item.contest.name}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-slate-400">
-                            <div className="flex items-center gap-2">
-                              <FaCalendarAlt className="text-blue-400" />
-                              <span>
-                                Deadline:{" "}
-                                {new Date(
-                                  item.contest.deadline
-                                ).toLocaleDateString()}
-                              </span>
+                        <div className="flex flex-row md:flex-row md:items-start justify-between gap-4 mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all">
+                              {item.contest.name}
+                            </h3>
+                            <div className="flex items-center gap-4 text-sm text-slate-400">
+                              <div className="flex items-center gap-2">
+                                <FaCalendarAlt className="text-blue-400" />
+                                <span>
+                                  Deadline:{" "}
+                                  {new Date(
+                                    item.contest.deadline
+                                  ).toLocaleDateString()}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Status Badges */}
-                      <div className="flex flex-wrap gap-3 mb-4">
-                        <div className="relative group/badge">
-                          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg blur opacity-50" />
-                          <div className="relative bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
-                            <FaCheckCircle />
-                            {item.paymentStatus}
+                        {/* Status Badges */}
+                        <div className="flex flex-wrap gap-3 mb-4">
+                          <div className="relative group/badge">
+                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg blur opacity-50" />
+                            <div className="relative bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                              <FaCheckCircle />
+                              {item.paymentStatus}
+                            </div>
                           </div>
+
+                          {item.submissionStatus === "submitted" ? (
+                            <div className="relative group/badge">
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg blur opacity-50" />
+                              <div className="relative bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 text-blue-300 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                                <FaFileAlt />
+                                Submitted
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="relative group/badge">
+                              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg blur opacity-50" />
+                              <div className="relative bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                                <FaClock />
+                                Pending
+                              </div>
+                            </div>
+                          )}
                         </div>
-
-                        {item.submissionStatus === "submitted" ? (
-                          <div className="relative group/badge">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg blur opacity-50" />
-                            <div className="relative bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 text-blue-300 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
-                              <FaFileAlt />
-                              Submitted
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="relative group/badge">
-                            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg blur opacity-50" />
-                            <div className="relative bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
-                              <FaClock />
-                              Pending
-                            </div>
-                          </div>
-                        )}
                       </div>
 
                       {/* Action Button */}
-                      <Link to={`/contest/${item.contest._id}`}>
-                        <motion.button
-                          whileHover={{ scale: 1.02, x: 5 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all flex items-center gap-2"
-                        >
-                          <FaEye />
-                          View Details
-                          <FaArrowRight className="text-sm" />
-                        </motion.button>
-                      </Link>
+                      <div>
+                        <Link to={`/contest/${item.contest._id}`}>
+                          <motion.button
+                            whileHover={{ scale: 1.02, x: 5 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all flex items-center gap-2"
+                          >
+                            <FaEye />
+                            View Details
+                            <FaArrowRight className="text-sm" />
+                          </motion.button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
