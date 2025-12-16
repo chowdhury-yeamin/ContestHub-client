@@ -172,6 +172,7 @@ const Navbar = ({ user, logout }) => {
 
             {/* Right Section */}
             <div className="flex items-center gap-3">
+              {/* Theme toggle removed to preserve original color scheme */}
               {/* Desktop Dropdown */}
               {user ? (
                 <div className="relative" ref={dropdownRef}>
@@ -198,7 +199,7 @@ const Navbar = ({ user, logout }) => {
                       >
                         <div className="flex flex-col cursor-pointer">
                           {user && (
-                            <div className="px-4 py-3 border-b border-white/10 font-semibold cursor-default">
+                            <div className="px-4 py-3 border-b border-white/10 font-bold cursor-default text-md">
                               {user.displayName || user.name || "User"}
                             </div>
                           )}

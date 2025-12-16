@@ -24,6 +24,12 @@ const ParticipatedContests = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
+    {
+      user.role === "admin" ? navigate("/dashboard/profile") : "";
+    }
+    {
+      user.role === "creator" ? navigate("/dashboard/profile") : "";
+    }
     if (!loading && !user) {
       navigate("/login");
     }

@@ -488,12 +488,12 @@ const AddContest = () => {
                 </motion.button>
                 <motion.button
                   type="submit"
-                  disabled={createMutation.isPending}
+                  disabled={createMutation.isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="flex-1 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-indigo-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {createMutation.isPending ? (
+                  {createMutation.isLoading ? (
                     <>
                       <motion.div
                         animate={{ rotate: 360 }}

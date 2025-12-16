@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 /* =========================
    USER PROFILE
@@ -13,7 +14,7 @@ export const useUserProfile = () => {
     queryKey: ["user", "profile"],
     enabled: !!token,
     queryFn: async () => {
-      const { data } = await api.get("/users/me", {
+      const { data } = await api.get("/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -33,21 +34,20 @@ export const useParticipatedContests = () => {
 
   return useQuery({
     queryKey: ["user", "participatedContests"],
-    enabled: !!token, 
+    enabled: !!token,
     queryFn: async () => {
       const res = await api.get("/users/me/registrations", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      
-      // Handle both response formats
+
       if (Array.isArray(res.data)) {
         return { registrations: res.data };
       }
-      
+
       return {
-        registrations: res.data.registrations || []
+        registrations: res.data.registrations || [],
       };
     },
   });
@@ -107,6 +107,12 @@ export const useUpdateProfile = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", "profile"] });
+      toast.success("Profile updated");
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error || err?.message || "Failed to update profile"
+      );
     },
   });
 };

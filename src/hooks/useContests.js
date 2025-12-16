@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 // ==================== Fetch all contests ====================
 export const useContests = () => {
@@ -47,6 +48,10 @@ export const useSubmitTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contest"] });
+      toast.success("Submission sent");
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Submission failed");
     },
   });
 };
@@ -64,6 +69,12 @@ export const useRegisterContest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contest"] });
+      toast.success("Registered for contest");
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error || err?.message || "Registration failed"
+      );
     },
   });
 };
@@ -78,6 +89,12 @@ export const useCreateContest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contests"] });
+      toast.success("Contest submitted for review");
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error || err?.message || "Failed to create contest"
+      );
     },
   });
 };
@@ -92,6 +109,12 @@ export const useDeleteContest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contests"] });
+      toast.success("Contest deleted");
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error || err?.message || "Delete failed"
+      );
     },
   });
 };
@@ -110,6 +133,12 @@ export const useDeclareWinner = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
       queryClient.invalidateQueries({ queryKey: ["contest"] });
+      toast.success("Winner declared");
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error || err?.message || "Failed to declare winner"
+      );
     },
   });
 };
@@ -125,6 +154,12 @@ export const useUpdateContest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contests"] });
       queryClient.invalidateQueries({ queryKey: ["contest"] });
+      toast.success("Contest updated");
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error || err?.message || "Update failed"
+      );
     },
   });
 };

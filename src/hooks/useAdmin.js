@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 /* ============================================================
    USERS — GET ALL
@@ -48,10 +49,15 @@ export const useChangeUserRole = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries(["admin", "users"]);
+      toast.success("User role updated");
     },
-
     onError: (error) => {
       console.error("❌ Role update failed:", error);
+      toast.error(
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to update role"
+      );
     },
   });
 };
@@ -94,6 +100,14 @@ export const useApproveContest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "contests"] });
       queryClient.invalidateQueries({ queryKey: ["contests"] });
+      toast.success("Contest approved");
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to approve contest"
+      );
     },
   });
 };
@@ -112,6 +126,14 @@ export const useRejectContest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "contests"] });
+      toast.success("Contest rejected");
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to reject contest"
+      );
     },
   });
 };
@@ -124,12 +146,21 @@ export const useAdminDeleteContest = () => {
 
   return useMutation({
     mutationFn: async (contestId) => {
-      const response = await api.delete(`/admin/contests/${contestId}`);
+      const response = await api.delete(`/contests/${contestId}`);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["admin", "contests"]);
       queryClient.invalidateQueries(["contests"]);
+      toast.success("Contest deleted");
+    },
+    onError: (error) => {
+      console.error("❌ Failed to delete contest:", error);
+      toast.error(
+        error?.response?.data?.error ||
+          error?.message ||
+          "Failed to delete contest"
+      );
     },
   });
 };

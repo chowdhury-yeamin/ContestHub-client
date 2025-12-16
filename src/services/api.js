@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://contest-hub-server-psi.vercel.app/api";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://contest-hub-server-psi.vercel.app/api";
 
 const api = axios.create({
   baseURL: API_URL,

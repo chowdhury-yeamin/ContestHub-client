@@ -221,8 +221,8 @@ const Submissions = () => {
           </div>
         </div>
       )}
-      {/* Submissions */}
 
+      {/* Submissions */}
       <div
         className={
           viewMode === "grid"
@@ -267,7 +267,7 @@ const Submissions = () => {
                       submission.contestName
                     )
                   }
-                  disabled={declareWinnerMutation.isPending}
+                  disabled={declareWinnerMutation.isLoading}
                   className="mt-4 w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white py-3 rounded-xl font-bold"
                 >
                   Declare Winner

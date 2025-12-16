@@ -130,6 +130,12 @@ const DashboardLayout = () => {
       emoji: "👥",
     },
     {
+      path: "/dashboard/creator-requests",
+      label: "Creator Requests",
+      gradient: "from-purple-500 to-pink-500",
+      emoji: "👨‍💼",
+    },
+    {
       path: "/dashboard/manage-contests",
       label: "Manage Contests",
       gradient: "from-orange-500 to-red-500",

@@ -260,10 +260,10 @@ const EditContest = () => {
             </button>
             <button
               type="submit"
-              disabled={updateMutation.isPending}
+              disabled={updateMutation.isLoading}
               className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-6 py-3 rounded-lg font-semibold transition-colors"
             >
-              {updateMutation.isPending ? (
+              {updateMutation.isLoading ? (
                 <span className="loading loading-spinner"></span>
               ) : (
                 "Update Contest"

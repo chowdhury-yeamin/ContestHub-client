@@ -259,7 +259,7 @@ const ManageUsers = () => {
                               onClick={() =>
                                 handleRoleChange(user._id, user.role, role)
                               }
-                              disabled={changeRoleMutation.isPending}
+                              disabled={changeRoleMutation.isLoading}
                               className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-indigo-500/50 rounded-lg text-white text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <FaExchangeAlt className="text-xs" />

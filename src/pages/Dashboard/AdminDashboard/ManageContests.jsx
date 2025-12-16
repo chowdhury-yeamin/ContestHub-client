@@ -399,7 +399,7 @@ const ManageContests = () => {
                                     onClick={() =>
                                       handleApprove(contest._id, contest.name)
                                     }
-                                    disabled={approveMutation.isPending}
+                                    disabled={approveMutation.isLoading}
                                     className="w-9 h-9 rounded-lg bg-green-600/20 hover:bg-green-600/30 border border-green-500/50 text-green-400 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Approve"
                                   >
@@ -411,7 +411,7 @@ const ManageContests = () => {
                                     onClick={() =>
                                       handleReject(contest._id, contest.name)
                                     }
-                                    disabled={rejectMutation.isPending}
+                                    disabled={rejectMutation.isLoading}
                                     className="w-9 h-9 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-400 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Reject"
                                   >
@@ -425,7 +425,7 @@ const ManageContests = () => {
                                 onClick={() =>
                                   handleDelete(contest._id, contest.name)
                                 }
-                                disabled={deleteMutation.isPending}
+                                disabled={deleteMutation.isLoading}
                                 className="w-9 h-9 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-400 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Delete"
                               >

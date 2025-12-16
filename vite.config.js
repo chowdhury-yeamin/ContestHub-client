@@ -9,12 +9,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("react")) return "vendor-react";
-            if (id.includes("framer-motion")) return "vendor-frames";
-            if (id.includes("@tanstack")) return "vendor-query";
-            return "vendor";
-          }
+          if (!id.includes("node_modules")) return;
+          const parts = id.split("node_modules/")[1].split("/");
+          const pkg = parts[0].startsWith("@")
+            ? `${parts[0]}/${parts[1]}`
+            : parts[0];
+          return `vendor-${pkg.replace("@", "").replace("/", "-")}`;
         },
       },
     },

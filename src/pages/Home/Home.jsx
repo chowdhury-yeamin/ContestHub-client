@@ -23,6 +23,11 @@ import {
   BadgeCheck,
 } from "lucide-react";
 import BrandsSwiper from "./BrandsSwiper";
+import Swal from "sweetalert2";
+import {
+  useCreatorRequestStatus,
+  useSubmitCreatorRequest,
+} from "../../hooks/useCreatorRequests";
 
 const Home = () => {
   const { data: contests = [], isLoading } = useContests();
@@ -32,6 +37,8 @@ const Home = () => {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
+  const submitRequestMutation = useSubmitCreatorRequest();
+  const { data: requestStatus } = useCreatorRequestStatus();
 
   const { data: winnersData = [] } = useWinners();
 
@@ -57,6 +64,95 @@ const Home = () => {
       totalPrizes,
     };
   }, [contestsArray, winnersArray]);
+
+  const handleBecomeCreator = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (user.role === "creator") {
+      navigate("/dashboard");
+      return;
+    }
+
+    if (requestStatus && requestStatus.status === "pending") {
+      Swal.fire({
+        icon: "info",
+        title: "Request Pending",
+        text: "Your creator request is being reviewed by our admin team.",
+        background: "#0f172a",
+        color: "#fff",
+        confirmButtonColor: "#6366f1",
+      });
+      return;
+    }
+
+    if (requestStatus && requestStatus.status === "rejected") {
+      Swal.fire({
+        icon: "error",
+        title: "Request Rejected",
+        text: "Your previous request was rejected. Please contact support for more information.",
+        background: "#0f172a",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
+      });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Become a Creator",
+      html: `
+      <div style="text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
+        <p style="font-size: 1.1rem; color: #94a3b8; margin-bottom: 1rem;">
+          Submit a request to become a contest creator and start building your community!
+        </p>
+        <p style="font-size: 0.9rem; color: #64748b;">
+          Our admin team will review your request and get back to you soon.
+        </p>
+      </div>
+    `,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#6366f1",
+      cancelButtonColor: "#64748b",
+      confirmButtonText: "Submit Request",
+      cancelButtonText: "Cancel",
+      background: "#0f172a",
+      color: "#fff",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await submitRequestMutation.mutateAsync();
+        Swal.fire({
+          icon: "success",
+          title: "Request Submitted!",
+          html: `
+          <div style="text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+            <p style="color: #94a3b8;">
+              Your creator request has been submitted successfully. We'll review it and notify you soon!
+            </p>
+          </div>
+        `,
+          background: "#0f172a",
+          color: "#fff",
+          confirmButtonColor: "#10b981",
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.error || "Failed to submit request",
+          background: "#0f172a",
+          color: "#fff",
+          confirmButtonColor: "#ef4444",
+        });
+      }
+    }
+  };
 
   const popularContests = contestsArray
     .filter((c) => c.status === "confirmed")
@@ -204,8 +300,7 @@ const Home = () => {
                 🎯
               </motion.span>
               <span className="text-sm text-slate-300 font-medium">
-                Join 100+ creators
-                worldwide
+                Join 100+ creators worldwide
               </span>
             </motion.div>
 
@@ -750,17 +845,18 @@ const Home = () => {
                 Create contests easily, manage participants, and declare
                 winners. Start building your community today!
               </p>
-              <Link to="/dashboard">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-white/30 transition-all inline-flex items-center gap-3"
-                >
-                  <FaRocket />
-                  Start Creating Contests
-                  <FaArrowRight />
-                </motion.button>
-              </Link>
+              <motion.button
+                onClick={handleBecomeCreator}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-white/30 transition-all inline-flex items-center gap-3"
+              >
+                <FaRocket />
+                {user?.role === "creator"
+                  ? "Go to Dashboard"
+                  : "Become a Creator"}
+                <FaArrowRight />
+              </motion.button>
             </div>
           </div>
         </motion.section>

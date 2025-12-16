@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useLeaderboard } from "../../hooks/useUsers";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   FaTrophy,
@@ -19,32 +20,19 @@ import { FaFilterCircleXmark } from "react-icons/fa6";
 
 const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: lb = [], isLoading } = useLeaderboard();
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  // prefer query data when available
+  const currentLeaderboard = lb && lb.length ? lb : leaderboard;
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
 
-  // Fetch all users
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/leaderboard");
-        const data = await response.json();
-        setLeaderboard(data.leaderboard);
-      } catch (err) {
-        console.error("Failed to fetch leaderboard:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchLeaderboard();
-  }, []);
+  // data comes from useLeaderboard
 
   // Filter and sort leaderboard
-  const filteredLeaderboard = leaderboard
+  const filteredLeaderboard = currentLeaderboard
     .filter((user) => user.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       if (filter === "wins") return b.wins - a.wins;

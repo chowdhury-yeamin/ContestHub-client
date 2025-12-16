@@ -140,7 +140,7 @@ const AllContests = () => {
           </motion.div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-4">
-            Explore
+            Explore{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
               Contests
             </span>

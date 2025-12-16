@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   useContest,
   useSubmitTask,
@@ -66,39 +66,6 @@ const ContestDetails = () => {
       return () => clearInterval(interval);
     }
   }, [contest, isEnded]);
-
-  const handleRegister = async () => {
-    Swal.fire({
-      title: "Processing Payment",
-      text: "Redirecting to payment gateway...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    setTimeout(async () => {
-      try {
-        await registerMutation.mutateAsync({
-          contestId: id,
-          paymentData: { amount: contest.price, method: "card" },
-        });
-
-        setIsRegistered(true);
-        Swal.fire({
-          icon: "success",
-          title: "Registration Successful!",
-          text: "You have successfully registered for this contest",
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Registration Failed",
-          text: "Payment processing failed. Please try again.",
-        });
-      }
-    }, 2000);
-  };
 
   const handleSubmit = async () => {
     if (!submissionLink.trim()) {
@@ -175,7 +142,6 @@ const ContestDetails = () => {
     );
   }
 
-  // Add this check for error
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex items-center justify-center">
@@ -202,6 +168,10 @@ const ContestDetails = () => {
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    navigate("/login");
   }
 
   return (
@@ -238,7 +208,7 @@ const ContestDetails = () => {
           >
             <img
               src={contest.image}
-              alt={contest.title}
+              alt={contest.name}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
@@ -451,77 +421,31 @@ const ContestDetails = () => {
                     </h3>
                   </div>
                   <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-6">
-                    ${contest.prizeMoney}
+                    ${contest.entryFee}
                   </div>
-
-                  {!isRegistered ? (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleRegister}
-                      disabled={isEnded || registerMutation.isPending}
-                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-indigo-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-                    >
-                      {registerMutation.isPending ? (
-                        <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{
-                              duration: 1,
-                              repeat: Infinity,
-                              ease: "linear",
-                            }}
-                          >
-                            <FaBolt />
-                          </motion.div>
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <FaAward />
-                          Register & Pay
-                        </>
-                      )}
-                    </motion.button>
-                  ) : (
-                    <div className="space-y-4">
+                  <div>
+                    {contest.paymentStatus === "paid" ? (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-emerald-500/20 border border-emerald-500/50 rounded-xl p-4 flex items-center gap-3"
+                        animate={{ scale: [1, 1.05, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="text-3xl font-black text-green-400"
                       >
-                        <FaCheckCircle className="text-emerald-400 text-xl" />
-                        <span className="text-emerald-100 font-semibold">
-                          You're registered for this contest
-                        </span>
+                        Payment Done 🎉
                       </motion.div>
-
-                      {!hasSubmitted && !isEnded && (
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setShowSubmitModal(true)}
-                          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-purple-500/50 transition-all flex items-center justify-center gap-3"
-                        >
-                          <FaUpload />
-                          Submit Task
-                        </motion.button>
-                      )}
-
-                      {hasSubmitted && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-4 flex items-center gap-3"
-                        >
-                          <FaCheckCircle className="text-blue-400 text-xl" />
-                          <span className="text-blue-100 font-semibold">
-                            Task submitted successfully
-                          </span>
-                        </motion.div>
-                      )}
-                    </div>
-                  )}
+                    ) : (
+                      <motion.div
+                        animate={{ scale: [1, 1.05, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className=""
+                      >
+                        <Link to={`/dashboard/payment/${contest._id}`}>
+                          <button className="btn btn-primary w-full">
+                            Pay to Register
+                          </button>
+                        </Link>
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -585,7 +509,7 @@ const ContestDetails = () => {
                   onClick={handleSubmit}
                   className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-purple-500/50 transition-all flex items-center justify-center gap-3"
                 >
-                  {submitMutation.isPending ? (
+                  {submitMutation.isLoading ? (
                     <>
                       <motion.div
                         animate={{ rotate: 360 }}

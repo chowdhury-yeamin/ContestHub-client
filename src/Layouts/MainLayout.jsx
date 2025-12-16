@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar/Navbar";
 import { Outlet } from "react-router";
 import Footer from "../components/Footer/Footer";
 import { useAuth } from "../contexts/AuthContext";
+import { Toaster } from "react-hot-toast";
 
 const MainLayout = () => {
   const { user, logout } = useAuth();
@@ -12,6 +13,7 @@ const MainLayout = () => {
       <div>
         <Navbar user={user} logout={logout} />
       </div>
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       <div className="pt-navbar">
         <Outlet />
       </div>

@@ -466,7 +466,7 @@ const MyContests = () => {
                       className="border-b border-white/5 hover:bg-white/5 transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-center gap-4">
                           <img
                             src={
                               contest.image ||

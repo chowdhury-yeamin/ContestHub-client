@@ -41,13 +41,17 @@ import {
   FaUserShield,
 } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, refetchUser } = useAuth(); // Make sure refetchUser is available in AuthContext
   const { data: profile, isLoading, refetch } = useUserProfile();
   const { data: stats, isLoading: statsLoading } = useUserStats();
   const updateMutation = useUpdateProfile();
   const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -67,9 +71,26 @@ const Profile = () => {
 
   const onSubmit = async (formData) => {
     try {
+      // Update profile
       await updateMutation.mutateAsync(formData);
+
+      // Refetch user profile data
       await refetch();
+
+      // Refetch user from auth context if available
+      if (refetchUser) {
+        await refetchUser();
+      }
+
+      // Invalidate all relevant queries to force refetch
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+
+      // Close modal
       setIsEditing(false);
+
+      // Show success message
       Swal.fire({
         icon: "success",
         title: "Profile Updated!",
@@ -87,6 +108,7 @@ const Profile = () => {
         text: error?.message || "Something went wrong.",
         background: "#0f172a",
         color: "#fff",
+        confirmButtonColor: "#ef4444",
       });
     }
   };
@@ -224,6 +246,7 @@ const Profile = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        key={profile?.photoURL || user?.photoURL} // Re-render when image changes
         className="relative group"
       >
         <div
@@ -232,7 +255,11 @@ const Profile = () => {
         <div className="relative bg-slate-900/90 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-8 shadow-2xl">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="relative">
-              <motion.div whileHover={{ scale: 1.05 }} className="relative">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative"
+                key={profile?.photoURL || user?.photoURL} // Force re-render on image change
+              >
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${currentRole.gradient} rounded-full blur-lg opacity-75`}
                 />
@@ -246,6 +273,7 @@ const Profile = () => {
                   }
                   alt={profile?.name || user?.name}
                   className="relative w-32 h-32 rounded-full border-4 border-white/30 object-cover shadow-xl"
+                  key={profile?.photoURL || user?.photoURL} // Force image reload
                 />
                 <div
                   className={`absolute -bottom-2 -right-2 bg-gradient-to-r ${currentRole.gradient} w-12 h-12 rounded-full flex items-center justify-center border-4 border-slate-900 shadow-lg`}
@@ -257,7 +285,7 @@ const Profile = () => {
 
             <div className="flex-1 text-center md:text-left">
               <h3 className="text-3xl font-black text-white mb-2 drop-shadow-lg">
-                {user?.name || user?.displayName || profile?.name || "User"}
+                {profile?.name || user?.name || user?.displayName || "User"}
               </h3>
               {(profile?.bio || user?.bio) && (
                 <p className="text-slate-100 mb-4 max-w-2xl font-medium">
@@ -359,7 +387,7 @@ const Profile = () => {
                       className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
                     />
                   </div>
-                  <div className="text-4xl font-black text-white mb-2 drop-shadow-lg">
+                  <div className="text-2xl font-black text-white mb-2 drop-shadow-lg">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-200 font-bold">
@@ -478,7 +506,7 @@ const Profile = () => {
                       className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
                     />
                   </div>
-                  <div className="text-4xl font-black text-white mb-2 drop-shadow-lg">
+                  <div className="text-2xl font-black text-white mb-2 drop-shadow-lg">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-200 font-bold">
@@ -646,7 +674,7 @@ const Profile = () => {
                       className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
                     />
                   </div>
-                  <div className="text-4xl font-black text-white mb-2 drop-shadow-lg">
+                  <div className="text-3xl font-black text-white mb-2 drop-shadow-lg">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-200 font-bold">
@@ -971,10 +999,10 @@ const Profile = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      disabled={updateMutation.isPending}
+                      disabled={updateMutation.isLoading}
                       className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-emerald-500/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {updateMutation.isPending ? (
+                      {updateMutation.isLoading ? (
                         <>
                           <motion.div
                             animate={{ rotate: 360 }}

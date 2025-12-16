@@ -15,3 +15,46 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.7);
 }
+
+/* Enforce a single dark theme to restore original visuals */
+:root,
+[data-theme="dark"] {
+  --color-base-content: #e6eef8; /* light text for readability on dark bg */
+  --color-base-100: #071022; /* deep page background */
+  --b1: #071022;
+  --bc: #e6eef8;
+}
+
+/* Ensure body uses the theme variables */
+body {
+  color: var(--color-base-content) !important;
+  background-color: var(--color-base-100) !important;
+}
+
+/* Do not globally remap `text-white` — keep component-level choices intact */
+
+/* Dark-theme overrides for utilities that assume light backgrounds */
+[data-theme="dark"] .text-black,
+[data-theme="dark"] .text-gray-900 {
+  color: var(--color-base-content) !important;
+}
+
+[data-theme="dark"] .text-gray-800,
+[data-theme="dark"] .text-gray-700,
+[data-theme="dark"] .text-gray-600,
+[data-theme="dark"] .text-gray-500,
+[data-theme="dark"] .text-slate-400,
+[data-theme="dark"] .text-slate-300 {
+  color: rgba(230, 238, 248, 0.9) !important;
+}
+
+/* Make placeholders visible on dark backgrounds */
+[data-theme="dark"] ::placeholder {
+  color: rgba(230, 238, 248, 0.55) !important;
+  opacity: 1 !important;
+}
+
+/* Ensure semi-transparent white overlays remain subtle on dark */
+[data-theme="dark"] [class*="bg-white/"] {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
