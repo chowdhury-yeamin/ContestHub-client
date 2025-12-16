@@ -46,13 +46,16 @@ const DashboardLayout = () => {
           return;
         }
 
-        const response = await fetch("http://localhost:5000/api/stats", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          "https://contest-hub-server-psi.vercel.app/api/stats",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
