@@ -34,9 +34,7 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
       setLoading(false);
 
-      if (result && result.success && result.token) {
-        localStorage.setItem("token", result.token); // store token
-        setToken(result.token); // update context
+      if (result && result.success) {
         navigate("/");
       } else {
         console.error("Login failed:", result.message);
@@ -60,9 +58,7 @@ const Login = () => {
       const result = await googleSignIn();
       setLoading(false);
 
-      if (result && result.success && result.token) {
-        localStorage.setItem("token", result.token);
-        setToken(result.token);
+      if (result && result.success) {
         navigate("/");
       } else {
         console.error("Google login failed:", result);
@@ -90,7 +86,6 @@ const Login = () => {
       color: "from-blue-500 to-cyan-500",
     },
   ];
-  
 
   return (
     <div className="min-h-screen pt-24 bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden flex items-center justify-center pb-12 px-4 sm:px-6 lg:px-8">
