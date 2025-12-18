@@ -30,7 +30,6 @@ const MyContests = () => {
     ? contests.contests
     : [];
 
-  // Filter contests
   let filteredContests = contestsArray;
   if (filterStatus !== "all") {
     filteredContests = filteredContests.filter(
@@ -176,7 +175,7 @@ const MyContests = () => {
               <div>
                 <p className="text-slate-400 text-sm mb-1">Active</p>
                 <p className="text-3xl font-bold text-white">
-                  {contestsArray.filter((c) => c.status === "confirmed").length}
+                  {contestsArray.filter((c) => c.status === "confirmed" && c.deadline > new Date()).length}
                 </p>
               </div>
               <div className="bg-gradient-to-br from-emerald-600 to-teal-600 p-3 rounded-xl">

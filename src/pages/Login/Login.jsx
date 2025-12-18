@@ -47,7 +47,6 @@ const Login = () => {
 
   const { setToken } = useAuth();
 
-  // redirect if already logged in
   useEffect(() => {
     if (user) navigate("/", { replace: true });
   }, [user, navigate]);

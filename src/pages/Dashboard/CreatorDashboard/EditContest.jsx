@@ -22,14 +22,15 @@ const EditContest = () => {
 
   useEffect(() => {
     if (contest) {
+      console.log("Contest data loaded:", contest);
       reset({
         name: contest.name,
         image: contest.image,
         description: contest.description,
         taskInstruction: contest.taskInstruction,
-        price: contest.price,
+        entryFee: contest.entryFee || 0,
         prizeMoney: contest.prizeMoney,
-        contestType: contest.contestType,
+        type: contest.type || contest.contestType,
       });
       setDeadline(new Date(contest.deadline));
     }
@@ -51,17 +52,28 @@ const EditContest = () => {
         icon: "error",
         title: "Validation Error",
         text: "Please select a deadline",
+        background: "#0f172a",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
       });
       return;
     }
 
     try {
+      console.log("Submitting form data:", data);
+
       const contestData = {
-        ...data,
-        deadline: deadline.toISOString(),
-        price: parseFloat(data.price),
+        name: data.name,
+        image: data.image,
+        description: data.description,
+        taskInstruction: data.taskInstruction,
+        type: data.type, // Send as 'type'
+        entryFee: parseFloat(data.entryFee), // Changed from 'price' to 'entryFee'
         prizeMoney: parseFloat(data.prizeMoney),
+        deadline: deadline.toISOString(),
       };
+
+      console.log("Sending contest data:", contestData);
 
       await updateMutation.mutateAsync({ id, data: contestData });
 
@@ -69,14 +81,23 @@ const EditContest = () => {
         icon: "success",
         title: "Contest Updated!",
         text: "Your contest has been updated successfully",
+        background: "#0f172a",
+        color: "#fff",
+        confirmButtonColor: "#10b981",
       });
 
       navigate("/dashboard/my-contests");
     } catch (error) {
+      console.error("Update error:", error);
       Swal.fire({
         icon: "error",
         title: "Update Failed",
-        text: "Failed to update contest. Please try again.",
+        text:
+          error?.response?.data?.error ||
+          "Failed to update contest. Please try again.",
+        background: "#0f172a",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
       });
     }
   };
@@ -172,7 +193,7 @@ const EditContest = () => {
                 <span className="label-text">Entry Fee ($) *</span>
               </label>
               <input
-                {...register("price", {
+                {...register("entryFee", {
                   required: "Entry fee is required",
                   min: { value: 0, message: "Entry fee must be positive" },
                 })}
@@ -180,9 +201,9 @@ const EditContest = () => {
                 step="0.01"
                 className="input input-bordered w-full"
               />
-              {errors.price && (
+              {errors.entryFee && (
                 <p className="text-error text-sm mt-1">
-                  {errors.price.message}
+                  {errors.entryFee.message}
                 </p>
               )}
             </div>
@@ -214,7 +235,7 @@ const EditContest = () => {
                 <span className="label-text">Contest Type *</span>
               </label>
               <select
-                {...register("contestType", {
+                {...register("type", {
                   required: "Contest type is required",
                 })}
                 className="select select-bordered w-full"
@@ -225,10 +246,8 @@ const EditContest = () => {
                   </option>
                 ))}
               </select>
-              {errors.contestType && (
-                <p className="text-error text-sm mt-1">
-                  {errors.contestType.message}
-                </p>
+              {errors.type && (
+                <p className="text-error text-sm mt-1">{errors.type.message}</p>
               )}
             </div>
 
@@ -260,10 +279,10 @@ const EditContest = () => {
             </button>
             <button
               type="submit"
-              disabled={updateMutation.isLoading}
-              className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-6 py-3 rounded-lg font-semibold transition-colors"
+              disabled={updateMutation.isPending}
+              className="bg-accent-custom hover:bg-accent-custom/90 text-white border-0 px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {updateMutation.isLoading ? (
+              {updateMutation.isPending ? (
                 <span className="loading loading-spinner"></span>
               ) : (
                 "Update Contest"

@@ -20,9 +20,13 @@ export const useContest = (id) => {
   return useQuery({
     queryKey: ["contest", id],
     queryFn: async () => {
+      if (!id) {
+        throw new Error("Contest ID is required");
+      }
       const { data } = await api.get(`/contests/${id}`);
       return data.contest;
     },
+    enabled: !!id, // Only fetch if id exists
   });
 };
 
@@ -123,16 +127,16 @@ export const useDeleteContest = () => {
 export const useDeclareWinner = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ submissionId, isWinner = true, score = null }) => {
-      const { data } = await api.post(`/submissions/${submissionId}/winner`, {
-        isWinner,
-        score,
-      });
+    mutationFn: async ({ submissionId }) => {
+      const { data } = await api.post(`/submissions/${submissionId}/winner`);
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
       queryClient.invalidateQueries({ queryKey: ["contest"] });
+      queryClient.invalidateQueries({
+        queryKey: ["creator", "all-submissions"],
+      });
       toast.success("Winner declared");
     },
     onError: (err) => {
@@ -144,19 +148,28 @@ export const useDeclareWinner = () => {
 };
 
 // ==================== Update a contest ====================
+// FIXED VERSION - matches what EditContest component passes
 export const useUpdateContest = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ contestId, updateData }) => {
-      const { data } = await api.put(`/contests/${contestId}`, updateData);
-      return data;
+    mutationFn: async ({ id, data }) => {
+      if (!id) {
+        throw new Error("Contest ID is required");
+      }
+
+      console.log("Updating contest with ID:", id);
+
+      const response = await api.put(`/contests/${id}`, data);
+      return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["contests"] });
-      queryClient.invalidateQueries({ queryKey: ["contest"] });
-      toast.success("Contest updated");
+      queryClient.invalidateQueries({ queryKey: ["contest", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-contests"] });
+      toast.success("Contest updated successfully");
     },
     onError: (err) => {
+      console.error("Update contest error:", err);
       toast.error(
         err?.response?.data?.error || err?.message || "Update failed"
       );

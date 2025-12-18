@@ -27,7 +27,7 @@ const AddContest = () => {
     formState: { errors },
     setValue,
     watch,
-    reset, // 👈 ADD THIS - this is the reset function from useForm
+    reset,
   } = useForm();
 
   const contestTypes = [
@@ -49,7 +49,6 @@ const AddContest = () => {
       8) *
     100;
 
-  // 👇 FIXED: Remove resetForm parameter, use reset from useForm
   const onSubmit = async (data) => {
     if (!deadline) {
       Swal.fire({
@@ -94,9 +93,8 @@ const AddContest = () => {
         showConfirmButton: false,
       });
 
-      // 👇 FIXED: Use reset() from useForm hook
       reset();
-      setDeadline(null); // Also reset the deadline state
+      setDeadline(null);
     } catch (error) {
       console.error("❌ Error:", error);
       Swal.fire({

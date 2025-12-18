@@ -1,11 +1,13 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://contest-hub-server-psi.vercel.app/api";
 
 const api = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
-  withCredentials: true, // Add this for CORS with credentials
+  withCredentials: true,
 });
 
 api.interceptors.request.use(

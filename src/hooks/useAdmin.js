@@ -11,17 +11,14 @@ export const useAllUsers = () => {
     queryFn: async () => {
       const response = await api.get("/admin/users");
 
-      // Handle both response formats: direct array or {users: [...]}
       if (Array.isArray(response.data)) {
         return response.data;
       }
 
-      // If response has a users property, use that
       if (response.data && Array.isArray(response.data.users)) {
         return response.data.users;
       }
 
-      // Fallback to empty array if data is unexpected
       console.error("❌ Unexpected API response format:", response.data);
       return [];
     },

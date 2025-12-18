@@ -254,7 +254,7 @@ const ParticipatedContests = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg blur opacity-50" />
                             <div className="relative bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                               <FaCheckCircle />
-                              {item.paymentStatus}
+                              Payment: {item.paymentStatus}
                             </div>
                           </div>
 

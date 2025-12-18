@@ -1,25 +1,29 @@
 import { useWinningContests } from "../../../hooks/useUsers";
 import { motion } from "framer-motion";
-import { 
-  FaTrophy, 
-  FaMedal, 
+import {
+  FaTrophy,
+  FaMedal,
   FaCrown,
   FaStar,
   FaFire,
   FaGem,
   FaCalendarAlt,
   FaAward,
-  FaChartLine
+  FaChartLine,
 } from "react-icons/fa";
 
 const WinningContests = () => {
   const { data: winnings = [], isLoading } = useWinningContests();
 
   // Calculate stats
-  const totalWinnings = winnings.reduce((sum, w) => sum + w.contest.prizeMoney, 0);
-  const averageWin = winnings.length > 0 ? Math.round(totalWinnings / winnings.length) : 0;
+  const totalWinnings = winnings.reduce(
+    (sum, w) => sum + w.contest.prizeMoney,
+    0
+  );
+  const averageWin =
+    winnings.length > 0 ? Math.round(totalWinnings / winnings.length) : 0;
 
-  // Get rank emoji based on position
+  //  rank emoji based on position
   const getRankEmoji = (index) => {
     if (index === 0) return "🥇";
     if (index === 1) return "🥈";
@@ -27,7 +31,7 @@ const WinningContests = () => {
     return "🏆";
   };
 
-  // Get gradient based on rank
+  //  gradient based on rank
   const getRankGradient = (index) => {
     if (index === 0) return "from-yellow-400 via-amber-500 to-orange-500";
     if (index === 1) return "from-slate-300 via-slate-400 to-slate-500";
@@ -39,13 +43,13 @@ const WinningContests = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <motion.div
-          animate={{ 
+          animate={{
             rotate: 360,
-            scale: [1, 1.2, 1]
+            scale: [1, 1.2, 1],
           }}
-          transition={{ 
+          transition={{
             rotate: { duration: 2, repeat: Infinity, ease: "linear" },
-            scale: { duration: 1, repeat: Infinity }
+            scale: { duration: 1, repeat: Infinity },
           }}
         >
           <FaTrophy className="text-6xl text-amber-500" />
@@ -65,9 +69,9 @@ const WinningContests = () => {
       >
         <div className="flex items-center gap-3 mb-6">
           <motion.div
-            animate={{ 
+            animate={{
               rotate: [0, 15, -15, 0],
-              scale: [1, 1.1, 1]
+              scale: [1, 1.1, 1],
             }}
             transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
             className="text-4xl"
@@ -75,7 +79,9 @@ const WinningContests = () => {
             🏆
           </motion.div>
           <div>
-            <h2 className="text-3xl font-black text-white">My Winning Contests</h2>
+            <h2 className="text-3xl font-black text-white">
+              My Winning Contests
+            </h2>
             <p className="text-slate-400">Celebrate your achievements</p>
           </div>
         </div>
@@ -89,28 +95,28 @@ const WinningContests = () => {
                 value: winnings.length,
                 icon: FaTrophy,
                 gradient: "from-amber-500 to-orange-500",
-                emoji: "🏆"
+                emoji: "🏆",
               },
               {
                 label: "Total Earned",
                 value: `$${totalWinnings.toLocaleString()}`,
                 icon: FaGem,
                 gradient: "from-emerald-500 to-teal-500",
-                emoji: "💰"
+                emoji: "💰",
               },
               {
                 label: "Average Win",
                 value: `$${averageWin.toLocaleString()}`,
                 icon: FaChartLine,
                 gradient: "from-blue-500 to-cyan-500",
-                emoji: "📊"
+                emoji: "📊",
               },
               {
                 label: "Success Rate",
                 value: "100%",
                 icon: FaStar,
                 gradient: "from-purple-500 to-pink-500",
-                emoji: "⭐"
+                emoji: "⭐",
               },
             ].map((stat, idx) => (
               <motion.div
@@ -121,11 +127,15 @@ const WinningContests = () => {
                 whileHover={{ y: -5, scale: 1.02 }}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-xl blur-lg`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-30 transition-opacity rounded-xl blur-lg`}
+                />
                 <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-2xl">{stat.emoji}</span>
-                    <stat.icon className={`text-lg text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`} />
+                    <stat.icon
+                      className={`text-lg text-transparent bg-clip-text bg-gradient-to-r ${stat.gradient}`}
+                    />
                   </div>
                   <div className="text-2xl font-black text-white mb-1">
                     {stat.value}
@@ -150,9 +160,9 @@ const WinningContests = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-orange-600/10 to-red-600/10 rounded-2xl blur-xl" />
           <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-12">
             <motion.div
-              animate={{ 
+              animate={{
                 y: [0, -20, 0],
-                rotate: [0, 10, -10, 0]
+                rotate: [0, 10, -10, 0],
               }}
               transition={{ duration: 3, repeat: Infinity }}
               className="text-8xl mb-6"
@@ -166,7 +176,8 @@ const WinningContests = () => {
               You haven't won any contests yet.
             </p>
             <p className="text-slate-500 mb-8">
-              Keep participating and showcasing your talent to win amazing prizes!
+              Keep participating and showcasing your talent to win amazing
+              prizes!
             </p>
             <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
               <FaStar className="text-amber-500" />
@@ -187,40 +198,68 @@ const WinningContests = () => {
               className="relative group"
             >
               {/* Glow Effect */}
-              <div className={`absolute inset-0 bg-gradient-to-r ${getRankGradient(index)} rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity`} />
-              
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${getRankGradient(
+                  index
+                )} rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity`}
+              />
+
               {/* Card */}
-              <div className={`relative bg-gradient-to-br ${getRankGradient(index)} rounded-2xl p-1`}>
+              <div
+                className={`relative bg-gradient-to-br ${getRankGradient(
+                  index
+                )} rounded-2xl p-1`}
+              >
                 <div className="bg-slate-950/90 backdrop-blur-xl rounded-2xl p-6 h-full">
                   {/* Header */}
                   <div className="flex items-center justify-between mb-4">
                     <motion.div
-                      animate={{ 
+                      animate={{
                         rotate: [0, 15, -15, 0],
-                        scale: [1, 1.2, 1]
+                        scale: [1, 1.2, 1],
                       }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 3,
+                      }}
                       className="text-5xl"
                     >
                       {getRankEmoji(index)}
                     </motion.div>
                     <div className="flex flex-col items-end gap-2">
-                      <div className={`bg-gradient-to-r ${getRankGradient(index)} text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg`}>
+                      <div
+                        className={`bg-gradient-to-r ${getRankGradient(
+                          index
+                        )} text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg`}
+                      >
                         Rank #{index + 1}
                       </div>
                       {index < 3 && (
                         <motion.div
                           animate={{ rotate: 360 }}
-                          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                          transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
                         >
-                          <FaCrown className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(index)}`} />
+                          <FaCrown
+                            className={`text-2xl text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(
+                              index
+                            )}`}
+                          />
                         </motion.div>
                       )}
                     </div>
                   </div>
 
                   {/* Contest Name */}
-                  <h3 className={`text-xl font-black text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(index)} mb-4`}>
+                  <h3
+                    className={`text-xl font-black text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(
+                      index
+                    )} mb-4`}
+                  >
                     {win.contest.name}
                   </h3>
 
@@ -233,18 +272,29 @@ const WinningContests = () => {
                       <span className="text-4xl font-black text-white">
                         ${win.contest.prizeMoney.toLocaleString()}
                       </span>
-                      <FaGem className={`text-xl text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(index)}`} />
+                      <FaGem
+                        className={`text-xl text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(
+                          index
+                        )}`}
+                      />
                     </div>
                   </div>
 
                   {/* Date */}
                   <div className="flex items-center gap-2 text-sm text-slate-400 pt-4 border-t border-white/10">
-                    <FaCalendarAlt className={`text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(index)}`} />
-                    <span>Won on {new Date(win.wonAt).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}</span>
+                    <FaCalendarAlt
+                      className={`text-transparent bg-clip-text bg-gradient-to-r ${getRankGradient(
+                        index
+                      )}`}
+                    />
+                    <span>
+                      Won on{" "}
+                      {new Date(win.wonAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
                   </div>
 
                   {/* Achievement Badge */}
@@ -254,7 +304,11 @@ const WinningContests = () => {
                     transition={{ delay: 0.5 + index * 0.1, type: "spring" }}
                     className="absolute -top-7 -right-5"
                   >
-                    <div className={`bg-gradient-to-r ${getRankGradient(index)} w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-4 border-slate-950`}>
+                    <div
+                      className={`bg-gradient-to-r ${getRankGradient(
+                        index
+                      )} w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-4 border-slate-950`}
+                    >
                       <FaAward className="text-2xl text-white" />
                     </div>
                   </motion.div>

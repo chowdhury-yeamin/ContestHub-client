@@ -1,6 +1,20 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaChevronDown, FaChevronUp, FaEnvelope, FaHeadset, FaSearch, FaBook, FaCreditCard, FaCog, FaUserCircle, FaQuestionCircle, FaLightbulb, FaRocket, FaCheckCircle } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaEnvelope,
+  FaHeadset,
+  FaSearch,
+  FaBook,
+  FaCreditCard,
+  FaCog,
+  FaUserCircle,
+  FaQuestionCircle,
+  FaLightbulb,
+  FaRocket,
+  FaCheckCircle,
+} from "react-icons/fa";
 
 const faqsData = [
   {
@@ -10,17 +24,20 @@ const faqsData = [
     questions: [
       {
         question: "How do I create an account?",
-        answer: "Click on the Sign Up button at the top-right corner and fill in the required details. You'll receive a verification email to activate your account."
+        answer:
+          "Click on the Sign Up button at the top-right corner and fill in the required details. You'll receive a verification email to activate your account.",
       },
       {
         question: "How do I reset my password?",
-        answer: "Go to the login page, click on 'Forgot Password', and follow the instructions. We'll send you a secure link to reset your password."
+        answer:
+          "Go to the login page, click on 'Forgot Password', and follow the instructions. We'll send you a secure link to reset your password.",
       },
       {
         question: "Can I change my username?",
-        answer: "Yes, you can change your username in your profile settings. Go to Dashboard > Settings > Profile to update your information."
+        answer:
+          "Yes, you can change your username in your profile settings. Go to Dashboard > Settings > Profile to update your information.",
       },
-    ]
+    ],
   },
   {
     category: "Contests",
@@ -29,17 +46,20 @@ const faqsData = [
     questions: [
       {
         question: "How do I participate in a contest?",
-        answer: "Register and pay the entry fee for the contest, then submit your task before the deadline. Make sure to read the contest rules carefully before participating."
+        answer:
+          "Register and pay the entry fee for the contest, then submit your task before the deadline. Make sure to read the contest rules carefully before participating.",
       },
       {
         question: "How is the winner selected?",
-        answer: "The contest creator evaluates submissions and declares the winner after the deadline. Winners are notified via email and announced on the platform."
+        answer:
+          "The contest creator evaluates submissions and declares the winner after the deadline. Winners are notified via email and announced on the platform.",
       },
       {
         question: "Can I participate in multiple contests?",
-        answer: "Absolutely! You can participate in as many contests as you like. Each contest has its own entry fee and requirements."
+        answer:
+          "Absolutely! You can participate in as many contests as you like. Each contest has its own entry fee and requirements.",
       },
-    ]
+    ],
   },
   {
     category: "Payments",
@@ -48,17 +68,20 @@ const faqsData = [
     questions: [
       {
         question: "What payment methods are accepted?",
-        answer: "We accept credit/debit cards, PayPal, and Stripe payments. All transactions are secure and encrypted for your safety."
+        answer:
+          "We accept credit/debit cards, PayPal, and Stripe payments. All transactions are secure and encrypted for your safety.",
       },
       {
         question: "Can I get a refund?",
-        answer: "Refunds are only available before submission if the contest allows cancellation. Check the contest's refund policy before entering."
+        answer:
+          "Refunds are only available before submission if the contest allows cancellation. Check the contest's refund policy before entering.",
       },
       {
         question: "How do I receive my prize money?",
-        answer: "Prize money is transferred directly to your registered payment method within 5-7 business days after winner announcement."
+        answer:
+          "Prize money is transferred directly to your registered payment method within 5-7 business days after winner announcement.",
       },
-    ]
+    ],
   },
   {
     category: "Technical",
@@ -67,17 +90,20 @@ const faqsData = [
     questions: [
       {
         question: "The website is not loading, what should I do?",
-        answer: "Clear your cache, check your internet connection, or try using a different browser. If the issue persists, contact our support team."
+        answer:
+          "Clear your cache, check your internet connection, or try using a different browser. If the issue persists, contact our support team.",
       },
       {
         question: "How do I report a bug?",
-        answer: "Contact support through the form at the bottom of this page with details of the issue. Include screenshots if possible to help us resolve it faster."
+        answer:
+          "Contact support through the form at the bottom of this page with details of the issue. Include screenshots if possible to help us resolve it faster.",
       },
       {
         question: "Is there a mobile app?",
-        answer: "Currently, we're mobile-optimized web platform. A dedicated mobile app is in development and will be available soon!"
+        answer:
+          "Currently, we're mobile-optimized web platform. A dedicated mobile app is in development and will be available soon!",
       },
-    ]
+    ],
   },
 ];
 
@@ -91,18 +117,23 @@ const HelpCenter = () => {
   };
 
   const filteredFaqs = faqsData
-    .filter(cat => activeCategory === "all" || cat.category === activeCategory)
-    .map(category => ({
+    .filter(
+      (cat) => activeCategory === "all" || cat.category === activeCategory
+    )
+    .map((category) => ({
       ...category,
       questions: category.questions.filter(
-        q =>
+        (q) =>
           q.question.toLowerCase().includes(search.toLowerCase()) ||
           q.answer.toLowerCase().includes(search.toLowerCase())
-      )
+      ),
     }))
-    .filter(cat => cat.questions.length > 0);
+    .filter((cat) => cat.questions.length > 0);
 
-  const totalQuestions = faqsData.reduce((acc, cat) => acc + cat.questions.length, 0);
+  const totalQuestions = faqsData.reduce(
+    (acc, cat) => acc + cat.questions.length,
+    0
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
@@ -146,9 +177,12 @@ const HelpCenter = () => {
           </motion.div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-6">
-            Help <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Center</span>
+            Help{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              Center
+            </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-8">
             Find answers to your questions or contact our support team
           </p>
@@ -159,7 +193,9 @@ const HelpCenter = () => {
               whileHover={{ scale: 1.05 }}
               className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-6 py-3"
             >
-              <div className="text-2xl font-bold text-white">{totalQuestions}+</div>
+              <div className="text-2xl font-bold text-white">
+                {totalQuestions}+
+              </div>
               <div className="text-sm text-slate-400">Articles</div>
             </motion.div>
             <motion.div
@@ -282,8 +318,12 @@ const HelpCenter = () => {
               >
                 🔍
               </motion.div>
-              <h3 className="text-2xl font-bold text-white mb-2">No results found</h3>
-              <p className="text-slate-400 mb-6">Try adjusting your search or browse all categories</p>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                No results found
+              </h3>
+              <p className="text-slate-400 mb-6">
+                Try adjusting your search or browse all categories
+              </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -306,12 +346,18 @@ const HelpCenter = () => {
                 className="mb-8"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className={`bg-gradient-to-r ${category.gradient} p-3 rounded-xl`}>
+                  <div
+                    className={`bg-gradient-to-r ${category.gradient} p-3 rounded-xl`}
+                  >
                     <category.icon className="text-2xl text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-white">{category.category}</h2>
-                    <p className="text-slate-400 text-sm">{category.questions.length} articles</p>
+                    <h2 className="text-3xl font-bold text-white">
+                      {category.category}
+                    </h2>
+                    <p className="text-slate-400 text-sm">
+                      {category.questions.length} articles
+                    </p>
                   </div>
                 </div>
 
@@ -328,13 +374,17 @@ const HelpCenter = () => {
                         whileHover={{ scale: 1.01 }}
                         className="relative group"
                       >
-                        <div className={`absolute inset-0 bg-gradient-to-r ${category.gradient} rounded-xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity`} />
+                        <div
+                          className={`absolute inset-0 bg-gradient-to-r ${category.gradient} rounded-xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity`}
+                        />
                         <div
                           onClick={() => toggleOpen(key)}
                           className="relative bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/30 rounded-xl p-6 cursor-pointer transition-all"
                         >
                           <div className="flex justify-between items-start gap-4">
-                            <h3 className="font-bold text-lg text-white flex-1">{faq.question}</h3>
+                            <h3 className="font-bold text-lg text-white flex-1">
+                              {faq.question}
+                            </h3>
                             <motion.div
                               animate={{ rotate: isOpen ? 180 : 0 }}
                               transition={{ duration: 0.3 }}
@@ -346,8 +396,16 @@ const HelpCenter = () => {
                           <AnimatePresence>
                             {isOpen && (
                               <motion.div
-                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                animate={{ opacity: 1, height: "auto", marginTop: 16 }}
+                                initial={{
+                                  opacity: 0,
+                                  height: 0,
+                                  marginTop: 0,
+                                }}
+                                animate={{
+                                  opacity: 1,
+                                  height: "auto",
+                                  marginTop: 16,
+                                }}
                                 exit={{ opacity: 0, height: 0, marginTop: 0 }}
                                 transition={{ duration: 0.3 }}
                                 className="text-slate-300 leading-relaxed overflow-hidden"
@@ -378,19 +436,19 @@ const HelpCenter = () => {
               icon: FaLightbulb,
               title: "Getting Started",
               desc: "New to ContestHub? Check our beginner's guide",
-              gradient: "from-amber-500 to-orange-500"
+              gradient: "from-amber-500 to-orange-500",
             },
             {
               icon: FaRocket,
               title: "Pro Tips",
               desc: "Learn advanced strategies to win contests",
-              gradient: "from-purple-500 to-pink-500"
+              gradient: "from-purple-500 to-pink-500",
             },
             {
               icon: FaCheckCircle,
               title: "Best Practices",
               desc: "Follow guidelines for successful participation",
-              gradient: "from-emerald-500 to-teal-500"
+              gradient: "from-emerald-500 to-teal-500",
             },
           ].map((card, idx) => (
             <motion.div
@@ -398,12 +456,18 @@ const HelpCenter = () => {
               whileHover={{ y: -10, scale: 1.02 }}
               className="relative group cursor-pointer"
             >
-              <div className={`absolute inset-0 bg-gradient-to-r ${card.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity`} />
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${card.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity`}
+              />
               <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl p-6 text-center transition-all">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-r ${card.gradient} mb-4`}>
+                <div
+                  className={`inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-r ${card.gradient} mb-4`}
+                >
                   <card.icon className="text-2xl text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">{card.title}</h3>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {card.title}
+                </h3>
                 <p className="text-slate-400 text-sm">{card.desc}</p>
               </div>
             </motion.div>
@@ -430,7 +494,8 @@ const HelpCenter = () => {
               Still Need Help?
             </h2>
             <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-white/90">
-              Our support team is here to help you 24/7. Get in touch and we'll respond as soon as possible.
+              Our support team is here to help you 24/7. Get in touch and we'll
+              respond as soon as possible.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.a

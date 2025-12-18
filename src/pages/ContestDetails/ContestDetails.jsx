@@ -4,6 +4,7 @@ import {
   useContest,
   useSubmitTask,
   useRegisterContest,
+  useAllCreatorSubmissions,
 } from "../../hooks/useContests";
 import { useAuth } from "../../contexts/AuthContext";
 import Swal from "sweetalert2";
@@ -48,7 +49,6 @@ const ContestDetails = () => {
   const [timeLeft, setTimeLeft] = useState("");
   const [checkingRegistration, setCheckingRegistration] = useState(true);
 
-  // Check if user can participate (only regular users can join)
   const canParticipate = user && user.role === "user";
   const isCreatorOrAdmin =
     user && (user.role === "creator" || user.role === "admin");
@@ -160,15 +160,6 @@ const ContestDetails = () => {
               <ArrowBigLeft className="w-5 h-5" />
               Back to Contests
             </Link>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleShare}
-              className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/30 text-white px-4 py-2 rounded-xl font-semibold transition-all"
-            >
-              <FaShare />
-              Share
-            </motion.button>
           </div>
 
           {/* Contest Banner */}
@@ -333,58 +324,6 @@ const ContestDetails = () => {
                   </div>
                 </div>
               </motion.div>
-
-              {/* Winner Section */}
-              {contest.winner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl blur-2xl opacity-50" />
-                  <div className="relative bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl p-8 overflow-hidden">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"
-                    />
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-6">
-                        <FaTrophy className="text-white text-3xl" />
-                        <h2 className="text-3xl font-black text-white">
-                          🏆 Winner Announced
-                        </h2>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <motion.img
-                          whileHover={{ scale: 1.1, rotate: 5 }}
-                          src={
-                            contest.winner.photoURL ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              contest.winner.name
-                            )}&background=6366F1&color=fff`
-                          }
-                          alt={contest.winner.name}
-                          className="w-20 h-20 rounded-full border-4 border-white shadow-2xl object-cover"
-                        />
-                        <div>
-                          <h3 className="text-2xl font-black text-white mb-1">
-                            {contest.winner.name}
-                          </h3>
-                          <p className="text-white/90 text-lg font-semibold">
-                            Won ${contest.prizeMoney}! 🎉
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
             </div>
 
             {/* Sidebar */}

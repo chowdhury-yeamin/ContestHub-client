@@ -45,7 +45,7 @@ import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 const Profile = () => {
-  const { user, refetchUser } = useAuth(); // Make sure refetchUser is available in AuthContext
+  const { user, refetchUser } = useAuth(); 
   const { data: profile, isLoading, refetch } = useUserProfile();
   const { data: stats, isLoading: statsLoading } = useUserStats();
   const updateMutation = useUpdateProfile();
@@ -71,26 +71,18 @@ const Profile = () => {
 
   const onSubmit = async (formData) => {
     try {
-      // Update profile
       await updateMutation.mutateAsync(formData);
-
-      // Refetch user profile data
       await refetch();
-
-      // Refetch user from auth context if available
       if (refetchUser) {
         await refetchUser();
       }
 
-      // Invalidate all relevant queries to force refetch
       queryClient.invalidateQueries({ queryKey: ["user"] });
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
 
-      // Close modal
       setIsEditing(false);
 
-      // Show success message
       Swal.fire({
         icon: "success",
         title: "Profile Updated!",

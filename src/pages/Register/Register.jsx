@@ -12,16 +12,16 @@ import {
   FaStar,
   FaUsers,
   FaCrown,
+  FaImage,
 } from "react-icons/fa";
 
 const Register = () => {
-  const { register: registerUser } = useAuth();
+  const { register: registerUser, user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
-  const { user } = useAuth();
 
   const {
     register,
@@ -35,14 +35,20 @@ const Register = () => {
       data.name,
       data.email,
       data.password,
-      "", // photoURL
-      "user" // default role
+      data.photoURL || "",
+      "user"
     );
     setLoading(false);
     if (result.success) {
       navigate("/");
     }
   };
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/", { replace: true });
+    }
+  }, [loading, user, navigate]);
 
   const benefits = [
     {
@@ -67,15 +73,9 @@ const Register = () => {
     },
   ];
 
-  useEffect(() => {
-    if (!loading && user) {
-      navigate("/", { replace: true });
-    }
-  }, [loading, user, navigate]);
-
   return (
     <div className="min-h-screen pt-24 bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden flex items-center justify-center pb-12 px-4 sm:px-6 lg:px-8">
-      {/* Animated Background Elements */}
+      {/* Background animations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           style={{ y: y1 }}
@@ -86,10 +86,7 @@ const Register = () => {
           className="absolute top-40 right-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3],
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 8, repeat: Infinity }}
           className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-600/20 rounded-full blur-3xl"
         />
@@ -97,36 +94,19 @@ const Register = () => {
 
       <div className="max-w-6xl w-full relative z-10">
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          {/* Left Side - Branding & Benefits */}
+          {/* Left Side - Branding */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             className="hidden md:block"
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-6 py-2 mb-6"
-            >
-              <motion.span
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              >
-                🚀
-              </motion.span>
-              <span className="text-sm text-slate-300 font-medium">
-                Start Your Creative Journey
-              </span>
-            </motion.div>
-
-            <h1 className="text-5xl lg:text-6xl font-black mb-6">
+            <h1 className="text-5xl lg:text-6xl font-black mb-6 text-white">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
                 Join the Best
               </span>
               <br />
-              <span className="text-white">Community</span>
+              <span>Community</span>
             </h1>
 
             <p className="text-xl text-slate-300 mb-8 leading-relaxed">
@@ -134,63 +114,29 @@ const Register = () => {
               contests with amazing prizes.
             </p>
 
-            {/* Benefits */}
             <div className="space-y-4 mb-12">
-              {benefits.map((benefit, idx) => (
+              {benefits.map((b, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + idx * 0.1 }}
-                  whileHover={{ x: 10 }}
-                  className="flex items-center gap-4 group cursor-pointer"
+                  className="flex items-center gap-4"
                 >
                   <div
-                    className={`w-12 h-12 rounded-xl bg-gradient-to-r ${benefit.color} flex items-center justify-center group-hover:scale-110 transition-transform`}
+                    className={`w-12 h-12 rounded-xl bg-gradient-to-r ${b.color} flex items-center justify-center`}
                   >
-                    <benefit.icon className="text-white text-xl" />
+                    <b.icon className="text-white text-xl" />
                   </div>
-                  <span className="text-lg text-white font-semibold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all">
-                    {benefit.text}
+                  <span className="text-lg text-white font-semibold">
+                    {b.text}
                   </span>
                 </motion.div>
               ))}
             </div>
-
-            {/* Testimonial Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl blur-xl opacity-30" />
-              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                <div className="flex items-center gap-4 mb-3">
-                  <img
-                    src="https://ui-avatars.com/api/?name=Alice+Johnson&background=6366F1&color=fff"
-                    alt="Testimonial"
-                    className="w-12 h-12 rounded-full border-2 border-white/20"
-                  />
-                  <div>
-                    <div className="text-white font-bold">Alice Johnson</div>
-                    <div className="text-sm text-slate-400">Contest Winner</div>
-                  </div>
-                </div>
-                <p className="text-slate-300 italic">
-                  "ContestHub helped me showcase my talent and win my first $500
-                  prize! The platform is amazing."
-                </p>
-                <div className="flex gap-1 mt-3">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className="text-amber-400" />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
 
-          {/* Right Side - Register Form */}
+          {/* Right Side - Form */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -200,31 +146,21 @@ const Register = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl blur-xl opacity-30" />
 
             <div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 md:p-10">
-              {/* Mobile Title */}
-              <div className="md:hidden text-center mb-8">
-                <h2 className="text-3xl font-black text-white mb-2">
-                  Join ContestHub
-                </h2>
-                <p className="text-slate-400">Create your free account</p>
-              </div>
-
-              <div className="hidden md:block mb-8">
-                <h2 className="text-3xl font-black text-white mb-2">
-                  Create Account
-                </h2>
-                <p className="text-slate-400">
-                  Already have an account?{" "}
-                  <Link
-                    to="/login"
-                    className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-semibold hover:from-indigo-300 hover:to-purple-300 transition-all"
-                  >
-                    Sign in
-                  </Link>
-                </p>
-              </div>
+              <h2 className="text-3xl font-black text-white mb-2">
+                Create Account
+              </h2>
+              <p className="text-slate-400 mb-6">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-semibold"
+                >
+                  Sign in
+                </Link>
+              </p>
 
               <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-                {/* Name Input */}
+                {/* Name */}
                 <div>
                   <label className="block text-sm font-semibold text-white mb-2">
                     Full Name
@@ -242,22 +178,18 @@ const Register = () => {
                         },
                       })}
                       type="text"
-                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                       placeholder="Enter your full name"
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                     />
                   </div>
                   {errors.name && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-2 text-sm text-red-400 flex items-center gap-1"
-                    >
+                    <p className="mt-2 text-sm text-red-400">
                       ⚠️ {errors.name.message}
-                    </motion.p>
+                    </p>
                   )}
                 </div>
 
-                {/* Email Input */}
+                {/* Email */}
                 <div>
                   <label className="block text-sm font-semibold text-white mb-2">
                     Email Address
@@ -275,22 +207,18 @@ const Register = () => {
                         },
                       })}
                       type="email"
-                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                       placeholder="Enter your email"
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                     />
                   </div>
                   {errors.email && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-2 text-sm text-red-400 flex items-center gap-1"
-                    >
+                    <p className="mt-2 text-sm text-red-400">
                       ⚠️ {errors.email.message}
-                    </motion.p>
+                    </p>
                   )}
                 </div>
 
-                {/* Password Input */}
+                {/* Password */}
                 <div>
                   <label className="block text-sm font-semibold text-white mb-2">
                     Password
@@ -308,74 +236,76 @@ const Register = () => {
                         },
                       })}
                       type="password"
-                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                       placeholder="Enter your password"
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                     />
                   </div>
                   {errors.password && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-2 text-sm text-red-400 flex items-center gap-1"
-                    >
+                    <p className="mt-2 text-sm text-red-400">
                       ⚠️ {errors.password.message}
-                    </motion.p>
+                    </p>
                   )}
                 </div>
 
-                {/* Sign Up Button */}
+                {/* Photo URL */}
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Photo URL
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <FaImage className="text-slate-400" />
+                    </div>
+                    <input
+                      {...register("photoURL", {
+                        pattern: {
+                          value: /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg))$/i,
+                          message: "Invalid image URL",
+                        },
+                      })}
+                      type="url"
+                      placeholder="Enter your photo URL"
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                  {errors.photoURL && (
+                    <p className="mt-2 text-sm text-red-400">
+                      ⚠️ {errors.photoURL.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Submit */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-indigo-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-indigo-500/50 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                      />
-                      <span>Creating account...</span>
-                    </>
+                    "Creating account..."
                   ) : (
                     <>
-                      <span>Create Account</span>
-                      <FaRocket />
+                      Create Account <FaRocket />
                     </>
                   )}
                 </motion.button>
               </form>
 
-              {/* Mobile Sign In Link */}
-              <div className="md:hidden mt-6 text-center">
-                <p className="text-slate-400 text-sm">
-                  Already have an account?{" "}
-                  <Link
-                    to="/login"
-                    className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-semibold hover:from-indigo-300 hover:to-purple-300 transition-all"
-                  >
-                    Sign in
-                  </Link>
-                </p>
-              </div>
-
-              {/* Terms Notice */}
               <p className="mt-6 text-center text-xs text-slate-500">
                 By creating an account, you agree to our{" "}
-                <span className="text-slate-400 hover:text-white cursor-pointer transition-colors">
-                  Terms of Service
-                </span>{" "}
+                <Link to="/terms">
+                  <span className="text-slate-400 hover:text-white cursor-pointer">
+                    Terms of Service
+                  </span>
+                </Link>{" "}
                 and{" "}
-                <span className="text-slate-400 hover:text-white cursor-pointer transition-colors">
-                  Privacy Policy
-                </span>
+                <Link to="/privacy">
+                  <span className="text-slate-400 hover:text-white cursor-pointer">
+                    Privacy Policy
+                  </span>
+                </Link>
               </p>
             </div>
           </motion.div>
