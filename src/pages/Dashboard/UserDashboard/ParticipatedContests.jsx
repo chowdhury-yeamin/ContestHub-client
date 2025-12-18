@@ -19,7 +19,6 @@ const ParticipatedContests = () => {
   const participated = data?.registrations || [];
   const [currentPage, setCurrentPage] = useState(1);
   const { loading, user } = useAuth();
-
   const navigate = useNavigate();
   const itemsPerPage = 10;
 

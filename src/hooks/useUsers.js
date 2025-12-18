@@ -25,10 +25,10 @@ export const useUserProfile = () => {
   });
 };
 
-/* =========================
+/* =================================
    PARTICIPATED CONTESTS
    GET /api/users/me/registrations
-========================= */
+==================================== */
 export const useParticipatedContests = () => {
   const { token } = useAuth();
 
@@ -56,7 +56,7 @@ export const useParticipatedContests = () => {
 /* =========================
    WINNING CONTESTS
    GET /api/users/me/wins
-========================= */
+============================ */
 export const useWinningContests = () => {
   const { token } = useAuth();
 
@@ -75,9 +75,9 @@ export const useWinningContests = () => {
 };
 
 /* =========================
-   LEADERBOARD (PUBLIC)
+   LEADERBOARD 
    GET /api/leaderboard
-========================= */
+============================ */
 export const useLeaderboard = () => {
   return useQuery({
     queryKey: ["leaderboard"],
@@ -91,7 +91,7 @@ export const useLeaderboard = () => {
 /* =========================
    UPDATE PROFILE
    PUT /api/users/me
-========================= */
+============================ */
 export const useUpdateProfile = () => {
   const { token } = useAuth();
   const queryClient = useQueryClient();
@@ -118,7 +118,7 @@ export const useUpdateProfile = () => {
 };
 
 /* =========================
-   USER STATS (Role-based)
+   USER STATS 
    GET /api/stats
 ========================= */
 export const useUserStats = () => {

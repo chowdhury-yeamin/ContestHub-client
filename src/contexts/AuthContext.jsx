@@ -32,14 +32,26 @@ export const AuthProvider = ({ children }) => {
           const data = await response.json();
           setUser(data.user);
         } else {
+          console.log("Auth check failed, clearing token");
           localStorage.removeItem("token");
           setUser(null);
         }
       } catch (error) {
         console.error("Auth check failed:", error);
-        localStorage.removeItem("token");
-        setUser(null);
-        setToken(null);
+
+        // Check if it's a connection error
+        if (error.message.includes("Failed to fetch")) {
+          console.error("⚠️ Backend server is not running on", API_URL);
+          console.error("Please start your backend server!");
+        }
+
+        // Only clear token if it's not a connection error
+        // This prevents logout when server is temporarily down
+        if (!error.message.includes("Failed to fetch")) {
+          localStorage.removeItem("token");
+          setUser(null);
+          setToken(null);
+        }
       } finally {
         setLoading(false);
       }

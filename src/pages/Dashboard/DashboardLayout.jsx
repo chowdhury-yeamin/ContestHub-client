@@ -45,7 +45,7 @@ const DashboardLayout = () => {
         if (!token) return console.error("No token found in localStorage");
 
         const response = await fetch(
-          "https://contest-hub-server-psi.vercel.app/api/stats",
+          "http://localhost:5000/api/stats",
           {
             method: "GET",
             headers: {

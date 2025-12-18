@@ -51,6 +51,19 @@ const Payment = () => {
 
   const handlePayment = async () => {
     setIsProcessing(true);
+
+    if (!contest?.entryFee && contest?.entryFee !== 0) {
+      toast.error("Entry fee not found for this contest");
+      setIsProcessing(false);
+      return;
+    }
+
+    if (!user?.email) {
+      toast.error("User email not found. Please log in again.");
+      setIsProcessing(false);
+      return;
+    }
+
     try {
       const paymentInfo = {
         contestName: contest.name,
@@ -59,8 +72,13 @@ const Payment = () => {
         senderEmail: user.email,
         senderId: user?._id || user?.uid || null,
       };
+
+      console.log("📍 Sending payment info:", paymentInfo); 
+
       const res = await api.post("/create-checkout-session", paymentInfo);
+
       if (res?.data?.url) {
+        console.log("✅ Redirecting to Stripe checkout");
         window.location.href = res.data.url;
       } else {
         toast.error("Failed to create checkout session");
@@ -68,16 +86,18 @@ const Payment = () => {
         setIsProcessing(false);
       }
     } catch (err) {
-      console.error("Checkout error:", err);
-      toast.error(
-        err?.response?.data?.error || err?.message || "Payment failed"
-      );
+      console.error("❌ Checkout error:", err);
+      console.error("Error response:", err?.response?.data); // Additional debug
+
+      const errorMessage =
+        err?.response?.data?.error || err?.message || "Payment failed";
+      toast.error(errorMessage);
       setIsProcessing(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden rounded-2xl">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -253,7 +273,7 @@ const Payment = () => {
                   />
                   <div className="relative bg-white/5 border border-white/10 rounded-xl p-4 text-center">
                     <feature.icon
-                      className={`text-3xl mb-2 mx-auto bg-clip-text bg-gradient-to-r ${feature.gradient}`}
+                      className={`text-3xl mb-2 mx-auto  bg-clip-text bg-gradient-to-r ${feature.gradient}`}
                     />
                     <h4 className="text-white font-bold text-sm mb-1">
                       {feature.title}
@@ -270,7 +290,7 @@ const Payment = () => {
               whileTap={{ scale: 0.98 }}
               onClick={handlePayment}
               disabled={isProcessing}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-6 rounded-2xl cursor-pointer font-black text-xl shadow-2xl hover:shadow-emerald-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-6 rounded-2xl font-black text-xl shadow-2xl hover:shadow-emerald-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
               {isProcessing ? (
                 <>
@@ -326,15 +346,15 @@ const Payment = () => {
               </h4>
               <ul className="space-y-2 text-slate-300 text-sm">
                 <li className="flex items-center gap-2">
-                  <span className="text-emerald-600">✓</span>
+                  <span className="text-emerald-400">✓</span>
                   Instant access to contest details and submission form
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-emerald-600">✓</span>
+                  <span className="text-emerald-400">✓</span>
                   Email confirmation with contest information
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-emerald-600">✓</span>
+                  <span className="text-emerald-400">✓</span>
                   Ability to submit your work anytime before deadline
                 </li>
               </ul>

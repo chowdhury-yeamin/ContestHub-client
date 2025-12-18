@@ -168,6 +168,7 @@ const Home = () => {
     }
   };
 
+
   const handleContestClick = (contestId) => {
     if (!user) {
       navigate("/login");

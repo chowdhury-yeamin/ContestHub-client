@@ -25,10 +25,8 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     if (sessionId) {
-      axios
-        .patch(
-          `https://contest-hub-server-psi.vercel.app/api/payment-success?session_id=${sessionId}`
-        )
+      api
+        .patch(`/payment-success?session_id=${sessionId}`)
         .then(() => {
           queryClient.invalidateQueries({
             queryKey: ["user", "participatedContests"],
