@@ -35,7 +35,6 @@ const DashboardLayout = () => {
     totalUsers: 0,
   });
 
-  // Fetch stats dynamically
   useEffect(() => {
     if (!user) return;
 
@@ -45,7 +44,7 @@ const DashboardLayout = () => {
         if (!token) return console.error("No token found in localStorage");
 
         const response = await fetch(
-          "http://localhost:5000/api/stats",
+          "https://contest-hub-server-psi.vercel.app/api/stats",
           {
             method: "GET",
             headers: {
@@ -64,7 +63,6 @@ const DashboardLayout = () => {
 
         const data = await response.json();
 
-        // Map API data safely to state without touching UI
         setStats((prev) => ({
           activeContests: data.activeContests ?? prev.activeContests,
           totalWins: data.totalWins ?? prev.totalWins,

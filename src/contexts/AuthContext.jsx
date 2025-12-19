@@ -6,7 +6,9 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
-const API_URL = import.meta.env.VITE_API_URL || "https://contest-hub-server-psi.vercel.app/api";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://contest-hub-server-psi.vercel.app/api";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -16,8 +18,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
+
+      // If no token, user is not logged in - this is OK for public pages
       if (!token) {
         setLoading(false);
+        setUser(null);
         return;
       }
 
@@ -31,23 +36,30 @@ export const AuthProvider = ({ children }) => {
         if (response.ok) {
           const data = await response.json();
           setUser(data.user);
+          setToken(token);
         } else {
-          console.log("Auth check failed, clearing token");
+          // Token is invalid, clear it
+          console.log("Token invalid, clearing...");
           localStorage.removeItem("token");
           setUser(null);
+          setToken(null);
         }
       } catch (error) {
         console.error("Auth check failed:", error);
 
-        // Check if it's a connection error
-        if (error.message.includes("Failed to fetch")) {
-          console.error("⚠️ Backend server is not running on", API_URL);
-          console.error("Please start your backend server!");
-        }
-
-        // Only clear token if it's not a connection error
-        // This prevents logout when server is temporarily down
-        if (!error.message.includes("Failed to fetch")) {
+        // If it's a network error, keep the loading state minimal
+        // Don't clear token on network errors (backend might be temporarily down)
+        if (
+          error.message.includes("Failed to fetch") ||
+          error.message.includes("NetworkError")
+        ) {
+          console.warn(
+            "⚠️ Network error during auth check. Backend might be down."
+          );
+          // Keep token but set user to null for now
+          setUser(null);
+        } else {
+          // For other errors, clear the token
           localStorage.removeItem("token");
           setUser(null);
           setToken(null);
@@ -78,6 +90,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       localStorage.setItem("token", data.token);
+      setToken(data.token);
       setUser(data.user);
 
       Swal.fire({
@@ -160,7 +173,6 @@ export const AuthProvider = ({ children }) => {
       console.log("🚀 Starting Google Sign-In...");
       setLoading(true);
 
-      // Step 1: Sign in with Firebase
       const provider = new GoogleAuthProvider();
       provider.addScope("email");
       provider.addScope("profile");
@@ -175,7 +187,6 @@ export const AuthProvider = ({ children }) => {
 
       console.log("✅ Firebase sign-in successful:", firebaseUser.email);
 
-      // Step 2: Get Firebase ID token
       console.log("🔑 Getting ID token...");
       const idToken = await firebaseUser.getIdToken();
 
@@ -185,7 +196,6 @@ export const AuthProvider = ({ children }) => {
 
       console.log("✅ Got ID token, length:", idToken.length);
 
-      // Step 3: Send to backend
       console.log("📤 Sending to backend:", `${API_URL}/auth/google`);
       const response = await fetch(`${API_URL}/auth/google`, {
         method: "POST",
@@ -215,8 +225,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Incomplete backend response");
       }
 
-      // Step 4: Save token and user
       localStorage.setItem("token", data.token);
+      setToken(data.token);
       setUser(data.user);
 
       console.log("✅ Google sign-in complete!");
