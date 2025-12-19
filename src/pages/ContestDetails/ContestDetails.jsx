@@ -4,7 +4,6 @@ import {
   useContest,
   useSubmitTask,
   useRegisterContest,
-  useAllCreatorSubmissions,
 } from "../../hooks/useContests";
 import { useAuth } from "../../contexts/AuthContext";
 import Swal from "sweetalert2";
@@ -21,11 +20,11 @@ import {
   FaShieldAlt,
   FaBolt,
   FaTag,
-  FaShare,
   FaChartLine,
   FaUserShield,
   FaCrown,
   FaExclamationTriangle,
+  FaMedal,
 } from "react-icons/fa";
 import api from "../../services/api";
 import { ArrowBigLeft } from "lucide-react";
@@ -37,22 +36,55 @@ const ContestDetails = () => {
   const { data: contest, isLoading, error } = useContest(id);
   const registerMutation = useRegisterContest();
   const submitMutation = useSubmitTask();
+
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [submissionLink, setSubmissionLink] = useState("");
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState("");
+  const [checkingRegistration, setCheckingRegistration] = useState(true);
+  const [winner, setWinner] = useState(null);
+
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
 
   const isEnded = contest && new Date(contest.deadline) < new Date();
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState("");
-  const [checkingRegistration, setCheckingRegistration] = useState(true);
-
   const canParticipate = user && user.role === "user";
   const isCreatorOrAdmin =
     user && (user.role === "creator" || user.role === "admin");
 
+  // Live Countdown Timer
+  useEffect(() => {
+    if (!contest?.deadline) return;
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const deadline = new Date(contest.deadline).getTime();
+      const distance = deadline - now;
+
+      if (distance < 0) {
+        setTimeLeft("Contest Ended");
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [contest?.deadline]);
+
+  // Check Registration Status
   useEffect(() => {
     const checkRegistration = async () => {
       if (!user || !id || !canParticipate) {
@@ -92,6 +124,92 @@ const ContestDetails = () => {
 
     checkRegistration();
   }, [user, id, canParticipate]);
+
+  // Fetch Winner Information
+  useEffect(() => {
+    const fetchWinner = async () => {
+      if (!contest?.winner || !id) return;
+
+      try {
+        // Fetch submissions to get winner details
+        const { data } = await api.get(`/contests/${id}/my-submission`);
+
+        // If there's a winner ID, fetch user details
+        if (contest.winner) {
+          try {
+            // Try to get winner from submissions
+            const submissionsRes = await api.get(`/contests/${id}/submissions`);
+            const winnerSubmission = submissionsRes.data.submissions?.find(
+              (sub) => sub.isWinner === true
+            );
+
+            if (winnerSubmission?.participant) {
+              setWinner(winnerSubmission.participant);
+            }
+          } catch (err) {
+            console.error("Error fetching winner:", err);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching winner info:", error);
+      }
+    };
+
+    if (contest) {
+      fetchWinner();
+    }
+  }, [contest, id]);
+
+  // Handle Task Submission
+  const handleSubmit = async () => {
+    if (!submissionLink.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Submission",
+        text: "Please provide a valid link to your work",
+      });
+      return;
+    }
+
+    try {
+      await submitMutation.mutateAsync({
+        contestId: id,
+        submissionData: { submission: submissionLink },
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Your submission has been received",
+        confirmButtonColor: "#8b5cf6",
+      });
+
+      setShowSubmitModal(false);
+      setSubmissionLink("");
+      setHasSubmitted(true);
+    } catch (error) {
+      console.error("Submission error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text:
+          error.response?.data?.error || "Failed to submit. Please try again.",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <FaTrophy className="text-6xl text-indigo-500" />
+        </motion.div>
+      </div>
+    );
+  }
 
   if (!contest || error) {
     return (
@@ -151,7 +269,7 @@ const ContestDetails = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Back Button & Share */}
+          {/* Back Button */}
           <div className="flex justify-between items-center mb-6">
             <Link
               to="/all-contests"
@@ -189,7 +307,11 @@ const ContestDetails = () => {
                   : "bg-gradient-to-r from-red-500 to-rose-500"
               } text-white`}
             >
-              {contest.status === "confirmed" ? "Active" : contest.status}
+              {isEnded
+                ? "Ended"
+                : contest.status === "confirmed"
+                ? "Active"
+                : contest.status}
             </motion.div>
 
             {/* Prize Badge */}
@@ -202,6 +324,7 @@ const ContestDetails = () => {
               <FaTrophy />${contest.prizeMoney} Prize
             </motion.div>
 
+            {/* Contest Info Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -224,7 +347,7 @@ const ContestDetails = () => {
                   >
                     <FaUsers className="text-blue-400" />
                     <span className="font-semibold">
-                      {contest.participantsCount || 0} Joined
+                      {contest.participantsCount || 0} Participants
                     </span>
                   </motion.div>
                   <motion.div
@@ -242,7 +365,8 @@ const ContestDetails = () => {
                   >
                     <FaCalendarAlt className="text-purple-400" />
                     <span className="font-semibold">
-                      Ends {new Date(contest.deadline).toLocaleDateString()}
+                      {isEnded ? "Ended" : "Ends"}{" "}
+                      {new Date(contest.deadline).toLocaleDateString()}
                     </span>
                   </motion.div>
                 </div>
@@ -253,6 +377,63 @@ const ContestDetails = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
+              {/* Winner Announcement - Only show if winner declared */}
+              {winner && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl blur-2xl opacity-30" />
+                  <div className="relative bg-gradient-to-r from-amber-500/20 to-orange-500/20 backdrop-blur-xl border border-amber-500/50 rounded-3xl p-8">
+                    <div className="flex items-center justify-center mb-4">
+                      <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <FaCrown className="text-6xl text-amber-400" />
+                      </motion.div>
+                    </div>
+                    <h2 className="text-3xl font-black text-center text-white mb-6">
+                      🎉 Contest Winner Announced! 🎉
+                    </h2>
+                    <div className="flex items-center justify-center gap-6">
+                      <div className="relative">
+                        <motion.div
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-xl opacity-50"
+                        />
+                        {winner.photoURL ? (
+                          <img
+                            src={winner.photoURL}
+                            alt={winner.name}
+                            className="relative w-24 h-24 rounded-full object-cover border-4 border-amber-400"
+                          />
+                        ) : (
+                          <div className="relative w-24 h-24 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center text-white text-3xl font-bold border-4 border-amber-400">
+                            {winner.name?.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="absolute -bottom-2 -right-2 bg-amber-500 text-white rounded-full p-2">
+                          <FaMedal className="text-xl" />
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <p className="text-slate-300 text-sm mb-1">Winner</p>
+                        <h3 className="text-2xl font-black text-white mb-1">
+                          {winner.name}
+                        </h3>
+                        <p className="text-amber-400 font-semibold text-lg">
+                          Won ${contest.prizeMoney}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Description */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -354,11 +535,7 @@ const ContestDetails = () => {
                       Contest Ended
                     </motion.div>
                   ) : (
-                    <motion.div
-                      animate={{ scale: [1, 1.02, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400"
-                    >
+                    <motion.div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
                       {timeLeft}
                     </motion.div>
                   )}
@@ -535,7 +712,7 @@ const ContestDetails = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-slate-400">Entry Fee</span>
                       <span className="text-white font-bold text-lg">
-                        ${contest.entryFee}
+                        ${contest.entryFee || 0}
                       </span>
                     </div>
                   </div>
