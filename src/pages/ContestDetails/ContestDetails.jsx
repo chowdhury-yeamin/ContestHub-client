@@ -84,7 +84,6 @@ const ContestDetails = () => {
     return () => clearInterval(interval);
   }, [contest?.deadline]);
 
-  // Check Registration Status
   useEffect(() => {
     const checkRegistration = async () => {
       if (!user || !id || !canParticipate) {
@@ -107,7 +106,9 @@ const ContestDetails = () => {
             );
             setHasSubmitted(!!submissionsRes.data.submission);
           } catch (error) {
-            console.error("Error checking submissions:", error);
+            if (error.response?.status !== 404) {
+              console.error("Error checking submissions:", error);
+            }
             setHasSubmitted(false);
           }
         } else {
@@ -125,19 +126,15 @@ const ContestDetails = () => {
     checkRegistration();
   }, [user, id, canParticipate]);
 
-  // Fetch Winner Information
   useEffect(() => {
     const fetchWinner = async () => {
       if (!contest?.winner || !id) return;
 
       try {
-        // Fetch submissions to get winner details
         const { data } = await api.get(`/contests/${id}/my-submission`);
 
-        // If there's a winner ID, fetch user details
         if (contest.winner) {
           try {
-            // Try to get winner from submissions
             const submissionsRes = await api.get(`/contests/${id}/submissions`);
             const winnerSubmission = submissionsRes.data.submissions?.find(
               (sub) => sub.isWinner === true
@@ -154,13 +151,11 @@ const ContestDetails = () => {
         console.error("Error fetching winner info:", error);
       }
     };
-
     if (contest) {
       fetchWinner();
     }
   }, [contest, id]);
 
-  // Handle Task Submission
   const handleSubmit = async () => {
     if (!submissionLink.trim()) {
       Swal.fire({
@@ -477,32 +472,6 @@ const ContestDetails = () => {
                   <p className="text-slate-300 text-lg leading-relaxed whitespace-pre-line">
                     {contest.taskInstruction}
                   </p>
-                </div>
-              </motion.div>
-
-              {/* Contest Creator Info */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="relative group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity" />
-                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-400 text-sm mb-2">Hosted by</p>
-                      <h3 className="text-2xl font-black text-white">
-                        {contest.creatorName}
-                      </h3>
-                      <p className="text-slate-400 text-sm">
-                        {contest.creatorEmail}
-                      </p>
-                    </div>
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white text-2xl font-bold">
-                      {contest.creatorName?.charAt(0).toUpperCase()}
-                    </div>
-                  </div>
                 </div>
               </motion.div>
             </div>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useContests } from "../../hooks/useContests";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -12,42 +11,94 @@ import {
   FaFilter,
   FaStar,
   FaCalendarAlt,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
+import api from "../../services/api";
 
 const AllContests = () => {
-  const { data: contests = [], isLoading } = useContests();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [contests, setContests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalContests, setTotalContests] = useState(0);
+
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get("page")) || 1
+  );
   const [activeTab, setActiveTab] = useState(searchParams.get("type") || "all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("popular");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "popular");
   const [showFilters, setShowFilters] = useState(false);
 
+  const contestsPerPage = 10;
+
+  // Fetch contests from backend
   useEffect(() => {
-    const typeParam = searchParams.get("type");
-    if (typeParam) {
-      setActiveTab(typeParam);
-    }
-  }, [searchParams]);
+    const fetchContests = async () => {
+      setIsLoading(true);
+      try {
+        const params = {
+          page: currentPage,
+          limit: contestsPerPage,
+          status: "confirmed",
+        };
 
-  const contestTypes = [
-    "all",
-    ...new Set(
-      contests
-        .map((c) => c.contestType)
-        .filter((type) => type !== undefined && type !== null && type !== "")
-    ),
-  ];
+        if (activeTab !== "all") {
+          params.type = activeTab;
+        }
 
-  let filteredContests = contests.filter((c) => c.status === "confirmed");
+        const response = await api.get("/contests", { params });
 
-  // Apply category filter
-  if (activeTab !== "all") {
-    filteredContests = filteredContests.filter(
-      (c) => c.contestType === activeTab
-    );
-  }
+        setContests(response.data.contests || []);
+        setTotalPages(response.data.pages || 1);
+        setTotalContests(response.data.total || 0);
+      } catch (error) {
+        console.error("Error fetching contests:", error);
+        setContests([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContests();
+  }, [currentPage, activeTab]);
+
+  // Get unique contest types
+  const [contestTypes, setContestTypes] = useState(["all"]);
+
+  useEffect(() => {
+    const fetchAllTypes = async () => {
+      try {
+        const response = await api.get("/contests", {
+          params: { limit: 1000, status: "confirmed" },
+        });
+        const allContests = response.data.contests || [];
+        const types = [
+          "all",
+          ...new Set(
+            allContests
+              .map((c) => c.contestType)
+              .filter(
+                (type) => type !== undefined && type !== null && type !== ""
+              )
+          ),
+        ];
+        setContestTypes(types);
+      } catch (error) {
+        console.error("Error fetching contest types:", error);
+      }
+    };
+    fetchAllTypes();
+  }, []);
+
+  // Client-side filtering for search and sort
+  let filteredContests = [...contests];
 
   // Apply search filter
   if (searchQuery.trim()) {
@@ -59,6 +110,7 @@ const AllContests = () => {
     );
   }
 
+  // Apply sorting
   filteredContests = [...filteredContests].sort((a, b) => {
     switch (sortBy) {
       case "popular":
@@ -75,7 +127,6 @@ const AllContests = () => {
   });
 
   const handleContestClick = (contestId) => {
-    console.log("Clicking contest with ID:", contestId);
     if (!user) {
       navigate("/login");
     } else {
@@ -85,18 +136,61 @@ const AllContests = () => {
 
   const handleTabChange = (type) => {
     setActiveTab(type);
-    if (type === "all") {
-      navigate("/all-contests");
-    } else {
-      navigate(`/all-contests?type=${encodeURIComponent(type)}`);
-    }
+    setCurrentPage(1);
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (type !== "all") params.set("type", type);
+    if (searchQuery) params.set("search", searchQuery);
+    if (sortBy !== "popular") params.set("sort", sortBy);
+    setSearchParams(params);
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage.toString());
+    setSearchParams(params);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const clearFilters = () => {
     setActiveTab("all");
     setSearchQuery("");
     setSortBy("popular");
-    navigate("/all-contests");
+    setCurrentPage(1);
+    setSearchParams({});
+  };
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push("...");
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push("...");
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push("...");
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push("...");
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
   };
 
   return (
@@ -283,11 +377,9 @@ const AllContests = () => {
         >
           <p className="text-slate-400 text-lg">
             Found
-            <span className="text-white font-bold">
-              {" "}
-              {filteredContests.length}{" "}
-            </span>
-            contest{filteredContests.length !== 1 ? "s" : ""}
+            <span className="text-white font-bold"> {totalContests} </span>
+            contest{totalContests !== 1 ? "s" : ""}
+            {searchQuery && ` matching "${searchQuery}"`}
           </p>
         </motion.div>
 
@@ -349,12 +441,8 @@ const AllContests = () => {
                     className="group relative cursor-pointer"
                     onClick={() => handleContestClick(contest._id)}
                   >
-                    {/* Glow Effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity" />
-
-                    {/* Card */}
                     <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 group-hover:border-white/30 rounded-2xl overflow-hidden transition-all">
-                      {/* Image */}
                       <div className="relative h-48 overflow-hidden">
                         <motion.img
                           whileHover={{ scale: 1.1 }}
@@ -364,8 +452,6 @@ const AllContests = () => {
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-
-                        {/* Type Badge */}
                         <motion.div
                           initial={{ x: 100 }}
                           animate={{ x: 0 }}
@@ -373,15 +459,11 @@ const AllContests = () => {
                         >
                           {contest.contestType || "General"}
                         </motion.div>
-
-                        {/* Prize Badge */}
                         <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center gap-2">
                           <FaTrophy className="text-amber-400" />$
                           {(contest.prizeMoney || 0).toLocaleString()}
                         </div>
                       </div>
-
-                      {/* Content */}
                       <div className="p-6">
                         <h3 className="text-xl font-bold text-white mb-2 line-clamp-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all">
                           {contest.name}
@@ -389,8 +471,6 @@ const AllContests = () => {
                         <p className="text-slate-400 text-sm mb-4 line-clamp-2">
                           {contest.description}
                         </p>
-
-                        {/* Stats */}
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2 text-slate-300">
                             <div className="bg-blue-500/20 p-2 rounded-lg">
@@ -405,7 +485,6 @@ const AllContests = () => {
                               </div>
                             </div>
                           </div>
-
                           <div className="flex items-center gap-2 text-slate-300">
                             <div className="bg-amber-500/20 p-2 rounded-lg">
                               <FaCalendarAlt className="text-amber-400" />
@@ -424,8 +503,6 @@ const AllContests = () => {
                             </div>
                           </div>
                         </div>
-
-                        {/* Button */}
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
@@ -442,16 +519,76 @@ const AllContests = () => {
           )}
         </div>
 
-        {/* Load More  */}
-        {filteredContests.length > 0 && !isLoading && (
+        {/* Pagination */}
+        {!isLoading && filteredContests.length > 0 && totalPages > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex justify-center items-center gap-2 mt-12"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`p-3 rounded-xl font-semibold transition-all ${
+                currentPage === 1
+                  ? "bg-white/5 text-slate-600 cursor-not-allowed"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+            >
+              <FaChevronLeft />
+            </motion.button>
+
+            {getPageNumbers().map((page, idx) => (
+              <motion.button
+                key={idx}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.05 }}
+                whileHover={page !== "..." ? { scale: 1.1 } : {}}
+                whileTap={page !== "..." ? { scale: 0.95 } : {}}
+                onClick={() => page !== "..." && handlePageChange(page)}
+                disabled={page === "..." || page === currentPage}
+                className={`min-w-[44px] h-11 rounded-xl font-bold transition-all ${
+                  page === currentPage
+                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                    : page === "..."
+                    ? "bg-transparent text-slate-500 cursor-default"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                {page}
+              </motion.button>
+            ))}
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`p-3 rounded-xl font-semibold transition-all ${
+                currentPage === totalPages
+                  ? "bg-white/5 text-slate-600 cursor-not-allowed"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+            >
+              <FaChevronRight />
+            </motion.button>
+          </motion.div>
+        )}
+
+        {!isLoading && filteredContests.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-center mt-12"
+            transition={{ delay: 0.6 }}
+            className="text-center mt-6"
           >
             <p className="text-slate-400">
-              Showing all {filteredContests.length} contest
+              Page {currentPage} of {totalPages} • Showing{" "}
+              {filteredContests.length} contest
               {filteredContests.length !== 1 ? "s" : ""}
             </p>
           </motion.div>

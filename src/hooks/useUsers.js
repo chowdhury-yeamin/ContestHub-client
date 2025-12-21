@@ -69,7 +69,7 @@ export const useWinningContests = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      return data.contests || [];
+      return data.wins || [];
     },
   });
 };

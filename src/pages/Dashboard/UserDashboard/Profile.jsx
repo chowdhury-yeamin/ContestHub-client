@@ -45,7 +45,7 @@ import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 const Profile = () => {
-  const { user, refetchUser } = useAuth(); 
+  const { user, refetchUser } = useAuth();
   const { data: profile, isLoading, refetch } = useUserProfile();
   const { data: stats, isLoading: statsLoading } = useUserStats();
   const updateMutation = useUpdateProfile();
@@ -238,7 +238,7 @@ const Profile = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        key={profile?.photoURL || user?.photoURL} 
+        key={profile?.photoURL || user?.photoURL}
         className="relative group"
       >
         <div
@@ -250,7 +250,7 @@ const Profile = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="relative"
-                key={profile?.photoURL || user?.photoURL} 
+                key={profile?.photoURL || user?.photoURL}
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${currentRole.gradient} rounded-full blur-lg opacity-75`}
@@ -265,7 +265,7 @@ const Profile = () => {
                   }
                   alt={profile?.name || user?.name}
                   className="relative w-32 h-32 rounded-full border-4 border-white/30 object-cover shadow-xl"
-                  key={profile?.photoURL || user?.photoURL} 
+                  key={profile?.photoURL || user?.photoURL}
                 />
                 <div
                   className={`absolute -bottom-2 -right-2 bg-gradient-to-r ${currentRole.gradient} w-12 h-12 rounded-full flex items-center justify-center border-4 border-slate-900 shadow-lg`}

@@ -72,7 +72,7 @@ const Home = () => {
     }
 
     if (user.role === "creator") {
-      navigate("/dashboard");
+      navigate("/dashboard/add-contest");
       return;
     }
 
@@ -167,7 +167,6 @@ const Home = () => {
       navigate("/all-contests");
     }
   };
-
 
   const handleContestClick = (contestId) => {
     if (!user) {
@@ -839,13 +838,27 @@ const Home = () => {
               >
                 🚀
               </motion.div>
-              <h2 className="text-4xl md:text-6xl font-black mb-6">
-                Become a Contest Creator
-              </h2>
-              <p className="text-lg md:text-2xl mb-8 max-w-3xl mx-auto text-white/90">
-                Create contests easily, manage participants, and declare
-                winners. Start building your community today!
-              </p>
+              {user?.role === "creator" ? (
+                <>
+                  <h2 className="text-4xl md:text-6xl font-black mb-6">
+                    Make Contest
+                  </h2>
+                  <p className="text-lg md:text-2xl mb-8 max-w-3xl mx-auto text-white/90">
+                    Create contests easily, manage participants, and declare
+                    winners.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-4xl md:text-6xl font-black mb-6">
+                    Become a Contest Creator
+                  </h2>
+                  <p className="text-lg md:text-2xl mb-8 max-w-3xl mx-auto text-white/90">
+                    Create contests easily, manage participants, and declare
+                    winners. Start building your community today!
+                  </p>
+                </>
+              )}
               <motion.button
                 onClick={handleBecomeCreator}
                 whileHover={{ scale: 1.05 }}

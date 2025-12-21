@@ -26,7 +26,7 @@ export const useContest = (id) => {
       const { data } = await api.get(`/contests/${id}`);
       return data.contest;
     },
-    enabled: !!id, // Only fetch if id exists
+    enabled: !!id,
   });
 };
 
@@ -182,16 +182,27 @@ export const useAllCreatorSubmissions = () => {
   return useQuery({
     queryKey: ["creator", "all-submissions"],
     queryFn: async () => {
-      const response = await api.get("/creator/all-submissions");
+      try {
+        const response = await api.get("/creator/all-submissions");
+        
+        console.log("Raw response:", response.data);
 
-      if (Array.isArray(response.data)) {
-        return response.data;
-      }
-      if (response.data && Array.isArray(response.data.submissions)) {
-        return response.data.submissions;
-      }
+        if (Array.isArray(response.data)) {
+          return response.data;
+        }
+        if (response.data && Array.isArray(response.data.submissions)) {
+          return response.data.submissions;
+        }
 
-      return [];
+        console.warn("Unexpected response structure:", response.data);
+        return [];
+      } catch (error) {
+        console.error("Error fetching submissions:", error);
+        toast.error("Failed to load submissions");
+        return [];
+      }
     },
+    retry: 2,
+    staleTime: 30000, 
   });
 };

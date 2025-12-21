@@ -1,23 +1,13 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, useScroll, useTransform } from "framer-motion";
-import {
-  FaTrophy,
-  FaUser,
-  FaPlus,
-  FaList,
-  FaFileAlt,
-  FaUsers,
-  FaCog,
-  FaCrown,
-  FaStar,
-  FaRocket,
-} from "react-icons/fa";
 import { useEffect, useState } from "react";
+import api from "../../services/api"; // Use your configured API instance
 
 const DashboardLayout = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, 50]);
@@ -35,53 +25,47 @@ const DashboardLayout = () => {
     totalUsers: 0,
   });
 
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      console.warn("No user found, redirecting to login");
+      navigate("/login");
+      return;
+    }
 
     const fetchStats = async () => {
+      setIsLoadingStats(true);
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return console.error("No token found in localStorage");
+        const response = await api.get("/stats");
 
-        const response = await fetch(
-          "https://contest-hub-server-psi.vercel.app/api/stats",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.error || `HTTP error! status: ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-
-        setStats((prev) => ({
-          activeContests: data.activeContests ?? prev.activeContests,
-          totalWins: data.totalWins ?? prev.totalWins,
-          totalWinnings: data.totalWinnings ?? prev.totalWinnings,
-          totalContests: data.totalContests ?? prev.totalContests,
-          totalParticipants: data.totalParticipants ?? prev.totalParticipants,
-          totalSubmissions: data.totalSubmissions ?? prev.totalSubmissions,
-          totalPrizes: data.totalPrizes ?? prev.totalPrizes,
-          pendingContests: data.pendingContests ?? prev.pendingContests,
-          rejectedContests: data.rejectedContests ?? prev.rejectedContests,
-          totalUsers: data.totalUsers ?? prev.totalUsers,
-        }));
+        setStats({
+          activeContests: response.data.activeContests ?? 0,
+          totalWins: response.data.totalWins ?? 0,
+          totalWinnings: response.data.totalWinnings ?? 0,
+          totalContests: response.data.totalContests ?? 0,
+          totalParticipants: response.data.totalParticipants ?? 0,
+          totalSubmissions: response.data.totalSubmissions ?? 0,
+          totalPrizes: response.data.totalPrizes ?? 0,
+          pendingContests: response.data.pendingContests ?? 0,
+          rejectedContests: response.data.rejectedContests ?? 0,
+          totalUsers: response.data.totalUsers ?? 0,
+        });
       } catch (err) {
         console.error("Failed to fetch stats:", err);
+
+        if (err.response?.status === 401) {
+          console.warn("Unauthorized - redirecting to login");
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } finally {
+        setIsLoadingStats(false);
       }
     };
 
     fetchStats();
-  }, [user]);
+  }, [user, navigate]);
 
   // -----------------------------
   // ROLE-BASED ROUTES
@@ -189,6 +173,19 @@ const DashboardLayout = () => {
     },
   }[user?.role ?? "user"];
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="text-6xl"
+        >
+          ⚡
+        </motion.div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
       {/* Animated Background */}
@@ -339,54 +336,55 @@ const DashboardLayout = () => {
                   <h3 className="text-xs uppercase tracking-wider text-slate-400 mb-3 font-bold">
                     Quick Stats
                   </h3>
-                  <div className="space-y-2">
-                    {/* Participated / Active Contests */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">
-                        {user?.role === "user"
-                          ? "Participated"
-                          : "Active Contests"}
-                      </span>
-                      <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                        {user?.role === "user"
-                          ? user?.participatedCount || 0
-                          : stats?.activeContests || 0}
-                      </span>
+                  {isLoadingStats ? (
+                    <div className="text-center py-4">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="inline-block text-2xl"
+                      >
+                        ⚡
+                      </motion.div>
                     </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {/* Participated / Active Contests */}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-400">
+                          {user?.role === "user"
+                            ? "Participated"
+                            : "Active Contests"}
+                        </span>
+                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                          {user?.role === "user"
+                            ? user?.participatedCount || 0
+                            : stats?.activeContests || 0}
+                        </span>
+                      </div>
 
-                    {/* Wins / Participants / Users */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">
-                        {user?.role === "user"
-                          ? "Total Wins"
-                          : user?.role === "admin"
-                          ? "Total Users"
-                          : "Participants"}
-                      </span>
-                      <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-                        {user?.role === "user"
-                          ? user?.totalWins || 0
-                          : user?.role === "admin"
-                          ? stats?.totalUsers || 0
-                          : stats?.totalParticipants || 0}
-                      </span>
+                      {/* Wins / Participants / Users */}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-400">
+                          {user?.role === "user"
+                            ? "Total Wins"
+                            : user?.role === "admin"
+                            ? "Total Users"
+                            : "Participants"}
+                        </span>
+                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+                          {user?.role === "user"
+                            ? user?.wonCount || 0
+                            : user?.role === "admin"
+                            ? stats?.totalUsers || 0
+                            : stats?.totalParticipants || 0}
+                        </span>
+                      </div>
                     </div>
-
-                    {/* Winnings / Prize Pool */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">
-                        {user?.role === "user"
-                          ? "Total Winnings"
-                          : "Prize Pool"}
-                      </span>
-                      <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
-                        $
-                        {user?.role === "user"
-                          ? user?.totalWinnings || 0
-                          : stats?.totalPrizes || 0}
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </motion.div>
               </div>
             </motion.div>

@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
 
-      // If no token, user is not logged in - this is OK for public pages
+      // CRITICAL FIX: If no token, user is not logged in
+      // This is normal for public pages - don't show error
       if (!token) {
         setLoading(false);
         setUser(null);
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }) => {
           setUser(data.user);
           setToken(token);
         } else {
-          // Token is invalid, clear it
+          // Token is invalid, clear it silently
           console.log("Token invalid, clearing...");
           localStorage.removeItem("token");
           setUser(null);
@@ -47,8 +48,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error("Auth check failed:", error);
 
-        // If it's a network error, keep the loading state minimal
-        // Don't clear token on network errors (backend might be temporarily down)
+        // Network error - don't clear token immediately
         if (
           error.message.includes("Failed to fetch") ||
           error.message.includes("NetworkError")
@@ -65,12 +65,14 @@ export const AuthProvider = ({ children }) => {
           setToken(null);
         }
       } finally {
+        // CRITICAL FIX: Always set loading to false
+        // This prevents infinite loading state
         setLoading(false);
       }
     };
 
     checkAuth();
-  }, []);
+  }, []); // Run only once on mount
 
   const register = async (name, email, password, photoURL, role = "user") => {
     try {

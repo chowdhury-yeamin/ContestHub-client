@@ -175,7 +175,11 @@ const MyContests = () => {
               <div>
                 <p className="text-slate-400 text-sm mb-1">Active</p>
                 <p className="text-3xl font-bold text-white">
-                  {contestsArray.filter((c) => c.status === "confirmed" && c.deadline > new Date()).length}
+                  {
+                    contestsArray.filter(
+                      (c) => c.status === "confirmed" && c.deadline > new Date()
+                    ).length
+                  }
                 </p>
               </div>
               <div className="bg-gradient-to-br from-emerald-600 to-teal-600 p-3 rounded-xl">
@@ -346,9 +350,8 @@ const MyContests = () => {
                     <div className="grid grid-cols-2 gap-3 mb-4">
                       <div className="bg-white/5 rounded-lg p-3 border border-white/10">
                         <div className="flex items-center gap-2 text-blue-400 mb-1">
-                          <FaUsers className="text-sm" />
-                          <span className="text-xs text-slate-400">
-                            Participants
+                          <span className="text-xs text-slate-400 flex">
+                            👨‍💼Participants
                           </span>
                         </div>
                         <p className="text-lg font-bold text-white">

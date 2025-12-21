@@ -33,6 +33,7 @@ const ParticipatedContests = () => {
       navigate("/login");
     }
   }, [loading, user, navigate]);
+  
   if (loading || isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">

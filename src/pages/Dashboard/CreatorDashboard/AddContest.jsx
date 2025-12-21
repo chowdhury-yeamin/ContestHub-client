@@ -88,6 +88,8 @@ const AddContest = () => {
         icon: "success",
         title: "Contest Created!",
         text: "Your contest has been successfully submitted.",
+        footer:
+          '<a href="/dashboard/my-contests" className="underline text-2xl text-blue-600">Go to All Contests</a>',
         confirmButtonColor: "#6366F1",
         timer: 2000,
         showConfirmButton: false,

@@ -11,9 +11,11 @@ import {
   FaAward,
   FaChartLine,
 } from "react-icons/fa";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const WinningContests = () => {
   const { data: winnings = [], isLoading } = useWinningContests();
+  const { user } = useAuth();
 
   // Calculate stats
   const totalWinnings = winnings.reduce(
@@ -22,6 +24,10 @@ const WinningContests = () => {
   );
   const averageWin =
     winnings.length > 0 ? Math.round(totalWinnings / winnings.length) : 0;
+
+  const successRate = user?.participatedCount
+    ? (((user.wonCount || 0) / user.participatedCount) * 100).toFixed(1)
+    : 0;
 
   //  rank emoji based on position
   const getRankEmoji = (index) => {
@@ -113,7 +119,7 @@ const WinningContests = () => {
               },
               {
                 label: "Success Rate",
-                value: "100%",
+                value: `${successRate.toLocaleString()}%`,
                 icon: FaStar,
                 gradient: "from-purple-500 to-pink-500",
                 emoji: "⭐",

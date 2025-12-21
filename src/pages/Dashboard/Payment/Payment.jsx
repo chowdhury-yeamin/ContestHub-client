@@ -87,7 +87,7 @@ const Payment = () => {
       }
     } catch (err) {
       console.error("❌ Checkout error:", err);
-      console.error("Error response:", err?.response?.data); // Additional debug
+      console.error("Error response:", err?.response?.data);
 
       const errorMessage =
         err?.response?.data?.error || err?.message || "Payment failed";
